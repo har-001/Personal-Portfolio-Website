@@ -1628,8 +1628,21 @@ function initN8nJobAgent() {
     // Show notification
     if (statusEl) {
       statusEl.style.display = 'block';
-      statusEl.innerHTML = 'Applied to <strong>' + job.title + ' @ ' + job.company + '</strong> &mdash; Mail & WhatsApp notification sent!';
+      statusEl.innerHTML = 'Applied to <strong>' + job.title + ' @ ' + job.company + '</strong> &mdash; 100% Private Browser Notification sent!';
       setTimeout(() => { statusEl.style.display = 'none'; }, 4000);
+    }
+
+    // Trigger 100% Private Native Browser Push Notification
+    if ('Notification' in window) {
+      if (Notification.permission === 'granted') {
+        new Notification('🚀 Job Applied Successfully!', { body: job.title + ' @ ' + job.company + ' (Match: ' + job.match + '%)' });
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(p => {
+          if (p === 'granted') {
+            new Notification('🚀 Job Applied Successfully!', { body: job.title + ' @ ' + job.company + ' (Match: ' + job.match + '%)' });
+          }
+        });
+      }
     }
   };
 
@@ -1767,8 +1780,21 @@ function initFreelanceAgent() {
 
     if (statusEl) {
       statusEl.style.display = 'block';
-      statusEl.innerHTML = 'Bid sent for <strong>' + gig.title + '</strong> (' + gig.client + ') &mdash; Mail & WhatsApp notification sent!';
+      statusEl.innerHTML = 'Bid sent for <strong>' + gig.title + '</strong> (' + gig.client + ') &mdash; 100% Private Browser Notification sent!';
       setTimeout(() => { statusEl.style.display = 'none'; }, 4000);
+    }
+
+    // Trigger 100% Private Native Browser Push Notification
+    if ('Notification' in window) {
+      if (Notification.permission === 'granted') {
+        new Notification('💼 Freelance Proposal Sent!', { body: gig.title + ' (' + gig.client + ' - ' + gig.budget + ')' });
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(p => {
+          if (p === 'granted') {
+            new Notification('💼 Freelance Proposal Sent!', { body: gig.title + ' (' + gig.client + ' - ' + gig.budget + ')' });
+          }
+        });
+      }
     }
   };
 
