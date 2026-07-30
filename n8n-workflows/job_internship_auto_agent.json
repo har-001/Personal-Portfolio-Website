@@ -1,0 +1,214 @@
+{
+  "name": "Harshit Mishra Autonomous Job & Internship Search Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "trigger-cron",
+      "name": "Daily Job Search Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "harshit-job-agent",
+        "options": {}
+      },
+      "id": "trigger-webhook",
+      "name": "Portfolio Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        480
+      ],
+      "webhookId": "harshit-job-agent-webhook"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "candidate_name",
+              "value": "Harshit Mishra"
+            },
+            {
+              "name": "candidate_email",
+              "value": "harshitmishra1208@gmail.com"
+            },
+            {
+              "name": "degree",
+              "value": "B.Tech Information Technology (IIMT College of Engineering)"
+            },
+            {
+              "name": "top_skills",
+              "value": "Python, Machine Learning, Deep Learning (CNNs), OpenCV, RAG, LLMs, SQL, Web Development"
+            },
+            {
+              "name": "github_primary",
+              "value": "https://github.com/harshit-001-it"
+            },
+            {
+              "name": "linkedin_profile",
+              "value": "https://linkedin.com/in/harshit-mishra-51275b219"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "load-candidate-profile",
+      "name": "Load Resume Profile",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        460,
+        390
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://remoteok.com/api?tag=python",
+        "options": {}
+      },
+      "id": "fetch-job-listings",
+      "name": "Search AI & Python Jobs/Internships API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        680,
+        390
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.description }}",
+              "operation": "contains",
+              "value2": "python"
+            }
+          ]
+        }
+      },
+      "id": "filter-matching-jobs",
+      "name": "AI Match Jobs with Resume Skills",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        900,
+        390
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "harshitmishra1208@gmail.com",
+        "toEmail": "={{ $json.recruiter_email || 'recruiter@company.com' }}",
+        "subject": "Application for {{ $json.position }} — Harshit Mishra (B.Tech IT / AI Engineer)",
+        "text": "Dear Hiring Manager,\n\nI am writing to express my strong interest in the {{ $json.position }} role at {{ $json.company }}.\n\nI am currently pursuing my B.Tech in Information Technology from IIMT College and specialize in Machine Learning, Computer Vision (OpenCV), RAG architectures, and Python development. I have completed industry certifications from AnalytixLabs, Softpro/AKTU, and InternPe.\n\nGitHub Portfolio: https://github.com/harshit-001-it\nLinkedIn: https://linkedin.com/in/harshit-mishra-51275b219\n\nI have attached my resume for your review.\n\nBest regards,\nHarshit Mishra\nharshitmishra1208@gmail.com"
+      },
+      "id": "send-recruiter-email",
+      "name": "Send Recruiter Email & Cover Letter",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1120,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "message": "🚀 **Autonomous Job Agent Executed!**\n- Applied to: {{ $json.position }} at {{ $json.company }}\n- Recruiter Email Sent: {{ $json.recruiter_email || 'Submitted via Job Portal' }}\n- Timestamp: {{ $now }}"
+      },
+      "id": "discord-notify",
+      "name": "Notify Harshit on Discord/Telegram",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        390
+      ]
+    }
+  ],
+  "connections": {
+    "Daily Job Search Trigger": {
+      "main": [
+        [
+          {
+            "node": "Load Resume Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Portfolio Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Load Resume Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Resume Profile": {
+      "main": [
+        [
+          {
+            "node": "Search AI & Python Jobs/Internships API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search AI & Python Jobs/Internships API": {
+      "main": [
+        [
+          {
+            "node": "AI Match Jobs with Resume Skills",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Match Jobs with Resume Skills": {
+      "main": [
+        [
+          {
+            "node": "Send Recruiter Email & Cover Letter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Recruiter Email & Cover Letter": {
+      "main": [
+        [
+          {
+            "node": "Notify Harshit on Discord/Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

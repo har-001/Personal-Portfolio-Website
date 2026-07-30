@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO -->
+  <title>Harshit Mishra | IT Engineer & AI Enthusiast</title>
+  <meta name="description" content="Personal portfolio of Harshit Mishra - IT Engineer, Software Developer, and ML Engineer specializing in intelligent systems and scalable web applications." />
+  <meta name="keywords" content="Harshit Mishra, IT Engineer, Software Developer, ML Engineer, AI Enthusiast, IIMT College, Portfolio" />
+  <meta name="author" content="Harshit Mishra" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Harshit Mishra | IT Engineer & AI Enthusiast" />
+  <meta property="og:description" content="Personal portfolio of Harshit Mishra - IT Engineer, Software Developer, and ML Engineer specializing in intelligent systems and scalable web applications." />
+  <meta property="og:type" content="website" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+</head>
+<body>
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-logo">H<span class="accent">M</span></a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#hero" class="nav-link active" data-section="hero">Home</a></li>
+        <li><a href="#about" class="nav-link" data-section="about">About</a></li>
+        <li><a href="#skills" class="nav-link" data-section="skills">Skills</a></li>
+        <li><a href="#projects" class="nav-link" data-section="projects">Projects</a></li>
+        <li><a href="#certificates" class="nav-link" data-section="certificates">Certificates</a></li>
+        <li><a href="#contact" class="nav-link" data-section="contact">Contact</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#hero" class="mobile-link" data-section="hero">Home</a>
+    <a href="#about" class="mobile-link" data-section="about">About</a>
+    <a href="#skills" class="mobile-link" data-section="skills">Skills</a>
+    <a href="#projects" class="mobile-link" data-section="projects">Projects</a>
+    <a href="#certificates" class="mobile-link" data-section="certificates">Certificates</a>
+    <a href="#contact" class="mobile-link" data-section="contact">Contact</a>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero section" id="hero">
+    <div class="hero-canvas" id="heroCanvas"></div>
+    <div class="hero-glow hero-glow-1"></div>
+    <div class="hero-glow hero-glow-2"></div>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Available for opportunities & collaborations
+      </div>
+
+      <p class="hero-greeting">Hello, I'm</p>
+
+      <h1 class="hero-name">
+        Harshit <span class="gradient-text">Mishra</span>
+      </h1>
+
+      <p class="hero-role">
+        I'm an <span class="typed-text" id="typedText"></span><span class="cursor"></span>
+      </p>
+
+      <p class="hero-description">
+        Currently pursuing B.Tech in Information Technology from IIMT College. Passionate about building intelligent systems, Computer Vision, NLP, and scalable web applications.
+      </p>
+
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">View GitHub Work</a>
+        <a href="#contact" class="btn btn-outline">Get In Touch</a>
+      </div>
+    </div>
+
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ===== ABOUT ===== -->
+  <section class="about section" id="about">
+    <div class="container">
+      <div class="section-heading reveal">
+        <h2 class="gradient-text">About Me</h2>
+        <p>IT Engineer & AI Enthusiast bridging Machine Learning with Web Development.</p>
+        <div class="decor-line"><span class="dot"></span></div>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-image-wrapper reveal">
+          <div class="about-image-frame">
+            <div class="about-avatar">👨‍💻</div>
+          </div>
+          <div class="about-float-card">
+            <span>🎓</span> B.Tech in IT (IIMT)
+          </div>
+          <div class="about-float-card">
+            <span>🏆</span> 6+ Certifications
+          </div>
+        </div>
+
+        <div class="about-text reveal reveal-delay-2">
+          <h3>
+            Crafting <span class="accent">Intelligent Systems</span> & Solutions
+          </h3>
+          <p class="about-bio">
+            I am Harshit Mishra, currently pursuing my B.Tech in Information Technology from IIMT College. I am passionate about building intelligent systems, scalable web applications, and solving real-world problems using AI and modern technologies.
+          </p>
+          <p class="about-bio">
+            My core focus lies at the intersection of Machine Learning, Deep Learning (CNNs), Computer Vision, and Natural Language Processing (NLP). I continuously push my boundaries by building open-source projects and acquiring industry certifications.
+          </p>
+
+          <div class="about-stats">
+            <div class="stat-item reveal reveal-delay-1">
+              <span class="stat-number" data-target="10">0</span>
+              <span class="stat-label">GitHub Projects</span>
+            </div>
+            <div class="stat-item reveal reveal-delay-2">
+              <span class="stat-number" data-target="6">0</span>
+              <span class="stat-label">Certifications</span>
+            </div>
+            <div class="stat-item reveal reveal-delay-3">
+              <span class="stat-number" data-target="12">0</span>
+              <span class="stat-label">Tech Stack Tools</span>
+            </div>
+          </div>
+
+          <!-- Action Cards (GitHub with Dual Options, LinkedIn, Resume) -->
+          <div class="about-action-cards">
+            <!-- GitHub Card with Dropdown Toggle -->
+            <div class="action-card-dropdown-wrapper">
+              <button class="action-card" id="githubDropdownBtn" type="button" aria-haspopup="true">
+                <div class="action-card-icon">
+                  <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 496 512" height="22" width="22"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+                </div>
+                <div class="action-card-text">
+                  <span class="action-card-tag">Open Source & Code</span>
+                  <span class="action-card-title">GitHub Profiles ▾</span>
+                </div>
+              </button>
+
+              <!-- Dual GitHub Options Popover -->
+              <div class="github-options-menu" id="githubOptionsMenu">
+                <a href="https://github.com/harshit-001-it" target="_blank" rel="noopener" class="github-option-item">
+                  <div class="option-title">@harshit-001-it</div>
+                  <div class="option-desc">Primary GitHub (AI & IT Projects)</div>
+                </a>
+                <a href="https://github.com/har-001" target="_blank" rel="noopener" class="github-option-item">
+                  <div class="option-title">@har-001</div>
+                  <div class="option-desc">Secondary GitHub (Creations & Web)</div>
+                </a>
+              </div>
+            </div>
+
+            <!-- LinkedIn Card -->
+            <a href="https://linkedin.com/in/harshit-mishra-51275b219" target="_blank" rel="noopener noreferrer" class="action-card">
+              <div class="action-card-icon">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="22" width="22"><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
+              </div>
+              <div class="action-card-text">
+                <span class="action-card-tag">Professional Network</span>
+                <span class="action-card-title">LinkedIn</span>
+              </div>
+            </a>
+
+            <!-- Resume Card with User's Uploaded PDF -->
+            <a href="Harshit Mishra Resume.pdf" target="_blank" download="Harshit Mishra Resume.pdf" class="action-card action-card-highlight">
+              <div class="action-card-icon highlight-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>
+              </div>
+              <div class="action-card-text">
+                <span class="action-card-tag highlight-tag">Full Qualifications</span>
+                <span class="action-card-title highlight-title">View Resume</span>
+              </div>
+            </a>
+
+            <!-- n8n Autonomous Job Agent Card -->
+            <button class="action-card" id="n8nAgentBtn">
+              <div class="action-card-icon">
+                ⚡
+              </div>
+              <div class="action-card-text">
+                <span class="action-card-tag">Autonomous Automation</span>
+                <span class="action-card-title">n8n Job Agent 🤖</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SKILLS ===== -->
+  <section class="section" id="skills">
+    <div class="container">
+      <div class="section-heading reveal">
+        <h2 class="gradient-text">Technical Arsenal</h2>
+        <p>Technologies, frameworks, and domains I specialize in.</p>
+        <div class="decor-line"><span class="dot"></span></div>
+      </div>
+
+      <div class="skills-grid" id="skillsGrid">
+        <!-- Skill categories injected by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROJECTS ===== -->
+  <section class="projects section" id="projects">
+    <div class="container">
+      <div class="section-heading reveal">
+        <h2 class="gradient-text">Open Source & Creations</h2>
+        <p>Live repositories auto-fetched from @harshit-001-it and @har-001 GitHub accounts.</p>
+        <div class="decor-line"><span class="dot"></span></div>
+      </div>
+
+      <div class="project-filters reveal" id="projectFilters">
+        <!-- Dynamic language filter buttons injected by JS -->
+      </div>
+
+      <div class="projects-grid" id="projectsGrid">
+        <!-- GitHub repositories dynamically injected by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CERTIFICATES ===== -->
+  <section class="section" id="certificates">
+    <div class="container">
+      <div class="section-heading reveal">
+        <h2 class="gradient-text">Certifications</h2>
+        <p>Professional credentials, achievements & specialized training.</p>
+        <div class="decor-line"><span class="dot"></span></div>
+      </div>
+
+      <div class="certificates-grid" id="certificatesGrid">
+        <!-- Certificate cards injected by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section class="contact section" id="contact">
+    <div class="container">
+      <div class="section-heading reveal">
+        <h2 class="gradient-text">Get In Touch</h2>
+        <p>Have a project in mind or want to collaborate? Send me a message directly!</p>
+        <div class="decor-line"><span class="dot"></span></div>
+      </div>
+
+      <div class="contact-grid">
+        <div class="contact-info reveal">
+          <h3>Let's Build Something <span class="gradient-text">Amazing</span></h3>
+          <p class="contact-text">
+            Feel free to reach out via form below or connect with me directly via email!
+          </p>
+
+          <div class="contact-details">
+            <div class="contact-detail">
+              <div class="contact-detail-icon">📧</div>
+              <div>
+                <div class="contact-detail-label">Email</div>
+                <div class="contact-detail-value">
+                  <a href="mailto:harshitmishra1208@gmail.com">harshitmishra1208@gmail.com</a>
+                </div>
+              </div>
+            </div>
+            <div class="contact-detail">
+              <div class="contact-detail-icon">📍</div>
+              <div>
+                <div class="contact-detail-label">Location</div>
+                <div class="contact-detail-value">Greater Noida, India</div>
+              </div>
+            </div>
+            <div class="contact-detail">
+              <div class="contact-detail-icon">🎓</div>
+              <div>
+                <div class="contact-detail-label">Education</div>
+                <div class="contact-detail-value">B.Tech IT — IIMT College</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-socials">
+            <a href="https://github.com/harshit-001-it" target="_blank" rel="noopener" class="social-link" title="GitHub (@harshit-001-it)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+            <a href="https://github.com/har-001" target="_blank" rel="noopener" class="social-link" title="GitHub (@har-001)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+            <a href="https://linkedin.com/in/harshit-mishra-51275b219" target="_blank" rel="noopener noreferrer" class="social-link" title="LinkedIn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="mailto:harshitmishra1208@gmail.com" class="social-link" title="Email Me">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3v18h24v-18h-24zm21.518 2l-9.518 7.713-9.518-7.713h19.036zm-19.518 14v-11.817l10 8.104 10-8.104v11.817h-20z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="contact-form-wrapper reveal reveal-delay-2">
+          <form class="contact-form" id="contactForm" action="https://formspree.io/f/xvgokrye" method="POST">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="name">Your Name</label>
+                <input class="form-input" type="text" id="name" name="name" placeholder="John Doe" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="email">Your Email</label>
+                <input class="form-input" type="email" id="email" name="_replyto" placeholder="john@example.com" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="subject">Subject</label>
+              <input class="form-input" type="text" id="subject" name="subject" placeholder="Project Collaboration" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="message">Message</label>
+              <textarea class="form-textarea" id="message" name="message" placeholder="Tell me about your project..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary form-submit">
+              Send Message ✉️
+            </button>
+            <div class="form-status" id="formStatus"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="footer-glow"></div>
+    <div class="container">
+      <div class="footer-top">
+        <div>
+          <div class="footer-logo">H<span class="gradient-text">M</span></div>
+          <p class="footer-tagline">Harshit Mishra — IT Engineer & AI Enthusiast</p>
+        </div>
+        <div class="footer-socials">
+          <a href="https://github.com/harshit-001-it" target="_blank" rel="noopener" class="social-link" title="GitHub">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+          <a href="https://linkedin.com/in/harshit-mishra-51275b219" target="_blank" rel="noopener noreferrer" class="social-link" title="LinkedIn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a href="mailto:harshitmishra1208@gmail.com" class="social-link" title="Email">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3v18h24v-18h-24zm21.518 2l-9.518 7.713-9.518-7.713h19.036zm-19.518 14v-11.817l10 8.104 10-8.104v11.817h-20z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+        <p class="footer-copyright">© 2025 Harshit Mishra. Built with ❤️</p>
+        <button class="back-to-top" id="backToTop">↑ Back to Top</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== SKILL LEARNING ROADMAP MODAL ===== -->
+  <div class="skill-modal-overlay" id="skillModalOverlay">
+    <div class="skill-modal glass">
+      <button class="skill-modal-close" id="skillModalClose" aria-label="Close modal">&times;</button>
+      <div class="skill-modal-header">
+        <span class="skill-modal-icon" id="modalSkillIcon">💡</span>
+        <div>
+          <h3 class="skill-modal-title" id="modalSkillTitle">Skill Details</h3>
+          <span class="skill-modal-badge" id="modalSkillCategory">Category</span>
+        </div>
+      </div>
+      <div class="skill-modal-body">
+        <div class="modal-section">
+          <h4>🗺️ Step-by-Step Learning Roadmap</h4>
+          <ol class="roadmap-list" id="modalRoadmapList">
+            <!-- Injected by JS -->
+          </ol>
+        </div>
+        <div class="modal-section">
+          <h4>📚 Recommended Free Learning Resources</h4>
+          <div class="resources-list" id="modalResourcesList">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== AI ASSISTANT CHATBOT WIDGET ===== -->
+  <button class="ai-chat-trigger" id="aiChatTrigger" aria-label="Open AI Assistant">
+    <span class="ai-chat-icon">🤖</span>
+    <span class="ai-chat-badge">Ask AI</span>
+  </button>
+
+  <div class="ai-chat-widget glass" id="aiChatWidget">
+    <div class="ai-chat-header">
+      <div class="ai-chat-user-info">
+        <span class="ai-chat-avatar">🤖</span>
+        <div>
+          <h4>Harshit's AI Assistant</h4>
+          <span class="ai-chat-status"><span class="status-dot"></span> Online | Instant Answers</span>
+        </div>
+      </div>
+      <button class="ai-chat-close" id="aiChatClose" aria-label="Close AI Chat">&times;</button>
+    </div>
+
+    <div class="ai-chat-messages" id="aiChatMessages">
+      <div class="chat-msg bot-msg">
+        <div class="chat-bubble">
+          Hello! 👋 I am Harshit Mishra's AI Assistant. Ask me anything about his <strong>skills</strong>, <strong>GitHub projects</strong>, <strong>certifications</strong>, or <strong>education (B.Tech IT - IIMT)</strong>!
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-chat-suggestions">
+      <button class="chip-btn" data-query="What are Harshit's top skills?">💡 Top Skills</button>
+      <button class="chip-btn" data-query="Tell me about Harshit's GitHub projects">🚀 Projects</button>
+      <button class="chip-btn" data-query="What certifications does Harshit have?">🏆 Certifications</button>
+      <button class="chip-btn" data-query="How can I contact Harshit?">📧 Contact Info</button>
+    </div>
+
+    <form class="ai-chat-input-form" id="aiChatForm">
+      <input type="text" id="aiChatInput" placeholder="Ask about Harshit's background..." autocomplete="off" required />
+      <button type="submit" class="ai-chat-send" aria-label="Send message">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </form>
+  </div>
+
+  <!-- ===== CERTIFICATE MODAL VIEWER ===== -->
+  <div class="cert-modal-overlay" id="certModalOverlay">
+    <div class="cert-modal glass">
+      <button class="cert-modal-close" id="certModalClose" aria-label="Close modal">&times;</button>
+      <div class="cert-modal-header">
+        <div class="cert-modal-icon" id="certModalIcon">🏆</div>
+        <div>
+          <h3 class="cert-modal-title" id="certModalTitle">Certificate Title</h3>
+          <p class="cert-modal-issuer" id="certModalIssuer">Issuer</p>
+        </div>
+      </div>
+      <div class="cert-modal-body">
+        <div class="cert-verification-badge">
+          <span class="badge-icon">🏅</span>
+          <div>
+            <div class="badge-status">Verified Credential</div>
+            <div class="badge-sub">Authenticated Professional Certification</div>
+          </div>
+        </div>
+        <div class="cert-modal-section">
+          <h4>🎯 Key Skills & Concepts Validated</h4>
+          <ul class="cert-skills-list" id="certSkillsList">
+            <!-- Injected by JS -->
+          </ul>
+        </div>
+        <div class="cert-modal-actions">
+          <a href="#" target="_blank" rel="noopener" class="btn btn-primary" id="certVerifyLink">Verify Credential 🔗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== N8N AUTONOMOUS JOB AGENT MODAL ===== -->
+  <div class="cert-modal-overlay" id="n8nAgentModalOverlay">
+    <div class="cert-modal glass n8n-agent-modal">
+      <button class="cert-modal-close" id="n8nAgentModalClose" aria-label="Close modal">&times;</button>
+      <div class="cert-modal-header">
+        <div class="cert-modal-icon">⚡</div>
+        <div>
+          <h3 class="cert-modal-title">n8n Autonomous Job Agent</h3>
+          <p class="cert-modal-issuer">Smart Job Finder &bull; Resume Matcher &bull; One-Click Apply</p>
+        </div>
+      </div>
+      <div class="cert-modal-body">
+        <div class="cert-verification-badge" style="background: rgba(13, 202, 240, 0.1); border-color: rgba(13, 202, 240, 0.3);">
+          <span class="badge-icon">🔍</span>
+          <div>
+            <div class="badge-status" style="color: var(--accent);">Agent Status: Ready to Search</div>
+            <div class="badge-sub">Fetches from LinkedIn, Indeed, Naukri, Internshala, Wellfound, RemoteOK, Glassdoor &amp; company career pages</div>
+          </div>
+        </div>
+
+        <div class="cert-modal-section">
+          <h4>🤖 How It Works:</h4>
+          <ul class="cert-skills-list">
+            <li><strong>1. Multi-Source Scraping:</strong> Fetches jobs from LinkedIn, Indeed, Naukri, Internshala, Wellfound, Glassdoor, RemoteOK + official company career pages.</li>
+            <li><strong>2. Resume Skill Matching:</strong> Scores each role against your B.Tech IT, Python, ML, CNN, OpenCV, RAG skills &amp; 7 certifications.</li>
+            <li><strong>3. You Click &quot;Apply&quot;:</strong> Auto-fills your details (name, email, resume, cover letter) and submits the application.</li>
+            <li><strong>4. Recruiter Outreach:</strong> If recruiter email is found, sends personalized cover letter + resume directly.</li>
+            <li><strong>5. Instant Notifications:</strong> You get notified via Email &amp; WhatsApp for every application submitted!</li>
+          </ul>
+        </div>
+
+        <!-- Fetch Jobs Button -->
+        <div class="cert-modal-actions" style="justify-content:center;">
+          <button class="btn btn-primary" id="triggerJobAgentBtn" style="width:100%;">🔍 Fetch Latest Jobs &amp; Internships</button>
+        </div>
+        <div id="n8nTriggerStatus" style="font-size:0.8rem;margin-top:8px;text-align:center;color:var(--success);display:none;"></div>
+
+        <!-- Live Fetched Jobs Feed -->
+        <div class="cert-modal-section" id="jobFeedSection" style="display:none;">
+          <h4 style="display:flex;justify-content:space-between;align-items:center;">
+            <span>📋 Matched Jobs &amp; Internships</span>
+            <span style="font-size:0.75rem;color:var(--success);">● Live Results</span>
+          </h4>
+          <div class="applied-jobs-feed" id="appliedJobsFeed">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <!-- Applied Jobs History -->
+        <div class="cert-modal-section" id="appliedHistorySection" style="display:none;">
+          <h4 style="display:flex;justify-content:space-between;align-items:center;">
+            <span>✅ Applied Jobs History</span>
+            <span style="font-size:0.75rem;color:var(--accent);" id="appliedCountBadge">0 Applied</span>
+          </h4>
+          <div id="appliedHistoryFeed" style="display:flex;flex-direction:column;gap:8px;">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EmailJS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <!-- Main JavaScript -->
+  <script src="js/main.js"></script>
+</body>
+</html>
