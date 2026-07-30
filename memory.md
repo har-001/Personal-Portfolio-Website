@@ -55,6 +55,7 @@ Personal-Portfolio-Website/
 │   └── deploy.yml                # GitHub Pages CI/CD
 ├── DEPLOYMENT.md                 # Deployment guide
 ├── N8N_AGENT_SETUP.md            # n8n setup guide
+├── NOTIFICATION_SETUP_GUIDE.md   # Email & WhatsApp notifications guide
 ├── memory.md                     # THIS FILE — full project reference
 └── README.md                     # Repository README
 ```
