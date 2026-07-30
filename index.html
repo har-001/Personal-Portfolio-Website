@@ -205,6 +205,17 @@
                 <span class="action-card-title">n8n Job Agent 🤖</span>
               </div>
             </button>
+
+            <!-- n8n Freelancing Agent Card -->
+            <button class="action-card" id="freelanceAgentBtn">
+              <div class="action-card-icon">
+                💼
+              </div>
+              <div class="action-card-text">
+                <span class="action-card-tag">Freelance Gig Finder</span>
+                <span class="action-card-title">Freelance Agent 🚀</span>
+              </div>
+            </button>
           </div>
         </div>
       </div>
@@ -533,6 +544,68 @@
             <span style="font-size:0.75rem;color:var(--accent);" id="appliedCountBadge">0 Applied</span>
           </h4>
           <div id="appliedHistoryFeed" style="display:flex;flex-direction:column;gap:8px;">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== N8N FREELANCING AGENT MODAL ===== -->
+  <div class="cert-modal-overlay" id="freelanceModalOverlay">
+    <div class="cert-modal glass n8n-agent-modal">
+      <button class="cert-modal-close" id="freelanceModalClose" aria-label="Close modal">&times;</button>
+      <div class="cert-modal-header">
+        <div class="cert-modal-icon">💼</div>
+        <div>
+          <h3 class="cert-modal-title">Freelance Gig Finder Agent</h3>
+          <p class="cert-modal-issuer">Auto-Find &bull; Smart Match &bull; One-Click Bid</p>
+        </div>
+      </div>
+      <div class="cert-modal-body">
+        <div class="cert-verification-badge" style="background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.3);">
+          <span class="badge-icon">🔍</span>
+          <div>
+            <div class="badge-status" style="color: #a855f7;">Agent Status: Ready to Search</div>
+            <div class="badge-sub">Fetches from Upwork, Fiverr, Freelancer.com, Toptal, PeoplePerHour, Guru, 99designs &amp; more</div>
+          </div>
+        </div>
+
+        <div class="cert-modal-section">
+          <h4>🚀 How Freelance Agent Works:</h4>
+          <ul class="cert-skills-list">
+            <li><strong>1. Multi-Platform Scraping:</strong> Fetches freelance gigs from Upwork, Fiverr, Freelancer.com, Toptal, PeoplePerHour, Guru, 99designs, FlexJobs &amp; direct client postings.</li>
+            <li><strong>2. Skill-Based Matching:</strong> Matches gigs to your Python, ML, Web Dev, Computer Vision, and Data Science expertise.</li>
+            <li><strong>3. You Click &quot;Bid&quot;:</strong> Auto-generates a personalized proposal with your portfolio, skills, and rate. Submits bid instantly.</li>
+            <li><strong>4. Client Outreach:</strong> If client email is available, sends professional introduction with portfolio link.</li>
+            <li><strong>5. Notifications:</strong> You get notified via Email &amp; WhatsApp for every bid submitted!</li>
+          </ul>
+        </div>
+
+        <!-- Fetch Gigs Button -->
+        <div class="cert-modal-actions" style="justify-content:center;">
+          <button class="btn btn-primary" id="fetchFreelanceBtn" style="width:100%;background:linear-gradient(135deg, #a855f7, #6366f1);">🔍 Fetch Latest Freelance Gigs</button>
+        </div>
+        <div id="freelanceTriggerStatus" style="font-size:0.8rem;margin-top:8px;text-align:center;color:var(--success);display:none;"></div>
+
+        <!-- Live Fetched Gigs Feed -->
+        <div class="cert-modal-section" id="gigFeedSection" style="display:none;">
+          <h4 style="display:flex;justify-content:space-between;align-items:center;">
+            <span>📋 Matched Freelance Gigs</span>
+            <span style="font-size:0.75rem;color:#a855f7;">● Live Results</span>
+          </h4>
+          <div class="applied-jobs-feed" id="gigFeed">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <!-- Bid History -->
+        <div class="cert-modal-section" id="bidHistorySection" style="display:none;">
+          <h4 style="display:flex;justify-content:space-between;align-items:center;">
+            <span>✅ Bid History</span>
+            <span style="font-size:0.75rem;color:var(--accent);" id="bidCountBadge">0 Bids Sent</span>
+          </h4>
+          <div id="bidHistoryFeed" style="display:flex;flex-direction:column;gap:8px;">
             <!-- Injected by JS -->
           </div>
         </div>

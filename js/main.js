@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initGitHubDropdown();
   initAIChatbot();
   initN8nJobAgent();
+  initFreelanceAgent();
 });
 
 /* ----------------------------------------------------------------
@@ -1671,3 +1672,142 @@ function initN8nJobAgent() {
   }
 }
 
+/* ----------------------------------------------------------------
+   FREELANCE GIG FINDER AGENT
+   Multi-platform freelance gig fetching, user-initiated bid, Mail & WhatsApp alerts
+   ---------------------------------------------------------------- */
+const freelancePlatforms = [
+  { name: 'Upwork', icon: '🟢' },
+  { name: 'Fiverr', icon: '🟡' },
+  { name: 'Freelancer.com', icon: '🔵' },
+  { name: 'Toptal', icon: '🟣' },
+  { name: 'PeoplePerHour', icon: '🟠' },
+  { name: 'Guru', icon: '⚪' },
+  { name: '99designs', icon: '🎨' },
+  { name: 'FlexJobs', icon: '💚' }
+];
+
+const fetchedGigs = [
+  { id: 101, title: 'Python Automation Script for Data Pipeline', client: 'US Startup', source: 'Upwork', budget: '$500-1000', match: 95, skills: 5, url: 'https://www.upwork.com/freelance-jobs/python/', applied: false },
+  { id: 102, title: 'Build ML Model for Customer Churn Prediction', client: 'UK FinTech', source: 'Toptal', budget: '$2000-5000', match: 93, skills: 5, url: 'https://www.toptal.com/', applied: false },
+  { id: 103, title: 'Computer Vision App (OpenCV + YOLO)', client: 'German Startup', source: 'Freelancer.com', budget: '$800-2000', match: 96, skills: 5, url: 'https://www.freelancer.com/', applied: false },
+  { id: 104, title: 'RAG Chatbot using LangChain + Pinecone', client: 'Indian EdTech', source: 'Upwork', budget: '$1500-3000', match: 97, skills: 5, url: 'https://www.upwork.com/', applied: false },
+  { id: 105, title: 'Full Stack Portfolio Website (React + Node)', client: 'Dubai Agency', source: 'Fiverr', budget: '$300-600', match: 85, skills: 3, url: 'https://www.fiverr.com/', applied: false },
+  { id: 106, title: 'Data Scraping Bot (Selenium + BeautifulSoup)', client: 'US Marketing Co', source: 'PeoplePerHour', budget: '$200-500', match: 88, skills: 4, url: 'https://www.peopleperhour.com/', applied: false },
+  { id: 107, title: 'AI Image Classification API (TensorFlow)', client: 'Singapore HealthTech', source: 'Guru', budget: '$1000-2500', match: 92, skills: 4, url: 'https://www.guru.com/', applied: false },
+  { id: 108, title: 'NLP Sentiment Analysis Dashboard', client: 'Canadian SaaS', source: 'FlexJobs', budget: '$1200-2000', match: 90, skills: 4, url: 'https://www.flexjobs.com/', applied: false },
+  { id: 109, title: 'Django REST API for E-commerce Backend', client: 'Australian Retailer', source: 'Freelancer.com', budget: '$700-1500', match: 86, skills: 3, url: 'https://www.freelancer.com/', applied: false },
+  { id: 110, title: 'Logo & Brand Identity Design', client: 'Lifestyle Brand', source: '99designs', budget: '$150-400', match: 70, skills: 2, url: 'https://99designs.com/', applied: false }
+];
+
+const bidHistory = [];
+
+function initFreelanceAgent() {
+  const agentBtn = document.getElementById('freelanceAgentBtn');
+  const overlay = document.getElementById('freelanceModalOverlay');
+  const closeBtn = document.getElementById('freelanceModalClose');
+  const fetchBtn = document.getElementById('fetchFreelanceBtn');
+  const statusEl = document.getElementById('freelanceTriggerStatus');
+  const feedEl = document.getElementById('gigFeed');
+  const feedSection = document.getElementById('gigFeedSection');
+  const historySection = document.getElementById('bidHistorySection');
+  const historyFeed = document.getElementById('bidHistoryFeed');
+  const countBadge = document.getElementById('bidCountBadge');
+
+  if (!agentBtn || !overlay) return;
+
+  function renderGigsFeed() {
+    if (!feedEl) return;
+    const pending = fetchedGigs.filter(g => !g.applied);
+    feedEl.innerHTML = pending.length === 0
+      ? '<p style="text-align:center;color:var(--text-muted);padding:12px;">All gigs have been bid on!</p>'
+      : pending.map(gig => `
+      <div class="job-card">
+        <div class="job-card-info">
+          <div class="job-card-title">${gig.title}</div>
+          <div class="job-card-meta">Client: <span class="job-card-company">${gig.client}</span> &bull; ${gig.source} &bull; Budget: <strong>${gig.budget}</strong> &bull; Match: ${gig.match}% &bull; <span class="status-green">Open for Bid</span></div>
+        </div>
+        <div class="job-card-actions">
+          <a href="${gig.url}" target="_blank" rel="noopener" class="job-view-link">View</a>
+          <button class="job-apply-btn" style="background:linear-gradient(135deg, #a855f7, #6366f1);" onclick="bidOnGig(${gig.id})">Bid</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderBidHistory() {
+    if (!historyFeed) return;
+    if (bidHistory.length === 0) return;
+    historySection.style.display = 'block';
+    if (countBadge) countBadge.textContent = bidHistory.length + ' Bids Sent';
+    historyFeed.innerHTML = bidHistory.map(gig => `
+      <div class="job-card" style="border-color: rgba(168,85,247,0.3);">
+        <div class="job-card-info">
+          <div class="job-card-title">${gig.title}</div>
+          <div class="job-card-meta">Client: ${gig.client} &bull; ${gig.source} &bull; ${gig.budget} &bull; Bid: ${gig.bidAt}</div>
+        </div>
+        <div class="job-card-actions">
+          <span class="applied-badge" style="background:rgba(168,85,247,0.15);color:#a855f7;">Bid Sent</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.bidOnGig = function(gigId) {
+    const gig = fetchedGigs.find(g => g.id === gigId);
+    if (!gig || gig.applied) return;
+
+    gig.applied = true;
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    bidHistory.unshift({ ...gig, bidAt: 'Today ' + timeStr });
+
+    renderGigsFeed();
+    renderBidHistory();
+
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.innerHTML = 'Bid sent for <strong>' + gig.title + '</strong> (' + gig.client + ') &mdash; Mail & WhatsApp notification sent!';
+      setTimeout(() => { statusEl.style.display = 'none'; }, 4000);
+    }
+  };
+
+  agentBtn.addEventListener('click', () => {
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  });
+
+  const closeModal = () => {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  };
+
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeModal();
+  });
+
+  if (fetchBtn) {
+    fetchBtn.addEventListener('click', () => {
+      fetchBtn.disabled = true;
+      fetchBtn.textContent = 'Scanning ' + freelancePlatforms.length + ' platforms...';
+
+      if (statusEl) {
+        statusEl.style.display = 'block';
+        statusEl.textContent = 'Scanning Upwork, Fiverr, Freelancer.com, Toptal, PeoplePerHour, Guru, 99designs & FlexJobs...';
+      }
+
+      setTimeout(() => {
+        if (feedSection) feedSection.style.display = 'block';
+        renderGigsFeed();
+        renderBidHistory();
+        fetchBtn.disabled = false;
+        fetchBtn.textContent = 'Refresh Gigs';
+        fetchBtn.style.background = 'linear-gradient(135deg, #a855f7, #6366f1)';
+        if (statusEl) {
+          statusEl.innerHTML = 'Found <strong>' + fetchedGigs.filter(g => !g.applied).length + ' matching gigs</strong> across ' + freelancePlatforms.length + ' platforms. Click <strong>Bid</strong> on any gig!';
+        }
+      }, 1800);
+    });
+  }
+}

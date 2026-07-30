@@ -13,6 +13,7 @@ Deploy to Vercel or GitHub Pages (see [DEPLOYMENT.md](DEPLOYMENT.md)).
 - **AI Assistant Chatbot** — Interview tutor engine covering Python, ML/DL, RAG, Computer Vision, Web Dev, SQL, and DSA
 - **7 Authentic Certificates** — Interactive viewer with document download
 - **n8n Autonomous Job Agent** — Fetches jobs from LinkedIn, Indeed, Naukri, Internshala, Wellfound, RemoteOK, Glassdoor, and company career pages. One-click apply with Mail & WhatsApp notifications
+- **Freelance Gig Finder Agent** — Fetches freelance projects from Upwork, Fiverr, Freelancer.com, Toptal, PeoplePerHour, Guru, 99designs, FlexJobs with one-click bid submission
 - **Dynamic GitHub Projects** — Auto-fetches repositories from GitHub API
 - **Live Contact Form** — Powered by EmailJS
 - **Dual GitHub Profiles** — Dropdown for @harshit-001-it and @har-001

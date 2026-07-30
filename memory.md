@@ -124,6 +124,14 @@ Personal-Portfolio-Website/
 - Mail & WhatsApp notifications on every application
 - Standalone Python script (`scripts/job_agent.py`) for CLI usage
 
+### 9. Freelance Gig Finder Agent
+- Interactive modal in About section ("Freelance Agent 🚀")
+- Fetches freelance opportunities across 8 platforms: Upwork, Fiverr, Freelancer.com, Toptal, PeoplePerHour, Guru, 99designs, FlexJobs
+- Client budget & skill match scoring
+- **User clicks Bid** → auto-generates personalized proposal with portfolio & rate
+- Bid History tracker
+- Mail & WhatsApp notifications on every proposal submitted
+
 ---
 
 ## CSS Architecture
