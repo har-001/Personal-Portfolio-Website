@@ -1628,7 +1628,7 @@ function initN8nJobAgent() {
     // Show notification
     if (statusEl) {
       statusEl.style.display = 'block';
-      statusEl.innerHTML = 'Applied to <strong>' + job.title + ' @ ' + job.company + '</strong> &mdash; 100% Private Browser Notification sent!';
+      statusEl.innerHTML = 'Applied to <strong>' + job.title + ' @ ' + job.company + '</strong> &mdash; Multi-Channel Alert sent (Email, WhatsApp, Telegram, Discord, Push)!';
       setTimeout(() => { statusEl.style.display = 'none'; }, 4000);
     }
 
@@ -1780,7 +1780,7 @@ function initFreelanceAgent() {
 
     if (statusEl) {
       statusEl.style.display = 'block';
-      statusEl.innerHTML = 'Bid sent for <strong>' + gig.title + '</strong> (' + gig.client + ') &mdash; 100% Private Browser Notification sent!';
+      statusEl.innerHTML = 'Bid sent for <strong>' + gig.title + '</strong> (' + gig.client + ') &mdash; Multi-Channel Alert sent (Email, WhatsApp, Telegram, Discord, Push)!';
       setTimeout(() => { statusEl.style.display = 'none'; }, 4000);
     }
 

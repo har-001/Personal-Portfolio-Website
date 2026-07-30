@@ -1,45 +1,78 @@
-# 🔒 Private & Secure Notification Setup Guide (100% Private, Zero Data Shared)
+# 🔔 Complete Multi-Channel Notification Setup Guide
 
-This guide explains how to get notifications for Job & Freelance Agent actions **without sharing your phone number, WhatsApp, or compromising personal data security**.
+The Autonomous Job & Freelance Agents support **5 Notification Channels**. You can use any one or all of them depending on your preference:
 
----
-
-## Option 1: Native Browser OS Push Notifications (Recommended — 100% Private)
-
-**Zero Setup • Zero Data Shared • No Phone Number Required**
-
-1. When you click **Apply** or **Bid** in the Agent modal, your browser asks:  
-   `"Allow Portfolio Website to send notifications?"`
-2. Click **Allow**.
-3. Direct native OS push notifications will pop up on your Windows/Mac/Mobile screen whenever a job is applied to or a freelance proposal is submitted!
-4. **Privacy Benefit**: Everything stays 100% local on your device. No third-party servers, no phone numbers, no credentials exposed.
+1. **Email Notifications** (Gmail / SMTP / EmailJS)
+2. **WhatsApp Notifications** (CallMeBot / Twilio / Green API)
+3. **Telegram Bot Notifications** (100% Anonymous & Free)
+4. **Discord Channel Notifications** (Instant Webhook Alerts)
+5. **Native Browser OS Push Notifications** (100% Private, Zero Setup)
 
 ---
 
-## Option 2: Anonymous Telegram Bot (Zero Personal Data Exposure)
+## 1. 💬 WhatsApp Notification Setup (CallMeBot — 100% FREE)
 
-If you want phone notifications without sharing your personal WhatsApp or phone number:
+1. Save **+34 644 44 44 94** in your WhatsApp contacts.
+2. Send message: `I allow callmebot to send me messages`
+3. CallMeBot replies with your **API Key**.
+4. Put key in `.env`:
+   ```env
+   CALLMEBOT_PHONE=+91XXXXXXXXXX
+   CALLMEBOT_API_KEY=your_api_key
+   ```
+
+---
+
+## 2. 🤖 Telegram Bot Notification Setup (100% Free & Anonymous)
 
 1. Open Telegram and search for `@BotFather`.
-2. Type `/newbot` and give your bot a name (e.g., `MyPrivateAgentBot`).
-3. BotFather gives you an **API Token**.
-4. Send a message to your bot.
-5. In n8n / Python script, add a Telegram request node using your API Token.
-6. **Privacy Benefit**: Telegram bots do **not** use or expose your personal phone number or contacts.
+2. Send `/newbot` and create your bot (e.g. `HarshitJobAgentBot`).
+3. Copy the **Bot Token** (e.g. `123456789:ABCdefGHI...`).
+4. Search for `@userinfobot` to get your **Chat ID** (e.g. `987654321`).
+5. Put credentials in `.env`:
+   ```env
+   TELEGRAM_BOT_TOKEN=your_bot_token
+   TELEGRAM_CHAT_ID=your_chat_id
+   ```
 
 ---
 
-## Option 3: In-App Live Activity Feed & History Tracker
+## 3. 🎮 Discord Channel Webhook Setup (Instant Channel Alerts)
 
-- All applied jobs and submitted bids are stored directly in your portfolio's interactive **Applied Jobs History** and **Bid History** panels.
-- Provides real-time visual tracking directly on your portfolio site without any external services.
+1. Open your Discord server ➔ Click channel settings ➔ **Integrations** ➔ **Webhooks**.
+2. Click **Create Webhook** and copy the **Webhook URL**.
+3. Put URL in `.env`:
+   ```env
+   DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/your_webhook_id/your_token
+   ```
 
 ---
 
-## 🔒 Security Summary
+## 4. 📧 Email Notification Setup (Gmail / SMTP / EmailJS)
 
-| Notification Method | Personal Data Required | Security Level | Privacy |
+1. Enable 2-Step Verification in Google Account ➔ Generate **App Password**.
+2. Put credentials in `.env`:
+   ```env
+   GMAIL_USER=harshitmishra1208@gmail.com
+   GMAIL_APP_PASSWORD=your_app_password
+   ```
+
+---
+
+## 5. 🔔 Native Browser OS Push Notifications (Zero Setup)
+
+- Works automatically in your browser!
+- When you click **Apply** or **Bid**, your OS / Browser pops up a notification card on your desktop or mobile screen.
+
+---
+
+## 📋 Summary of All 5 Channels
+
+| Channel | Free? | Privacy / Security | Setup Time |
 |---|---|---|---|
-| **Native Browser Push** | ❌ NONE | 🛡️ 100% Secure | 100% Private Local |
-| **In-App Activity Feed** | ❌ NONE | 🛡️ 100% Secure | 100% Private Local |
-| **Telegram Private Bot** | ❌ NO Phone Number | 🛡️ High | 100% Anonymous |
+| **Native Browser Push** | Yes | 100% Private Local | 0 Seconds |
+| **In-App Activity Feed** | Yes | 100% Private Local | 0 Seconds |
+| **Telegram Bot** | Yes | 100% Anonymous | 1 Minute |
+| **Discord Webhook** | Yes | 100% Private Channel | 1 Minute |
+| **WhatsApp (CallMeBot)** | Yes | Uses Phone Number | 1 Minute |
+| **Email (Gmail / EmailJS)**| Yes | Standard Email | 2 Minutes |
