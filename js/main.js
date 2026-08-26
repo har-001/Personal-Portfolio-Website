@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
   initTypewriter();
   initParticles();
+  initCursorSpotlight();
+  init3DTilt();
   initRevealAnimations();
   initCounters();
   renderSkills();
@@ -173,13 +175,15 @@ function initTypewriter() {
    ---------------------------------------------------------------- */
 function initParticles() {
   const container = document.getElementById('heroCanvas');
+  if (!container) return;
   const canvas = document.createElement('canvas');
   container.appendChild(canvas);
   const ctx = canvas.getContext('2d');
 
   let particles = [];
+  let polyhedrons = [];
   let animId;
-  let mouse = { x: null, y: null };
+  let mouse = { x: null, y: null, targetX: 0, targetY: 0 };
 
   function resize() {
     canvas.width = container.offsetWidth;
@@ -189,46 +193,55 @@ function initParticles() {
   resize();
   window.addEventListener('resize', resize);
 
-  container.addEventListener('mousemove', (e) => {
+  window.addEventListener('mousemove', (e) => {
     const rect = container.getBoundingClientRect();
     mouse.x = e.clientX - rect.left;
     mouse.y = e.clientY - rect.top;
-  });
+    mouse.targetX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouse.targetY = (e.clientY / window.innerHeight - 0.5) * 2;
+  }, { passive: true });
 
-  container.addEventListener('mouseleave', () => {
+  window.addEventListener('mouseleave', () => {
     mouse.x = null;
     mouse.y = null;
+    mouse.targetX = 0;
+    mouse.targetY = 0;
   });
 
-  const particleCount = Math.min(80, Math.floor((canvas.width * canvas.height) / 12000));
+  const particleCount = Math.min(70, Math.floor((canvas.width * canvas.height) / 14000));
 
   class Particle {
     constructor() {
       this.x = Math.random() * canvas.width;
       this.y = Math.random() * canvas.height;
-      this.size = Math.random() * 2 + 0.5;
-      this.speedX = (Math.random() - 0.5) * 0.5;
-      this.speedY = (Math.random() - 0.5) * 0.5;
+      this.z = Math.random() * 400 - 200; // 3D depth
+      this.size = Math.random() * 2 + 0.6;
+      this.speedX = (Math.random() - 0.5) * 0.4;
+      this.speedY = (Math.random() - 0.5) * 0.4;
+      this.speedZ = (Math.random() - 0.5) * 0.3;
       this.opacity = Math.random() * 0.5 + 0.2;
     }
 
     update() {
-      this.x += this.speedX;
-      this.y += this.speedY;
+      this.x += this.speedX + mouse.targetX * 0.2;
+      this.y += this.speedY + mouse.targetY * 0.2;
+      this.z += this.speedZ;
 
-      // Mouse interaction
+      if (this.z < -200) this.z = 200;
+      if (this.z > 200) this.z = -200;
+
+      // Mouse repulsion in 2D projection
       if (mouse.x !== null && mouse.y !== null) {
         const dx = mouse.x - this.x;
         const dy = mouse.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120) {
-          const force = (120 - dist) / 120;
-          this.x -= (dx / dist) * force * 1.5;
-          this.y -= (dy / dist) * force * 1.5;
+        if (dist < 130) {
+          const force = (130 - dist) / 130;
+          this.x -= (dx / dist) * force * 1.8;
+          this.y -= (dy / dist) * force * 1.8;
         }
       }
 
-      // Wrap around
       if (this.x < 0) this.x = canvas.width;
       if (this.x > canvas.width) this.x = 0;
       if (this.y < 0) this.y = canvas.height;
@@ -236,17 +249,115 @@ function initParticles() {
     }
 
     draw() {
+      const fov = 400;
+      const scale = fov / (fov + this.z);
+      const projSize = Math.max(0.4, this.size * scale);
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(0, 212, 255, ${this.opacity})`;
+      ctx.arc(this.x, this.y, projSize, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0, 212, 255, ${Math.min(1, this.opacity * scale)})`;
       ctx.fill();
     }
   }
 
-  // Create particles
+  // 3D Wireframe Floating Polyhedrons (Octahedron Geometry)
+  class Polyhedron3D {
+    constructor(cx, cy, radius, speed) {
+      this.cx = cx;
+      this.cy = cy;
+      this.radius = radius;
+      this.rotX = Math.random() * Math.PI;
+      this.rotY = Math.random() * Math.PI;
+      this.rotZ = Math.random() * Math.PI;
+      this.speed = speed;
+
+      // Octahedron 6 vertices in 3D
+      this.vertices = [
+        [0, 1, 0],
+        [0, -1, 0],
+        [1, 0, 0],
+        [-1, 0, 0],
+        [0, 0, 1],
+        [0, 0, -1]
+      ];
+
+      // 12 edges
+      this.edges = [
+        [0,2], [0,3], [0,4], [0,5],
+        [1,2], [1,3], [1,4], [1,5],
+        [2,4], [4,3], [3,5], [5,2]
+      ];
+    }
+
+    update() {
+      this.rotX += 0.006 * this.speed + mouse.targetY * 0.005;
+      this.rotY += 0.009 * this.speed + mouse.targetX * 0.005;
+      this.rotZ += 0.004 * this.speed;
+    }
+
+    draw() {
+      const fov = 300;
+      const cosX = Math.cos(this.rotX), sinX = Math.sin(this.rotX);
+      const cosY = Math.cos(this.rotY), sinY = Math.sin(this.rotY);
+      const cosZ = Math.cos(this.rotZ), sinZ = Math.sin(this.rotZ);
+
+      const projected = this.vertices.map(([vx, vy, vz]) => {
+        let x = vx * this.radius;
+        let y = vy * this.radius;
+        let z = vz * this.radius;
+
+        // Rotate Y
+        let x1 = x * cosY + z * sinY;
+        let z1 = -x * sinY + z * cosY;
+
+        // Rotate X
+        let y2 = y * cosX - z1 * sinX;
+        let z2 = y * sinX + z1 * cosX;
+
+        // Rotate Z
+        let x3 = x1 * cosZ - y2 * sinZ;
+        let y3 = x1 * sinZ + y2 * cosZ;
+
+        const scale = fov / (fov + z2 + 200);
+        return {
+          x: this.cx + x3 * scale,
+          y: this.cy + y3 * scale,
+          scale
+        };
+      });
+
+      // Draw glowing wireframe edges
+      ctx.lineWidth = 1;
+      this.edges.forEach(([i1, i2]) => {
+        const p1 = projected[i1];
+        const p2 = projected[i2];
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = `rgba(123, 97, 255, 0.25)`;
+        ctx.stroke();
+      });
+
+      // Draw vertex nodes
+      projected.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2.5 * p.scale, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 212, 255, 0.7)`;
+        ctx.shadowColor = '#00d4ff';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+    }
+  }
+
   for (let i = 0; i < particleCount; i++) {
     particles.push(new Particle());
   }
+
+  // Add 3D floating geometric polyhedrons
+  polyhedrons.push(new Polyhedron3D(canvas.width * 0.15, canvas.height * 0.25, 45, 1));
+  polyhedrons.push(new Polyhedron3D(canvas.width * 0.85, canvas.height * 0.35, 55, 0.8));
+  polyhedrons.push(new Polyhedron3D(canvas.width * 0.5, canvas.height * 0.8, 40, 1.2));
 
   function drawConnections() {
     for (let i = 0; i < particles.length; i++) {
@@ -255,8 +366,8 @@ function initParticles() {
         const dy = particles[i].y - particles[j].y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist < 150) {
-          const opacity = (1 - dist / 150) * 0.15;
+        if (dist < 130) {
+          const opacity = (1 - dist / 130) * 0.12;
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(particles[j].x, particles[j].y);
@@ -271,6 +382,12 @@ function initParticles() {
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Draw 3D polyhedrons
+    polyhedrons.forEach(poly => {
+      poly.update();
+      poly.draw();
+    });
+
     particles.forEach((p) => {
       p.update();
       p.draw();
@@ -281,12 +398,94 @@ function initParticles() {
   }
 
   animate();
+}
 
-  // Cleanup on page unload
-  window.addEventListener('beforeunload', () => {
-    cancelAnimationFrame(animId);
+/* ----------------------------------------------------------------
+   3D CURSOR SPOTLIGHT
+   Smooth, interactive cursor light following mouse movement
+   ---------------------------------------------------------------- */
+function initCursorSpotlight() {
+  const spotlight = document.getElementById('cursorSpotlight');
+  if (!spotlight) return;
+
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let currentX = mouseX;
+  let currentY = mouseY;
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    spotlight.style.opacity = '1';
+  }, { passive: true });
+
+  window.addEventListener('mouseleave', () => {
+    spotlight.style.opacity = '0';
+  });
+
+  function animateSpotlight() {
+    currentX += (mouseX - currentX) * 0.12;
+    currentY += (mouseY - currentY) * 0.12;
+    spotlight.style.left = `${currentX}px`;
+    spotlight.style.top = `${currentY}px`;
+    requestAnimationFrame(animateSpotlight);
+  }
+  requestAnimationFrame(animateSpotlight);
+}
+
+/* ----------------------------------------------------------------
+   3D INTERACTIVE TILT & PARALLAX ENGINE
+   Adds dynamic 3D perspective tilt & glare reflection to cards
+   ---------------------------------------------------------------- */
+function init3DTilt() {
+  const tiltSelectors = [
+    '.action-card',
+    '.about-image-frame',
+    '.about-float-card',
+    '.stat-item',
+    '.skill-card',
+    '.project-card',
+    '.cert-card'
+  ];
+
+  const cards = document.querySelectorAll(tiltSelectors.join(', '));
+
+  cards.forEach(card => {
+    if (!card.querySelector('.card-glare-overlay')) {
+      const glare = document.createElement('div');
+      glare.className = 'card-glare-overlay';
+      card.appendChild(glare);
+    }
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const maxTilt = card.classList.contains('about-image-frame') ? 10 : 14;
+      const rotateX = ((y - centerY) / centerY) * -maxTilt;
+      const rotateY = ((x - centerX) / centerX) * maxTilt;
+
+      card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateZ(10px)`;
+      card.style.setProperty('--mouse-x', `${(x / rect.width * 100).toFixed(1)}%`);
+      card.style.setProperty('--mouse-y', `${(y / rect.height * 100).toFixed(1)}%`);
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+      card.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease';
+    });
+
+    card.addEventListener('mouseenter', () => {
+      card.style.transition = 'transform 0.08s ease-out, box-shadow 0.2s ease';
+    });
   });
 }
+
+
 
 /* ----------------------------------------------------------------
    SCROLL REVEAL ANIMATIONS
@@ -422,6 +621,7 @@ function renderSkills() {
   // Re-init reveal & click handlers for dynamically added elements
   initRevealAnimations();
   initSkillModalClickHandlers();
+  setTimeout(init3DTilt, 50);
 }
 
 function initSkillBarAnimations() {
@@ -622,6 +822,7 @@ function renderProjectCards(repos, filter) {
 
   // Re-init reveal for new elements
   initRevealAnimations();
+  setTimeout(init3DTilt, 50);
 }
 
 /* ----------------------------------------------------------------
@@ -736,6 +937,7 @@ function renderCertificates() {
   // Re-init reveal & click handlers for certificates
   initRevealAnimations();
   initCertModalHandlers();
+  setTimeout(init3DTilt, 50);
 }
 
 function initCertModalHandlers() {

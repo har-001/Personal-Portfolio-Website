@@ -22,6 +22,9 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
 </head>
 <body>
+  <!-- 3D Interactive Cursor Spotlight -->
+  <div class="cursor-spotlight" id="cursorSpotlight"></div>
+
   <!-- Scroll Progress Bar -->
   <div class="scroll-progress" id="scrollProgress"></div>
 
@@ -108,15 +111,25 @@
       </div>
 
       <div class="about-grid">
-        <div class="about-image-wrapper reveal">
+        <div class="about-image-wrapper reveal" id="aboutImageWrapper">
           <div class="about-image-frame">
-            <div class="about-avatar">👨‍💻</div>
+            <img src="image.png" alt="Harshit Mishra - IT Engineer & AI Specialist" class="about-profile-img" />
+            <div class="about-image-glow"></div>
+            <div class="about-scan-line"></div>
           </div>
-          <div class="about-float-card">
-            <span>🎓</span> B.Tech in IT (IIMT)
+          <div class="about-float-card float-card-top">
+            <span class="float-icon">🎓</span>
+            <div class="float-info">
+              <strong>B.Tech IT</strong>
+              <small>IIMT College</small>
+            </div>
           </div>
-          <div class="about-float-card">
-            <span>🏆</span> 6+ Certifications
+          <div class="about-float-card float-card-bottom">
+            <span class="float-icon">⚡</span>
+            <div class="float-info">
+              <strong>AI & ML Engineer</strong>
+              <small>RAG & Computer Vision</small>
+            </div>
           </div>
         </div>
 

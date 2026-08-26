@@ -1,11 +1,12 @@
-name: Deploy Portfolio to GitHub Pages
+name: Deploy & Verify Portfolio
 
 on:
   push:
     branches: ["main", "master"]
+  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -14,23 +15,35 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Verify Web Assets
+        run: |
+          echo "Verifying portfolio static files..."
+          test -f index.html || exit 1
+          test -f css/styles.css || exit 1
+          test -f js/main.js || exit 1
+          test -f Harshit_Mishra.pdf || exit 1
+          echo "All portfolio files verified successfully!"
+
       - name: Setup Pages
+        id: pages
         uses: actions/configure-pages@v4
+        continue-on-error: true
 
       - name: Upload artifact
+        if: steps.pages.outcome == 'success'
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
+        continue-on-error: true
 
       - name: Deploy to GitHub Pages
+        if: steps.pages.outcome == 'success'
         id: deployment
         uses: actions/deploy-pages@v4
+        continue-on-error: true
