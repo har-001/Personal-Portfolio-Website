@@ -66,13 +66,14 @@ function initNavbar() {
 
   sections.forEach((section) => observer.observe(section));
 
-  // Smooth scroll for nav links
-  navLinks.forEach((link) => {
+  // Smooth scroll for all anchor links (nav links, stat cards, badges)
+  document.querySelectorAll('a[href^="#"]').forEach((link) => {
     link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const targetId = link.getAttribute('data-section') || link.getAttribute('href').substring(1);
-      const target = document.getElementById(targetId);
+      const href = link.getAttribute('href');
+      if (!href || href === '#' || href === '#!') return;
+      const target = document.querySelector(href);
       if (target) {
+        e.preventDefault();
         target.scrollIntoView({ behavior: 'smooth' });
       }
     });
@@ -440,6 +441,7 @@ function initCursorSpotlight() {
 function init3DTilt() {
   const tiltSelectors = [
     '.action-card',
+    '.experience-card',
     '.about-image-frame',
     '.about-float-card',
     '.stat-item',
@@ -830,6 +832,32 @@ function renderProjectCards(repos, filter) {
    ---------------------------------------------------------------- */
 const certificatesData = [
   {
+    title: 'AI Web Developer Internship Completion',
+    issuer: 'Inamigos Foundation',
+    icon: '🌐',
+    filePath: 'Certificates/Inamigos Completion letter 1.pdf',
+    date: 'July 2026 - August 2026',
+    skills: [
+      'Full-Stack Web Development & Responsive Design',
+      'NGO Donation Platform Re-engineering',
+      'AI Integration & Modern Frontend Architecture',
+      'Verified Industrial Internship Completion'
+    ]
+  },
+  {
+    title: 'Python Programming Internship Completion',
+    issuer: 'InternPe',
+    icon: '🐍',
+    filePath: 'Certificates/InternPe Completion Letter.png',
+    date: '12 May 2025 - 08 June 2025',
+    skills: [
+      'Industrial Python Programming & Scripting',
+      'Object-Oriented Programming (OOP) & Clean Code',
+      'Data Structures & Algorithm Implementation',
+      'AICTE & MSME Recognized Internship (CID: IPI#52842)'
+    ]
+  },
+  {
     title: 'Excellence in Machine Learning Foundations',
     issuer: 'AnalytixLabs',
     icon: '🧠',
@@ -853,19 +881,6 @@ const certificatesData = [
       'Advanced Prompt Engineering Techniques',
       'AI Tools Integration & Productivity Optimization',
       'ISO 9001:2015 Certified Masterclass'
-    ]
-  },
-  {
-    title: 'Python Programming Internship',
-    issuer: 'InternPe',
-    icon: '🐍',
-    filePath: 'Certificates/1749204415346.jpeg',
-    date: '12 May 2025 - 08 June 2025',
-    skills: [
-      'Industrial Python Programming & Scripting',
-      'Object-Oriented Programming (OOP) & Clean Code',
-      'Data Structures & Algorithm Implementation',
-      'AICTE & MSME Recognized Internship (CID: IPI#52842)'
     ]
   },
   {

@@ -36,6 +36,7 @@
       <ul class="nav-links" id="navLinks">
         <li><a href="#hero" class="nav-link active" data-section="hero">Home</a></li>
         <li><a href="#about" class="nav-link" data-section="about">About</a></li>
+        <li><a href="#experience" class="nav-link" data-section="experience">Experience</a></li>
         <li><a href="#skills" class="nav-link" data-section="skills">Skills</a></li>
         <li><a href="#projects" class="nav-link" data-section="projects">Projects</a></li>
         <li><a href="#certificates" class="nav-link" data-section="certificates">Certificates</a></li>
@@ -57,6 +58,7 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="#hero" class="mobile-link" data-section="hero">Home</a>
     <a href="#about" class="mobile-link" data-section="about">About</a>
+    <a href="#experience" class="mobile-link" data-section="experience">Experience</a>
     <a href="#skills" class="mobile-link" data-section="skills">Skills</a>
     <a href="#projects" class="mobile-link" data-section="projects">Projects</a>
     <a href="#certificates" class="mobile-link" data-section="certificates">Certificates</a>
@@ -124,13 +126,13 @@
               <small>IIMT College</small>
             </div>
           </div>
-          <div class="about-float-card float-card-bottom">
+          <a href="#projects" class="about-float-card float-card-bottom" style="text-decoration:none;" title="Explore 10+ GitHub Projects">
             <span class="float-icon">🚀</span>
             <div class="float-info">
               <strong>Open Source Builder</strong>
-              <small>10+ GitHub Projects</small>
+              <small>10+ GitHub Projects ↗</small>
             </div>
-          </div>
+          </a>
         </div>
 
         <div class="about-text reveal reveal-delay-2">
@@ -145,18 +147,18 @@
           </p>
 
           <div class="about-stats">
-            <div class="stat-item reveal reveal-delay-1">
+            <a href="#projects" class="stat-item reveal reveal-delay-1 stat-link" title="Jump to Projects Section">
               <span class="stat-number" data-target="10">0</span>
-              <span class="stat-label">GitHub Projects</span>
-            </div>
-            <div class="stat-item reveal reveal-delay-2">
-              <span class="stat-number" data-target="6">0</span>
-              <span class="stat-label">Certifications</span>
-            </div>
-            <div class="stat-item reveal reveal-delay-3">
+              <span class="stat-label">GitHub Projects ↗</span>
+            </a>
+            <a href="#certificates" class="stat-item reveal reveal-delay-2 stat-link" title="Jump to Certificates Section">
+              <span class="stat-number" data-target="8">0</span>
+              <span class="stat-label">Certifications ↗</span>
+            </a>
+            <a href="#skills" class="stat-item reveal reveal-delay-3 stat-link" title="Jump to Skills Section">
               <span class="stat-number" data-target="12">0</span>
-              <span class="stat-label">Tech Stack Tools</span>
-            </div>
+              <span class="stat-label">Tech Stack Tools ↗</span>
+            </a>
           </div>
 
           <!-- Action Cards (GitHub with Dual Options, LinkedIn, Resume) -->
@@ -229,6 +231,79 @@
                 <span class="action-card-title">Freelance Agent 🚀</span>
               </div>
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== EXPERIENCE (INTERNSHIPS) ===== -->
+  <section class="experience section" id="experience">
+    <div class="container">
+      <div class="section-heading reveal">
+        <h2 class="gradient-text">Experience & Internships</h2>
+        <p>Practical industrial experience building web platforms, AI solutions, and Python software.</p>
+        <div class="decor-line"><span class="dot"></span></div>
+      </div>
+
+      <div class="experience-timeline">
+        <!-- Experience 1: Inamigos Foundation -->
+        <div class="experience-card glass reveal reveal-delay-1" data-tilt="3d">
+          <div class="exp-header">
+            <div class="exp-role-badge">Latest Internship</div>
+            <div class="exp-period">Jul 2026 – Aug 2026</div>
+          </div>
+          <div class="exp-title-row">
+            <div class="exp-icon">🌐</div>
+            <div>
+              <h3 class="exp-role">AI Web Developer Intern</h3>
+              <h4 class="exp-company">Inamigos Foundation</h4>
+            </div>
+          </div>
+          <p class="exp-desc">
+            Engineered an interactive NGO donation platform and replicated the Inamigos core web application with modern responsive UI, dynamic data flows, and scalable web architecture.
+          </p>
+          <div class="exp-tech-stack">
+            <span class="tech-tag">Web Development</span>
+            <span class="tech-tag">AI Integration</span>
+            <span class="tech-tag">HTML/CSS/JS</span>
+            <span class="tech-tag">Frontend Architecture</span>
+            <span class="tech-tag">UI/UX Re-engineering</span>
+          </div>
+          <div class="exp-footer">
+            <a href="Certificates/Inamigos Completion letter 1.pdf" target="_blank" rel="noopener" class="exp-cert-btn">
+              <span>View Completion Certificate</span> 📜 ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- Experience 2: InternPe -->
+        <div class="experience-card glass reveal reveal-delay-2" data-tilt="3d">
+          <div class="exp-header">
+            <div class="exp-role-badge" style="background: rgba(123, 97, 255, 0.15); color: var(--accent-2); border-color: rgba(123, 97, 255, 0.3);">Technical Internship</div>
+            <div class="exp-period">May 2025 – Jun 2025</div>
+          </div>
+          <div class="exp-title-row">
+            <div class="exp-icon" style="background: rgba(123, 97, 255, 0.15); color: var(--accent-2);">🐍</div>
+            <div>
+              <h3 class="exp-role">Python Programming Intern</h3>
+              <h4 class="exp-company">InternPe</h4>
+            </div>
+          </div>
+          <p class="exp-desc">
+            Built foundational Python programming and problem-solving skills during a one-month internship at InternPe. Developed industrial automation scripts, algorithm optimization, and data structures.
+          </p>
+          <div class="exp-tech-stack">
+            <span class="tech-tag">Python 3</span>
+            <span class="tech-tag">Data Structures</span>
+            <span class="tech-tag">Algorithm Design</span>
+            <span class="tech-tag">Problem Solving</span>
+            <span class="tech-tag">Automation</span>
+          </div>
+          <div class="exp-footer">
+            <a href="Certificates/InternPe Completion Letter.png" target="_blank" rel="noopener" class="exp-cert-btn">
+              <span>View Completion Certificate</span> 📜 ↗
+            </a>
           </div>
         </div>
       </div>
