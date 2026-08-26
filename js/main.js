@@ -52,19 +52,35 @@ function initNavbar() {
     navbar.classList.toggle('scrolled', window.scrollY > 50);
   }, { passive: true });
 
-  // Active section highlighting
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const id = entry.target.id;
-        navLinks.forEach((link) => {
-          link.classList.toggle('active', link.getAttribute('data-section') === id);
-        });
+  // Precise Active Section Scrollspy Highlighting
+  function updateActiveNav() {
+    const scrollPos = window.scrollY + 130;
+    let currentId = '';
+
+    sections.forEach((section) => {
+      const top = section.offsetTop;
+      const height = section.offsetHeight;
+      if (scrollPos >= top && scrollPos < top + height) {
+        currentId = section.getAttribute('id');
       }
     });
-  }, { threshold: 0.3, rootMargin: '-80px 0px 0px 0px' });
 
-  sections.forEach((section) => observer.observe(section));
+    // If near bottom of the page, activate contact section
+    if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 80)) {
+      currentId = 'contact';
+    }
+
+    if (currentId) {
+      navLinks.forEach((link) => {
+        const isMatch = link.getAttribute('data-section') === currentId;
+        link.classList.toggle('active', isMatch);
+      });
+    }
+  }
+
+  window.addEventListener('scroll', updateActiveNav, { passive: true });
+  window.addEventListener('resize', updateActiveNav, { passive: true });
+  setTimeout(updateActiveNav, 200);
 
   // Smooth scroll for all anchor links (nav links, stat cards, badges)
   document.querySelectorAll('a[href^="#"]').forEach((link) => {
@@ -74,7 +90,16 @@ function initNavbar() {
       const target = document.querySelector(href);
       if (target) {
         e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth' });
+        const targetId = href.substring(1);
+
+        // Instantly update active link underline
+        navLinks.forEach((nl) => {
+          nl.classList.toggle('active', nl.getAttribute('data-section') === targetId);
+        });
+
+        const navHeight = navbar.offsetHeight || 70;
+        const targetPos = target.getBoundingClientRect().top + window.pageYOffset - navHeight + 2;
+        window.scrollTo({ top: targetPos, behavior: 'smooth' });
       }
     });
   });
