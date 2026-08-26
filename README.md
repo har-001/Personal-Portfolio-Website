@@ -42,7 +42,7 @@ Personal-Portfolio-Website/
 │   └── job_agent.py
 ├── .env.example                  # Secret API keys & environment template
 ├── .gitignore                    # Protects .env & private keys from GitHub
-├── Harshit Mishra Resume.pdf     # Resume PDF file
+├── Harshit_Mishra.pdf            # Updated Resume PDF file
 ├── vercel.json                   # Vercel deployment config
 └── README.md                     # Main repository README
 ```

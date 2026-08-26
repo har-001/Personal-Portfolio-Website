@@ -1435,9 +1435,9 @@ function initAIChatbot() {
       Harshit Mishra is currently pursuing his <strong>B.Tech in Information Technology</strong> from <strong>IIMT College of Engineering</strong>, Greater Noida. He specializes in AI Engineering, Computer Vision, and Full Stack Web Solutions.`;
     }
 
-    if (query.includes('resume') || query.includes('cv') || query.includes('download')) {
+    if (query.includes('resume') || query.includes('cv') || query.includes('view resume')) {
       return `📄 <strong>Harshit's Resume:</strong><br/>
-      You can view or download Harshit's full CV here: <a href="Harshit Mishra Resume.pdf" target="_blank" download style="color:var(--accent);text-decoration:underline;">Download Harshit Mishra Resume.pdf 📥</a>`;
+      You can view Harshit's full CV here: <a href="Harshit_Mishra.pdf" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">View Harshit's Resume 📄</a>`;
     }
 
     // 3. AI / MACHINE LEARNING / DEEP LEARNING / RAG TUTOR

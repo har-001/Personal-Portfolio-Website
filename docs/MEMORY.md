@@ -14,7 +14,7 @@
 | **GitHub (Primary)** | https://github.com/harshit-001-it |
 | **GitHub (Secondary)** | https://github.com/har-001 |
 | **LinkedIn** | https://linkedin.com/in/harshit-mishra-51275b219 |
-| **Resume** | `Harshit Mishra Resume.pdf` (root directory) |
+| **Resume** | `Harshit_Mishra.pdf` (root directory) |
 
 ---
 
@@ -49,7 +49,7 @@ Personal-Portfolio-Website/
 │   └── job_agent.py              # Standalone Python job search agent (no AI/ML deps)
 ├── n8n-workflows/
 │   └── job_internship_auto_agent.json  # n8n workflow export
-├── Harshit Mishra Resume.pdf     # Resume file
+├── Harshit_Mishra.pdf            # Updated Resume file
 ├── vercel.json                   # Vercel deployment config
 ├── .github/workflows/
 │   └── deploy.yml                # GitHub Pages CI/CD
@@ -77,7 +77,7 @@ Personal-Portfolio-Website/
 - Action Cards:
   - **GitHub** — Dual profile dropdown (@harshit-001-it & @har-001)
   - **LinkedIn** — Direct profile link (rel="noopener noreferrer")
-  - **Resume** — Download link for `Harshit Mishra Resume.pdf`
+  - **Resume** — View link for `Harshit_Mishra.pdf` (view-only in browser)
   - **n8n Job Agent** — Opens interactive job search modal
 
 ### 3. Skills Section (24 Skills)
