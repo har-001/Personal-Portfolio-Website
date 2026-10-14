@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Hub | Harshit Mishra — Autonomous Systems & NIVA</title>
+  <meta name="description" content="Cinematic AI Hub showcasing Harshit Mishra's autonomous systems, N8N Workflow Automations, and NIVA Neural Intelligent Virtual Assistant." />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
+  <style>
+    /* Dedicated AI Hub Cinematic Styles */
+    .ai-hub-page {
+      min-height: 100vh;
+      background: var(--bg-primary);
+      position: relative;
+      overflow-x: hidden;
+      color: var(--text-primary);
+    }
+
+    .ai-hub-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-2xl);
+      background: rgba(7, 13, 26, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: var(--bg-glass);
+      transition: all var(--trans-base);
+    }
+
+    .back-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateX(-3px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .ai-hub-header {
+      padding-top: 140px;
+      padding-bottom: 60px;
+      text-align: center;
+      position: relative;
+    }
+
+    .ai-hub-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+      background: rgba(138, 229, 244, 0.1);
+      border: 1px solid rgba(138, 229, 244, 0.3);
+      color: var(--accent-2);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-md);
+    }
+
+    .ai-hub-title {
+      font-size: clamp(2.5rem, 5vw, 4.2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-sm);
+    }
+
+    .ai-hub-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 620px;
+      margin: 0 auto var(--space-2xl);
+      line-height: 1.6;
+    }
+
+    /* Robot Mascot Stage */
+    .robot-mascot-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 60px;
+    }
+
+    .robot-mascot-container {
+      width: 200px;
+      height: 200px;
+      position: relative;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .robot-mascot-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 15px 35px rgba(104, 168, 255, 0.35));
+      animation: robot-float 4s ease-in-out infinite;
+    }
+
+    @keyframes robot-float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-14px) rotate(2deg); }
+    }
+
+    .robot-platform {
+      width: 240px;
+      height: 20px;
+      background: radial-gradient(ellipse at center, rgba(104, 168, 255, 0.45) 0%, rgba(7, 13, 26, 0) 70%);
+      border-radius: 50%;
+      margin-top: -10px;
+      filter: blur(4px);
+    }
+
+    .robot-status-bubble {
+      margin-top: 16px;
+      background: rgba(12, 23, 48, 0.85);
+      border: 1px solid var(--border-titanium);
+      backdrop-filter: blur(12px);
+      padding: 6px 16px;
+      border-radius: 99px;
+      font-size: 0.78rem;
+      color: var(--accent-2);
+      font-family: var(--font-heading);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* AI Hub Showcase Grid */
+    .ai-hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: var(--space-2xl);
+      max-width: 1100px;
+      margin: 0 auto 100px;
+      padding: 0 var(--space-xl);
+    }
+
+    .ai-system-card {
+      background: linear-gradient(150deg, rgba(16, 30, 60, 0.85) 0%, rgba(9, 17, 36, 0.95) 100%);
+      border: 1.5px solid var(--border-titanium);
+      border-radius: 26px;
+      box-shadow: var(--shadow-titanium);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      padding: 36px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.2s ease-out, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .ai-system-card:hover {
+      border-color: rgba(138, 229, 244, 0.5);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(104, 168, 255, 0.25);
+    }
+
+    .card-badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .system-category {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-2);
+      padding: 4px 12px;
+      border-radius: 99px;
+      background: rgba(138, 229, 244, 0.12);
+      border: 1px solid rgba(138, 229, 244, 0.3);
+    }
+
+    .system-status-indicator {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .system-status-indicator.active {
+      color: var(--success);
+    }
+
+    .system-title-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .system-icon-box {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: rgba(104, 168, 255, 0.12);
+      border: 1px solid rgba(104, 168, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+
+    .system-name {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .system-desc {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+
+    .feature-points-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feature-points-list li {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .feature-points-list li span.bullet {
+      color: var(--accent-2);
+      font-weight: 800;
+    }
+
+    .system-tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .system-footer-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-action-primary {
+      background: var(--gradient);
+      color: #fff;
+      font-size: 0.84rem;
+      font-weight: 700;
+      padding: 10px 20px;
+      border-radius: var(--radius-full);
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all var(--trans-base);
+    }
+
+    .btn-action-primary:hover {
+      box-shadow: 0 0 20px rgba(104, 168, 255, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn-action-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-size: 0.84rem;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      text-decoration: none;
+      transition: all var(--trans-base);
+    }
+
+    .btn-action-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Modal for Workflow details */
+    .workflow-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.88);
+      backdrop-filter: blur(20px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .workflow-modal-overlay.active {
+      display: flex;
+    }
+
+    .workflow-modal-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-titanium);
+      border-radius: 24px;
+      max-width: 680px;
+      width: 100%;
+      padding: 32px;
+      position: relative;
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .modal-close-btn:hover {
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body class="ai-hub-page">
+  <!-- Interactive Cursor Spotlight -->
+  <div class="cursor-spotlight" id="cursorSpotlight"></div>
+
+  <!-- Top Navigation -->
+  <nav class="ai-hub-nav">
+    <a href="index.html" class="back-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span>Back to Portfolio</span>
+    </a>
+    <div style="font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; letter-spacing: -0.01em;">
+      HARSHIT MISHRA <span style="color: var(--accent-2);">// AI HUB</span>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+  </nav>
+
+  <!-- Hero Header -->
+  <header class="ai-hub-header container">
+    <div class="ai-hub-badge">Autonomous Intelligence &bull; Workflows</div>
+    <h1 class="ai-hub-title">
+      Autonomous <span class="gradient-text">AI Hub</span>
+    </h1>
+    <p class="ai-hub-subtitle">
+      A dedicated showcase of intelligent multi-agent pipelines, N8N workflow automations, and the NIVA Neural Virtual Assistant architecture.
+    </p>
+
+    <!-- Interactive Robot Mascot Stage -->
+    <div class="robot-mascot-stage">
+      <div class="robot-mascot-container" id="robotMascot">
+        <img src="assets/robot_mascot.svg" alt="Harshit Mishra AI Robot Mascot" class="robot-mascot-svg" id="robotSvg" />
+      </div>
+      <div class="robot-platform"></div>
+      <div class="robot-status-bubble">
+        <span class="status-indicator-dot"></span>
+        <span id="robotSpeech">NIVA Sentinel: Systems Active & Monitoring</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main AI Systems Grid -->
+  <main class="ai-hub-grid">
+    <!-- Card 1: N8N Workflow Automation -->
+    <article class="ai-system-card" id="n8nCard">
+      <div class="card-glare-overlay"></div>
+      <div>
+        <div class="card-badge-row">
+          <span class="system-category">Workflow Automation</span>
+          <span class="system-status-indicator active">
+            <span class="status-indicator-dot"></span>
+            <span>PRODUCTION SPEC READY</span>
+          </span>
+        </div>
+
+        <div class="system-title-row">
+          <div class="system-icon-box">⚡</div>
+          <div>
+            <h2 class="system-name">N8N Autonomous Agent</h2>
+            <span style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">Multi-Channel Scraper & Bid Orchestrator</span>
+          </div>
+        </div>
+
+        <p class="system-desc">
+          Automated multi-agent orchestrator connecting public job feeds, freelance boards, and algorithmic filtering with instant multi-channel alerts.
+        </p>
+
+        <ul class="feature-points-list">
+          <li><span class="bullet">▹</span> <strong>Live Ingestion:</strong> Connects to RemoteOK, Remotive, and ArbeitNow public APIs with verified CORS.</li>
+          <li><span class="bullet">▹</span> <strong>5-Channel Alert Matrix:</strong> Dispatches notifications via Email (SMTP/EmailJS), Telegram Bot, WhatsApp, Discord Webhooks, and Native Push.</li>
+          <li><span class="bullet">▹</span> <strong>One-Click Apply/Bid:</strong> Generates tailored application drafts and links directly to verified portals.</li>
+        </ul>
+
+        <div class="system-tech-tags">
+          <span class="tech-tag">n8n Node Workflows</span>
+          <span class="tech-tag">Python API Scraper</span>
+          <span class="tech-tag">REST & Webhooks</span>
+          <span class="tech-tag">Multi-Channel Alerts</span>
+          <span class="tech-tag">Zero Cloud Cost</span>
+        </div>
+      </div>
+
+      <div class="system-footer-actions">
+        <button class="btn-action-primary" id="openN8nSpecBtn">View Architecture Spec 📄</button>
+        <a href="docs/NOTIFICATION_SETUP_GUIDE.md" target="_blank" class="btn-action-secondary">Notification Guide ↗</a>
+      </div>
+    </article>
+
+    <!-- Card 2: NIVA (Neural Intelligent Virtual Assistant) -->
+    <article class="ai-system-card" id="nivaCard">
+      <div class="card-glare-overlay"></div>
+      <div>
+        <div class="card-badge-row">
+          <span class="system-category">Conversational AI</span>
+          <span class="system-status-indicator">
+            <span class="status-indicator-dot" style="background:#68A8FF;box-shadow:0 0 6px #68A8FF;"></span>
+            <span>PRIVATE DEVELOPMENT RUNTIME</span>
+          </span>
+        </div>
+
+        <div class="system-title-row">
+          <div class="system-icon-box" style="background:rgba(138,229,244,0.12);border-color:rgba(138,229,244,0.3);">🧠</div>
+          <div>
+            <h2 class="system-name">NIVA Virtual Assistant</h2>
+            <span style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">Neural Intelligent Virtual Assistant</span>
+          </div>
+        </div>
+
+        <p class="system-desc">
+          Harshit's flagship conversational assistant and multi-modal routing engine designed for real-time task orchestration, quantitative market analysis, and intelligent pair-programming.
+        </p>
+
+        <ul class="feature-points-list">
+          <li><span class="bullet">▹</span> <strong>Multi-Agent Debate Engine:</strong> Coordinates specialist debate agents to cross-verify hypotheses and mitigate hallucinations.</li>
+          <li><span class="bullet">▹</span> <strong>Real-Time Stream Routing:</strong> Low-latency streaming engine with WebSockets and dynamic context management.</li>
+          <li><span class="bullet">▹</span> <strong>Zero Fake Metrics Policy:</strong> Strictly operates on validated inputs, statistical indicators, and verified data pipelines.</li>
+        </ul>
+
+        <div class="system-tech-tags">
+          <span class="tech-tag">Python 3.12</span>
+          <span class="tech-tag">Multi-Agent Debate Engine</span>
+          <span class="tech-tag">WebSockets & FastAPI</span>
+          <span class="tech-tag">Chrome Extension Bridge</span>
+          <span class="tech-tag">Smart Money Concepts (SMC)</span>
+        </div>
+      </div>
+
+      <div class="system-footer-actions">
+        <button class="btn-action-primary" id="openNivaOverviewBtn">System Architecture 🔍</button>
+        <span style="font-size:0.75rem;color:var(--text-muted);align-self:center;">Local runtime • Private build</span>
+      </div>
+    </article>
+  </main>
+
+  <!-- Spec Modal -->
+  <div class="workflow-modal-overlay" id="specModalOverlay">
+    <div class="workflow-modal-card">
+      <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script>
+    // AI Hub Specific Interactive Enhancements
+    document.addEventListener('DOMContentLoaded', () => {
+      // Robot Mascot Cursor Tracking
+      const robot = document.getElementById('robotMascot');
+      const speech = document.getElementById('robotSpeech');
+      const speechPhrases = [
+        "NIVA Sentinel: Systems Active & Monitoring",
+        "Autonomous Pipeline: Ingestion Verified",
+        "Multi-Agent Cluster: Consensus Reached",
+        "Zero False Positive Engine: Operational"
+      ];
+      let phraseIdx = 0;
+
+      if (robot) {
+        document.addEventListener('mousemove', (e) => {
+          const rect = robot.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          const deltaX = (e.clientX - centerX) / (window.innerWidth / 2);
+          const deltaY = (e.clientY - centerY) / (window.innerHeight / 2);
+          robot.style.transform = `perspective(600px) rotateY(${deltaX * 18}deg) rotateX(${-deltaY * 18}deg)`;
+        }, { passive: true });
+
+        robot.addEventListener('click', () => {
+          phraseIdx = (phraseIdx + 1) % speechPhrases.length;
+          speech.textContent = speechPhrases[phraseIdx];
+          robot.style.transform = 'scale(1.15) rotate(5deg)';
+          setTimeout(() => {
+            robot.style.transform = 'scale(1) rotate(0deg)';
+          }, 300);
+        });
+      }
+
+      // Modal Handlers
+      const overlay = document.getElementById('specModalOverlay');
+      const closeBtn = document.getElementById('modalCloseBtn');
+      const content = document.getElementById('modalContent');
+      const openN8n = document.getElementById('openN8nSpecBtn');
+      const openNiva = document.getElementById('openNivaOverviewBtn');
+
+      function openModal(html) {
+        content.innerHTML = html;
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      if (openN8n) {
+        openN8n.addEventListener('click', () => {
+          openModal(`
+            <h2 style="font-size:1.5rem;font-weight:800;color:var(--text-primary);margin-bottom:12px;">⚡ N8N Autonomous Agent Specification</h2>
+            <p style="color:var(--text-secondary);font-size:0.92rem;line-height:1.6;margin-bottom:16px;">
+              This system is exported directly from the workspace workflow <code>n8n-workflows/job_internship_auto_agent.json</code> and configured to run continuously without subscription costs.
+            </p>
+            <div style="background:var(--bg-primary);padding:16px;border-radius:12px;border:1px solid var(--border);margin-bottom:16px;font-family:monospace;font-size:0.82rem;color:var(--accent);">
+              Trigger: Cron Scheduled / Webhook Ingestion<br>
+              Feed 1: RemoteOK API (200 OK / CORS: *)<br>
+              Feed 2: Remotive API (200 OK / CORS: *)<br>
+              Feed 3: ArbeitNow API (200 OK / CORS: *)<br>
+              Outputs: SMTP, Telegram Bot API, WhatsApp, Discord
+            </div>
+            <p style="color:var(--text-muted);font-size:0.82rem;">All secrets are strictly stored in local .env files and omitted from client bundles.</p>
+          `);
+        });
+      }
+
+      if (openNiva) {
+        openNiva.addEventListener('click', () => {
+          openModal(`
+            <h2 style="font-size:1.5rem;font-weight:800;color:var(--text-primary);margin-bottom:12px;">🧠 NIVA Architecture Overview</h2>
+            <p style="color:var(--text-secondary);font-size:0.92rem;line-height:1.6;margin-bottom:16px;">
+              <strong>Neural Intelligent Virtual Assistant (NIVA)</strong> is Harshit Mishra's proprietary multi-agent framework built with high-concurrency Python and WebSocket routing.
+            </p>
+            <ul style="color:var(--text-secondary);font-size:0.88rem;line-height:1.7;margin-bottom:16px;padding-left:20px;">
+              <li><strong>Intent Router:</strong> Classifies user queries into specialized task handlers (Code, Data Analysis, Quantitative SMC).</li>
+              <li><strong>Debate Engine:</strong> Synthesizes multiple perspectives before arriving at a final execution path.</li>
+              <li><strong>Chrome Extension Bridge:</strong> Real-time browser companion for automated workflow execution.</li>
+            </ul>
+            <p style="color:var(--text-muted);font-size:0.82rem;">Current Status: Private Local Environment. Public cloud endpoint in development.</p>
+          `);
+        });
+      }
+
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (overlay) {
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) closeModal();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

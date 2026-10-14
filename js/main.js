@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
    ---------------------------------------------------------------- */
 function initScrollProgress() {
   const bar = document.getElementById('scrollProgress');
+  if (!bar) return;
   window.addEventListener('scroll', () => {
     const scrollTop = window.scrollY;
     const docHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -44,6 +45,7 @@ function initScrollProgress() {
    ---------------------------------------------------------------- */
 function initNavbar() {
   const navbar = document.getElementById('navbar');
+  if (!navbar) return;
   const navLinks = document.querySelectorAll('.nav-link, .mobile-link');
   const sections = document.querySelectorAll('section[id]');
 
@@ -110,6 +112,7 @@ function initNavbar() {
    ---------------------------------------------------------------- */
 function initThemeToggle() {
   const toggle = document.getElementById('themeToggle');
+  if (!toggle) return;
   const saved = localStorage.getItem('theme');
   let theme = saved || 'dark';
 
@@ -133,6 +136,7 @@ function initThemeToggle() {
 function initMobileMenu() {
   const hamburger = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobileMenu');
+  if (!hamburger || !mobileMenu) return;
   const mobileLinks = mobileMenu.querySelectorAll('.mobile-link');
 
   hamburger.addEventListener('click', () => {
@@ -155,13 +159,13 @@ function initMobileMenu() {
    ---------------------------------------------------------------- */
 function initTypewriter() {
   const element = document.getElementById('typedText');
+  if (!element) return;
   const phrases = [
-    'IT Engineer',
-    'Software Developer',
-    'ML Engineer',
+    'Data Analytics',
     'AI Enthusiast',
-    'Computer Vision Explorer',
-    'Problem Solver',
+    'Machine Learning Models',
+    'Python Development',
+    'Intelligent Systems',
   ];
   let phraseIndex = 0;
   let charIndex = 0;
@@ -465,6 +469,7 @@ function initCursorSpotlight() {
    ---------------------------------------------------------------- */
 function init3DTilt() {
   const tiltSelectors = [
+    '.titanium-id-card',
     '.action-card',
     '.experience-card',
     '.about-image-frame',
@@ -567,61 +572,62 @@ function animateCounter(el, target) {
 }
 
 /* ----------------------------------------------------------------
-   SKILLS DATA & RENDERING
+   SKILLS DATA & RENDERING (Evidence-Grounded Competencies)
    ---------------------------------------------------------------- */
 const skillsData = [
   {
-    title: 'AI Engineering',
-    icon: '🤖',
+    title: 'Data Science & Machine Learning',
+    icon: '🧠',
     skills: [
-      { name: 'ML (Machine Learning)', level: 88 },
-      { name: 'Deep Learning (CNN)', level: 82 },
-      { name: 'NLP (Text Analysis)', level: 80 },
-      { name: 'OpenCV', level: 85 },
-      { name: 'RAG & LLM', level: 78 },
-      { name: 'Prompt Engineering', level: 90 },
+      { name: 'ML (Machine Learning)', tier: 'Core Specialization' },
+      { name: 'Deep Learning (CNN)', tier: 'Neural Networks' },
+      { name: 'NLP (Text Analysis)', tier: 'NLP & Transformers' },
+      { name: 'OpenCV', tier: 'Computer Vision' },
+      { name: 'Predictive Modeling', tier: 'Scikit-Learn' },
+      { name: 'Data Manipulation', tier: 'Pandas & NumPy' },
     ],
   },
   {
-    title: 'Core Stack',
+    title: 'Core Languages & Engineering',
     icon: '⚙️',
     skills: [
-      { name: 'Python', level: 92 },
-      { name: 'C++ / Java', level: 78 },
-      { name: 'TensorFlow', level: 82 },
-      { name: 'Web Development', level: 80 },
-      { name: 'MySQL / JSON', level: 75 },
-      { name: 'Linux (OS)', level: 72 },
+      { name: 'Python', tier: 'Primary Language' },
+      { name: 'C++ / Java', tier: 'Object-Oriented' },
+      { name: 'MySQL / Database', tier: 'Relational DB' },
+      { name: 'Modern Web Dev', tier: 'HTML5 • CSS3 • JS' },
+      { name: 'REST & Webhooks', tier: 'API Integration' },
+      { name: 'Linux (OS)', tier: 'Systems & Shell' },
     ],
   },
   {
-    title: 'Tools & Platforms',
+    title: 'Platforms & Developer Ecosystem',
     icon: '🛠️',
     skills: [
-      { name: 'Git / GitHub', level: 90 },
-      { name: 'VS Code', level: 95 },
-      { name: 'Power BI', level: 70 },
-      { name: 'Azure ML Studio', level: 68 },
-      { name: 'Google Colab', level: 88 },
-      { name: 'Jupyter Notebooks', level: 85 },
+      { name: 'Git / GitHub', tier: 'Version Control' },
+      { name: 'VS Code', tier: 'Development IDE' },
+      { name: 'Jupyter Notebooks', tier: 'Interactive Data Lab' },
+      { name: 'Google Colab', tier: 'Cloud GPU Runtime' },
+      { name: 'Power BI', tier: 'Business Analytics' },
+      { name: 'Vercel Deployment', tier: 'CI/CD & Hosting' },
     ],
   },
   {
-    title: 'Soft Skills',
+    title: 'Analytical & Professional Strengths',
     icon: '💡',
     skills: [
-      { name: 'Problem Solving', level: 92 },
-      { name: 'Leadership', level: 85 },
-      { name: 'Teamwork', level: 90 },
-      { name: 'Technical Writing', level: 80 },
-      { name: 'Communication', level: 85 },
-      { name: 'Continuous Learning', level: 95 },
+      { name: 'Problem Solving', tier: 'Algorithmic Thinking' },
+      { name: 'Model Evaluation', tier: 'Accuracy & ROC/AUC' },
+      { name: 'Data Cleaning & EDA', tier: 'Exploratory Analytics' },
+      { name: 'Technical Writing', tier: 'Documentation & Specs' },
+      { name: 'Continuous Learning', tier: 'Fast Tech Adoption' },
+      { name: 'Team Collaboration', tier: 'Agile Git Workflows' },
     ],
   },
 ];
 
 function renderSkills() {
   const grid = document.getElementById('skillsGrid');
+  if (!grid) return;
 
   grid.innerHTML = skillsData.map((cat, catIdx) => `
     <div class="skill-category reveal reveal-delay-${Math.min(catIdx + 1, 4)}">
@@ -629,15 +635,16 @@ function renderSkills() {
         <div class="skill-category-icon">${cat.icon}</div>
         <h3 class="skill-category-title">${cat.title}</h3>
       </div>
-      <div class="skill-items">
+      <div class="skill-capsules-grid">
         ${cat.skills.map((s) => `
-          <div class="skill-item" data-skill="${s.name}" data-category="${cat.title}" data-icon="${cat.icon}">
-            <div class="skill-info">
-              <span class="skill-name">${s.name} 💡</span>
-              <span class="skill-percent">${s.level}%</span>
+          <div class="skill-capsule" data-skill="${s.name}" data-category="${cat.title}" data-icon="${cat.icon}" title="Click to view roadmap & resources">
+            <div class="capsule-header">
+              <span class="capsule-dot"></span>
+              <span class="capsule-name">${s.name}</span>
             </div>
-            <div class="skill-bar">
-              <div class="skill-fill" data-level="${s.level}"></div>
+            <div class="capsule-footer">
+              <span class="capsule-tier">${s.tier}</span>
+              <span class="capsule-arrow">↗</span>
             </div>
           </div>
         `).join('')}
@@ -652,25 +659,10 @@ function renderSkills() {
 }
 
 function initSkillBarAnimations() {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const bars = entry.target.querySelectorAll('.skill-fill');
-        bars.forEach((bar, i) => {
-          setTimeout(() => {
-            bar.style.width = bar.getAttribute('data-level') + '%';
-            bar.classList.add('animated');
-          }, i * 100);
-        });
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.2 });
-
-  // Observe after rendering
-  setTimeout(() => {
-    document.querySelectorAll('.skill-category').forEach((cat) => observer.observe(cat));
-  }, 100);
+  const capsules = document.querySelectorAll('.skill-capsule');
+  capsules.forEach((cap, i) => {
+    cap.style.transitionDelay = `${(i % 6) * 0.04}s`;
+  });
 }
 
 /* ----------------------------------------------------------------
@@ -752,8 +744,90 @@ function getLanguageEmoji(lang) {
   return emojis[lang] || '📦';
 }
 
+const verifiedFallbackProjects = [
+  {
+    id: 'har-001/vedora-ai',
+    title: 'Trading Bot (VedoraAI Multi-Agent)',
+    description: 'Autonomous multi-agent algorithmic trading engine featuring Smart Money Concepts (SMC), real-time order blocks, and debate synthesis.',
+    language: 'Python',
+    stars: 1,
+    forks: 0,
+    githubUrl: 'https://github.com/har-001',
+    liveUrl: null,
+    topics: ['python', 'trading', 'smc', 'ai-agents'],
+    owner: 'har-001',
+    updatedAt: '2026-10-10T12:00:00Z'
+  },
+  {
+    id: 'harshit-001-it/emotion-recognition',
+    title: 'Human Emotion Recognition System',
+    description: 'Real-time facial expression analysis and emotion recognition engine built with OpenCV and deep convolutional neural networks.',
+    language: 'Python',
+    stars: 0,
+    forks: 0,
+    githubUrl: 'https://github.com/harshit-001-it',
+    liveUrl: null,
+    topics: ['opencv', 'computer-vision', 'deep-learning', 'python'],
+    owner: 'harshit-001-it',
+    updatedAt: '2026-09-15T12:00:00Z'
+  },
+  {
+    id: 'harshit-001-it/diabetes-prediction',
+    title: 'Diabetes Prediction Analytics',
+    description: 'Machine learning clinical analytics platform evaluating healthcare indicators to predict diabetes risk using Scikit-Learn.',
+    language: 'Python',
+    stars: 0,
+    forks: 0,
+    githubUrl: 'https://github.com/harshit-001-it',
+    liveUrl: null,
+    topics: ['machine-learning', 'scikit-learn', 'healthcare', 'eda'],
+    owner: 'harshit-001-it',
+    updatedAt: '2026-08-20T12:00:00Z'
+  },
+  {
+    id: 'harshit-001-it/sonar-rock-mine',
+    title: 'Sonar Rock vs Mine Detector',
+    description: 'Binary signal classification model analyzing sonar frequencies to distinguish underwater rock surfaces from metallic mines.',
+    language: 'Python',
+    stars: 0,
+    forks: 0,
+    githubUrl: 'https://github.com/harshit-001-it',
+    liveUrl: null,
+    topics: ['signal-processing', 'classification', 'numpy', 'scipy'],
+    owner: 'harshit-001-it',
+    updatedAt: '2026-07-10T12:00:00Z'
+  },
+  {
+    id: 'har-001/Personal-Portfolio-Website',
+    title: 'Personal Portfolio Website',
+    description: 'High-performance, 3D interactive portfolio website featuring titanium materials, glassmorphism, and responsive Apple-inspired UX.',
+    language: 'JavaScript',
+    stars: 1,
+    forks: 0,
+    githubUrl: 'https://github.com/har-001/Personal-Portfolio-Website',
+    liveUrl: 'https://advance-portfolio-umber.vercel.app/',
+    topics: ['3d-design', 'vanilla-js', 'css3', 'apple-design'],
+    owner: 'har-001',
+    updatedAt: '2026-10-14T12:00:00Z'
+  },
+  {
+    id: 'harshit-001-it/library-management',
+    title: 'Library Management System',
+    description: 'Database management software engineered with Python and MySQL for student issuance tracking, cataloging, and inventory.',
+    language: 'Python',
+    stars: 0,
+    forks: 0,
+    githubUrl: 'https://github.com/harshit-001-it',
+    liveUrl: null,
+    topics: ['python', 'mysql', 'database-design'],
+    owner: 'harshit-001-it',
+    updatedAt: '2026-05-10T12:00:00Z'
+  }
+];
+
 async function fetchAndRenderProjects() {
   const grid = document.getElementById('projectsGrid');
+  if (!grid) return;
 
   // Show loading state
   grid.innerHTML = `
@@ -764,26 +838,32 @@ async function fetchAndRenderProjects() {
   `;
 
   // Fetch from both accounts
-  const allReposArrays = await Promise.all(
-    GITHUB_USERNAMES.map((u) => fetchGitHubRepos(u))
-  );
+  let allRepos = [];
+  try {
+    const allReposArrays = await Promise.all(
+      GITHUB_USERNAMES.map((u) => fetchGitHubRepos(u))
+    );
+    allRepos = allReposArrays
+      .flat()
+      .filter(repo => {
+        // Enforce Build Kit rule: N8N and NIVA belong only in separate AI Hub
+        const text = (repo.title + ' ' + (repo.description || '')).toLowerCase();
+        return !text.includes('n8n') && !text.includes('niva');
+      })
+      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  } catch (err) {
+    console.warn('GitHub API fetch failed, falling back to verified repositories:', err);
+  }
 
-  const allRepos = allReposArrays
-    .flat()
-    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-
-  if (allRepos.length === 0) {
-    grid.innerHTML = `
-      <div class="projects-empty">
-        <p>Unable to load projects. Please check back later.</p>
-      </div>
-    `;
-    return;
+  // Graceful fallback if API fails or rate-limited
+  if (!allRepos || allRepos.length === 0) {
+    allRepos = verifiedFallbackProjects;
   }
 
   // Build unique language filter buttons
   const languages = [...new Set(allRepos.map((r) => r.language))].filter(Boolean);
   const filtersContainer = document.getElementById('projectFilters');
+  if (filtersContainer) {
   filtersContainer.innerHTML = `
     <button class="filter-btn active" data-filter="all">All (${allRepos.length})</button>
     ${languages.map((lang) => {
@@ -806,6 +886,7 @@ async function fetchAndRenderProjects() {
       renderProjectCards(filtered, filter);
     });
   });
+  }
 }
 
 function renderProjectCards(repos, filter) {
@@ -964,6 +1045,7 @@ const certificatesData = [
 
 function renderCertificates() {
   const grid = document.getElementById('certificatesGrid');
+  if (!grid) return;
 
   grid.innerHTML = certificatesData.map((cert, idx) => `
     <div class="cert-card reveal reveal-delay-${Math.min((idx % 4) + 1, 4)}" data-cert-index="${idx}">
@@ -982,6 +1064,7 @@ function renderCertificates() {
 
 function initCertModalHandlers() {
   const overlay = document.getElementById('certModalOverlay');
+  if (!overlay) return;
   const closeBtn = document.getElementById('certModalClose');
   const iconEl = document.getElementById('certModalIcon');
   const titleEl = document.getElementById('certModalTitle');
@@ -1075,16 +1158,9 @@ function initContactForm() {
         throw new Error('Server response was not ok');
       }
     } catch (err) {
-      console.warn('Formspree/AJAX send notice, activating mailto fallback:', err);
-      
-      // 2. Fallback: Launch mailto directly to harshitmishra1208@gmail.com so no message is ever lost
-      const mailtoUrl = `mailto:harshitmishra1208@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Hi Harshit,\n\n${message}\n\nFrom: ${name} (${email})`)}`;
-      
-      status.className = 'form-status success';
-      status.innerHTML = '✅ <strong>Opening your email client...</strong> If it does not open automatically, please email directly to <a href="mailto:harshitmishra1208@gmail.com" style="color:var(--accent);text-decoration:underline;">harshitmishra1208@gmail.com</a>';
-      
-      window.location.href = mailtoUrl;
-      form.reset();
+      console.warn('Contact delivery notification:', err);
+      status.className = 'form-status error';
+      status.innerHTML = '⚠️ <strong>Direct form submission encountered an issue.</strong> Please message Harshit directly at <a href="mailto:harshitmishra1208@gmail.com" style="color:var(--accent-2);text-decoration:underline;font-weight:700;">harshitmishra1208@gmail.com</a> or via <a href="https://linkedin.com/in/harshit-mishra-51275b219" target="_blank" rel="noopener" style="color:var(--accent-2);text-decoration:underline;font-weight:700;">LinkedIn ↗</a>';
     } finally {
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalBtnContent;
@@ -1102,6 +1178,7 @@ function initContactForm() {
    ---------------------------------------------------------------- */
 function initBackToTop() {
   const btn = document.getElementById('backToTop');
+  if (!btn) return;
   btn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
