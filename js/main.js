@@ -21,9 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initBackToTop();
   initSkillBarAnimations();
   initGitHubDropdown();
-  initAIChatbot();
-  initN8nJobAgent();
-  initFreelanceAgent();
+  init3DCardPhysics();
 });
 
 /* ----------------------------------------------------------------
@@ -469,7 +467,6 @@ function initCursorSpotlight() {
    ---------------------------------------------------------------- */
 function init3DTilt() {
   const tiltSelectors = [
-    '.titanium-id-card',
     '.action-card',
     '.experience-card',
     '.about-image-frame',
@@ -1638,651 +1635,174 @@ function initSkillModalClickHandlers() {
 }
 
 /* ----------------------------------------------------------------
-   AI ASSISTANT CHATBOT WIDGET ENGINE (Phase 3 Feature)
+   3D ID-CARD PHYSICS ENGINE & PULL-TO-SCROLL (Cinematic Hero)
+   Simulates a realistic hanging lanyard badge with spring-damper
+   elastic drag, 3D perspective rotation, and pull-to-scroll gesture.
    ---------------------------------------------------------------- */
-function initAIChatbot() {
-  const trigger = document.getElementById('aiChatTrigger');
-  const widget = document.getElementById('aiChatWidget');
-  const closeBtn = document.getElementById('aiChatClose');
-  const chatMessages = document.getElementById('aiChatMessages');
-  const chatForm = document.getElementById('aiChatForm');
-  const chatInput = document.getElementById('aiChatInput');
-  const suggestionChips = document.querySelectorAll('.chip-btn');
+function init3DCardPhysics() {
+  const card = document.getElementById('titaniumIdCard');
+  const stage = document.getElementById('idCardStage');
+  const ribbon = document.getElementById('lanyardRibbon');
+  const pullText = document.getElementById('pullText');
+  const pullIndicator = document.getElementById('pullIndicator');
+  const aboutSection = document.getElementById('about');
 
-  if (!trigger || !widget) return;
+  if (!card || !stage) return;
 
-  // Toggle Widget
-  trigger.addEventListener('click', () => {
-    widget.classList.toggle('active');
-    if (widget.classList.contains('active')) {
-      chatInput.focus();
-    }
-  });
+  let isDragging = false;
+  let startX = 0, startY = 0;
+  let currentX = 0, currentY = 0;
+  let targetX = 0, targetY = 0;
+  let velX = 0, velY = 0;
+  let mouseTiltX = 0, mouseTiltY = 0;
+  let isEntering = false;
 
-  closeBtn.addEventListener('click', () => {
-    widget.classList.remove('active');
-  });
+  const PULL_THRESHOLD = 95; // pixels pulled down to trigger transition
 
-  // Suggestion Chips Click
-  suggestionChips.forEach((chip) => {
-    chip.addEventListener('click', () => {
-      const query = chip.getAttribute('data-query');
-      handleUserMessage(query);
-    });
-  });
-
-  // Form Submission
-  chatForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const query = chatInput.value.trim();
-    if (!query) return;
-    chatInput.value = '';
-    handleUserMessage(query);
-  });
-
-  function handleUserMessage(text) {
-    // 1. Add User Message
-    appendBubble(text, 'user-msg');
-
-    // 2. Show Typing Indicator
-    const typingBubble = document.createElement('div');
-    typingBubble.className = 'chat-msg bot-msg typing-msg';
-    typingBubble.innerHTML = '<div class="chat-bubble">AI is typing... 💬</div>';
-    chatMessages.appendChild(typingBubble);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // 3. Generate Bot Response
-    setTimeout(() => {
-      typingBubble.remove();
-      const botResponse = generateAIResponse(text);
-      appendBubble(botResponse, 'bot-msg');
-    }, 600);
+  // Pointer Down (Desktop & Mobile)
+  function onPointerDown(e) {
+    if (isEntering) return;
+    isDragging = true;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    startX = clientX - currentX;
+    startY = clientY - currentY;
+    card.classList.add('is-dragging');
+    document.body.style.userSelect = 'none';
   }
 
-  function appendBubble(content, msgClass) {
-    const msgDiv = document.createElement('div');
-    msgDiv.className = `chat-msg ${msgClass}`;
-    msgDiv.innerHTML = `<div class="chat-bubble">${content}</div>`;
-    chatMessages.appendChild(msgDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
+  // Pointer Move
+  function onPointerMove(e) {
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-  function generateAIResponse(q) {
-    const query = q.toLowerCase();
+    if (isDragging) {
+      if (e.cancelable && e.touches) e.preventDefault(); // prevent native scroll while pulling card
+      const rawX = clientX - startX;
+      const rawY = clientY - startY;
 
-    // 1. GREETINGS & INTRO
-    if (query.includes('hi') || query.includes('hello') || query.includes('hey') || query.includes('namaste') || query.includes('kaise') || query.includes('who are you')) {
-      return `👋 Hi there! I am Harshit Mishra's **AI Knowledge & Portfolio Assistant** (powered like ChatGPT/Gemini/Claude).<br/><br/>
-      I can answer questions about:<br/>
-      • 👤 <strong>Harshit's Portfolio:</strong> Projects, Skills, Resume, Certifications, Contact.<br/>
-      • 📚 <strong>Tech & Interview Questions:</strong> Python, ML, Deep Learning, RAG, Web Dev, DSA, SQL.<br/>
-      • 💡 <strong>Concepts:</strong> Ask me to explain any technology or interview problem!<br/><br/>
-      <i>Try asking: "Explain Machine Learning vs Deep Learning" or "What is RAG?" or "Show Harshit's projects"</i>`;
-    }
+      // Elastic physics resistance: easier to pull down, high resistance pulling up
+      targetX = rawX * 0.55;
+      targetY = rawY > 0 ? rawY * 0.82 : rawY * 0.22;
 
-    // 2. SPECIFIC HARSHIT PORTFOLIO INQUIRIES
-    if (query.includes('project') || query.includes('github') || query.includes('repo') || query.includes('work')) {
-      return `🚀 <strong>Harshit's Open-Source & GitHub Work:</strong><br/>
-      Harshit actively builds projects across 2 GitHub accounts:<br/>
-      1. <a href="https://github.com/harshit-001-it" target="_blank" style="color:var(--accent);text-decoration:underline;">@harshit-001-it</a> — Primary AI, ML & IT Repositories.<br/>
-      2. <a href="https://github.com/har-001" target="_blank" style="color:var(--accent);text-decoration:underline;">@har-001</a> — Web Development & AI Bots.<br/><br/>
-      Check out the <strong>Projects</strong> section above which live-fetches all repositories automatically!`;
-    }
+      // Real-time tension badge feedback
+      if (targetY >= PULL_THRESHOLD) {
+        if (pullText) pullText.textContent = 'Release to Explore Portfolio 🚀';
+        if (pullIndicator) pullIndicator.classList.add('ready-to-release');
+      } else if (targetY > 25) {
+        if (pullText) pullText.textContent = 'Keep pulling down... ↓';
+        if (pullIndicator) pullIndicator.classList.remove('ready-to-release');
+      } else {
+        if (pullText) pullText.textContent = 'Move · Tilt · Pull Down to Explore';
+        if (pullIndicator) pullIndicator.classList.remove('ready-to-release');
+      }
+    } else {
+      // Proximity tilt when hovering near card
+      const rect = card.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const distX = clientX - centerX;
+      const distY = clientY - centerY;
+      const maxDistance = 500;
 
-    if (query.includes('certif') || query.includes('credential')) {
-      return `🏆 <strong>Harshit's Certifications:</strong><br/>
-      • <strong>AnalytixLabs:</strong> Excellence in Machine Learning Foundations<br/>
-      • <strong>Freedom with AI:</strong> AI Masterclass (Generative AI & LLMs)<br/>
-      • <strong>InternPe:</strong> Python Programming Internship<br/>
-      • <strong>Softpro / AKTU:</strong> Machine Learning Workshop<br/>
-      • <strong>Technoledge / IIMT:</strong> Smart Embedded Systems & IoT (2 Module Certifications)<br/>
-      • <strong>Appwars Technologies:</strong> Startups & Legal Seminar<br/><br/>
-      You can click any card under <strong>Certifications</strong> to view the authentic documents!`;
-    }
-
-    if (query.includes('contact') || query.includes('email') || query.includes('hire') || query.includes('reach') || query.includes('where')) {
-      return `📧 <strong>Get in Touch with Harshit:</strong><br/>
-      • <strong>Email:</strong> <a href="mailto:harshitmishra1208@gmail.com" style="color:var(--accent);text-decoration:underline;">harshitmishra1208@gmail.com</a><br/>
-      • <strong>LinkedIn:</strong> <a href="https://linkedin.com/in/harshit-mishra-51275b219" target="_blank" style="color:var(--accent);text-decoration:underline;">Harshit Mishra</a><br/>
-      • <strong>Location:</strong> Greater Noida, India<br/>
-      • <strong>Status:</strong> Available for work & collaborations!<br/><br/>
-      You can use the <strong>Contact Form</strong> below to send a message directly.`;
-    }
-
-    if (query.includes('education') || query.includes('college') || query.includes('b.tech') || query.includes('iimt')) {
-      return `🎓 <strong>Education & Degree:</strong><br/>
-      Harshit Mishra is currently pursuing his <strong>B.Tech in Information Technology</strong> from <strong>IIMT College of Engineering</strong>, Greater Noida. He specializes in AI Engineering, Computer Vision, and Full Stack Web Solutions.`;
-    }
-
-    if (query.includes('resume') || query.includes('cv') || query.includes('view resume')) {
-      return `📄 <strong>Harshit's Resume:</strong><br/>
-      You can view Harshit's full CV here: <a href="Harshit_Mishra.pdf" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">View Harshit's Resume 📄</a>`;
-    }
-
-    // 3. AI / MACHINE LEARNING / DEEP LEARNING / RAG TUTOR
-    if (query.includes('rag') || query.includes('retrieval augmented')) {
-      return `⚡ <strong>RAG (Retrieval-Augmented Generation) Explained:</strong><br/>
-      RAG is a technique that enhances LLMs (like GPT-4) by retrieving external context from a custom knowledge base or Vector DB (e.g. ChromaDB, Pinecone) before generating answers.<br/><br/>
-      • <strong>Step 1: Chunking</strong> — Split documents into smaller text snippets.<br/>
-      • <strong>Step 2: Embedding</strong> — Convert text chunks into vector embeddings.<br/>
-      • <strong>Step 3: Retrieval</strong> — Search top-K similar chunks using cosine similarity.<br/>
-      • <strong>Step 4: Generation</strong> — Feed retrieved context + user prompt to LLM for accurate, hallucination-free answers!`;
-    }
-
-    if (query.includes('machine learning') || query.includes('ml vs') || query.includes('what is ml')) {
-      return `🧠 <strong>Machine Learning (ML) Foundations:</strong><br/>
-      ML is a branch of AI where systems learn patterns from data rather than explicit programming.<br/><br/>
-      • <strong>Supervised Learning:</strong> Trained on labeled data (e.g. Regression for prices, Classification for spam).<br/>
-      • <strong>Unsupervised Learning:</strong> Finds hidden patterns in unlabeled data (e.g. K-Means Clustering, PCA).<br/>
-      • <strong>Reinforcement Learning:</strong> Agent learns via rewards and penalties in an environment.`;
-    }
-
-    if (query.includes('deep learning') || query.includes('cnn') || query.includes('neural network')) {
-      return `👁️ <strong>Deep Learning & CNNs:</strong><br/>
-      Deep Learning uses Multi-Layer Neural Networks with artificial neurons (Perceptrons) trained via Backpropagation.<br/><br/>
-      • <strong>CNNs (Convolutional Neural Networks):</strong> Specialized for computer vision. They use Convolutional filters to extract spatial features (edges, textures, shapes), followed by Pooling layers to downsample, and Dense layers to classify objects!`;
-    }
-
-    if (query.includes('nlp') || query.includes('transformer') || query.includes('bert') || query.includes('llm')) {
-      return `📝 <strong>NLP & Transformers:</strong><br/>
-      Natural Language Processing enables computers to understand human language.<br/><br/>
-      • <strong>Transformers (Vaswani et al., 2017):</strong> Uses <i>Self-Attention</i> mechanism to weigh the importance of tokens relative to each other regardless of position. Powers modern LLMs like ChatGPT, Claude, and Gemini!`;
-    }
-
-    if (query.includes('opencv') || query.includes('computer vision')) {
-      return `📷 <strong>OpenCV & Computer Vision:</strong><br/>
-      OpenCV is an open-source Computer Vision library used for real-time image and video processing.<br/><br/>
-      • <strong>Key Tasks:</strong> Grayscale conversion, Gaussian blurring, Canny Edge Detection, Contour finding, and Object Detection using YOLO or Haar Cascades.`;
-    }
-
-    // 4. PYTHON & INTERVIEW CONCEPTS
-    if (query.includes('list vs tuple') || query.includes('tuple vs list')) {
-      return `🐍 <strong>Python Interview Q: List vs Tuple</strong><br/>
-      • <strong>List:</strong> Mutable (changeable), uses square brackets <code>[1, 2, 3]</code>, slower performance, more memory.<br/>
-      • <strong>Tuple:</strong> Immutable (un-changeable), uses parentheses <code>(1, 2, 3)</code>, faster performance, used for fixed records.`;
-    }
-
-    if (query.includes('decorator') || query.includes('python decorator')) {
-      return `🐍 <strong>Python Interview Q: Decorators</strong><br/>
-      A decorator is a function that takes another function as an argument, extends its behavior without modifying it explicitly, and returns a new function (using <code>@decorator_name</code> syntax). Used for logging, authentication, and execution time measurement!`;
-    }
-
-    if (query.includes('generator') || query.includes('yield')) {
-      return `🐍 <strong>Python Interview Q: Generators & Yield</strong><br/>
-      Generators are functions that return an iterator using the <code>yield</code> keyword instead of <code>return</code>. They generate values lazily on-the-fly, making them extremely memory-efficient for large datasets!`;
-    }
-
-    // 5. DSA & ALGORITHMS TUTOR
-    if (query.includes('dsa') || query.includes('algorithm') || query.includes('complexity') || query.includes('big o')) {
-      return `🧩 <strong>Data Structures & Complexity Guide:</strong><br/>
-      • <strong>O(1):</strong> Constant Time (Direct array access, Hash Map lookup).<br/>
-      • <strong>O(log N):</strong> Logarithmic Time (Binary Search in sorted array).<br/>
-      • <strong>O(N):</strong> Linear Time (Single loop through array).<br/>
-      • <strong>O(N log N):</strong> Linearithmic Time (Merge Sort, Quick Sort).<br/>
-      • <strong>O(N²):</strong> Quadratic Time (Nested loops, Bubble Sort).`;
-    }
-
-    // 6. WEB DEV & DATABASES
-    if (query.includes('join') || query.includes('sql join') || query.includes('inner join')) {
-      return `🗄️ <strong>SQL Interview Q: Types of JOINs</strong><br/>
-      • <strong>INNER JOIN:</strong> Returns matching rows from both tables.<br/>
-      • <strong>LEFT JOIN:</strong> Returns all rows from left table + matching rows from right.<br/>
-      • <strong>RIGHT JOIN:</strong> Returns all rows from right table + matching rows from left.<br/>
-      • <strong>FULL OUTER JOIN:</strong> Returns all rows when there is a match in either table.`;
-    }
-
-    if (query.includes('flexbox vs grid') || query.includes('css grid')) {
-      return `🌐 <strong>Web Dev Q: Flexbox vs CSS Grid</strong><br/>
-      • <strong>Flexbox:</strong> 1-Dimensional layout system (along a row OR column). Perfect for navigation bars, buttons, and linear items.<br/>
-      • <strong>CSS Grid:</strong> 2-Dimensional layout system (rows AND columns simultaneously). Perfect for page layouts, galleries, and multi-row grids.`;
-    }
-
-    // 7. COMPREHENSIVE SMART KNOWLEDGE ENGINE FALLBACK (ChatGPT / Gemini Style Explanation)
-    const cleanQ = q.replace(/[^\w\s]/gi, '').trim();
-    return `🤖 <strong>AI Explanation: "${cleanQ}"</strong><br/><br/>
-    Here is a clear breakdown of your query:<br/><br/>
-    1. 📌 <strong>Core Concept:</strong> <em>"${cleanQ}"</em> is an important topic in Computer Science and Technology. It deals with optimizing workflows, algorithms, or software engineering practices.<br/>
-    2. 💡 <strong>How it works:</strong> Systems process inputs through structured rules or neural models, evaluating conditions to produce efficient outputs.<br/>
-    3. 🚀 <strong>Best Practice:</strong> Break the problem into modular steps, verify edge cases, and utilize standard libraries.<br/><br/>
-    💬 <i>Want to learn more or ask another interview question? Feel free to ask anything about Python, ML, RAG, Web Dev, or Harshit's portfolio!</i>`;
-  }
-}
-
-/* ----------------------------------------------------------------
-   N8N AUTONOMOUS JOB AGENT — REAL LIVE API INTEGRATION
-   Fetches REAL jobs from public APIs globally. No demo/mock data.
-   ---------------------------------------------------------------- */
-const JOB_SKILLS = ['python', 'machine learning', 'ai', 'ml', 'deep learning', 'data science', 'opencv', 'nlp', 'rag', 'langchain', 'tensorflow', 'pytorch', 'computer vision', 'django', 'flask', 'web', 'react', 'node'];
-
-let fetchedJobs = [];
-const appliedHistory = [];
-let jobIdCounter = 1;
-
-function calculateSkillMatch(title, tags) {
-  const text = ((title || '') + ' ' + (tags || []). join(' ')).toLowerCase();
-  let matched = 0;
-  JOB_SKILLS.forEach(s => { if (text.includes(s)) matched++; });
-  const pct = Math.min(99, Math.round((matched / 5) * 100));
-  return { match: Math.max(pct, 60 + Math.floor(Math.random() * 25)), skills: Math.max(matched, 1) };
-}
-
-async function fetchRealJobs() {
-  const results = [];
-
-  // 1. RemoteOK API (free, no auth, CORS-friendly via proxy)
-  try {
-    const res = await fetch('https://remoteok.com/api');
-    const data = await res.json();
-    const jobs = data.filter(j => j.position && j.company);
-    jobs.slice(0, 8).forEach(j => {
-      const { match, skills } = calculateSkillMatch(j.position, j.tags || []);
-      results.push({
-        id: jobIdCounter++,
-        title: j.position,
-        company: j.company,
-        source: 'RemoteOK',
-        match, skills,
-        url: j.url || `https://remoteok.com/remote-jobs/${j.slug || ''}`,
-        location: j.location || 'Remote',
-        salary: j.salary_min ? `$${j.salary_min}-${j.salary_max}` : 'Not Listed',
-        applied: false
-      });
-    });
-  } catch(e) { console.warn('RemoteOK fetch error:', e); }
-
-  // 2. Remotive API (free, no auth)
-  try {
-    const res = await fetch('https://remotive.com/api/remote-jobs?limit=8');
-    const data = await res.json();
-    (data.jobs || []).slice(0, 8).forEach(j => {
-      const { match, skills } = calculateSkillMatch(j.title, [j.category || '']);
-      results.push({
-        id: jobIdCounter++,
-        title: j.title,
-        company: j.company_name,
-        source: 'Remotive',
-        match, skills,
-        url: j.url,
-        location: j.candidate_required_location || 'Remote',
-        salary: j.salary || 'Not Listed',
-        applied: false
-      });
-    });
-  } catch(e) { console.warn('Remotive fetch error:', e); }
-
-  // 3. Arbeitnow API (free, no auth)
-  try {
-    const res = await fetch('https://www.arbeitnow.com/api/job-board-api');
-    const data = await res.json();
-    (data.data || []).slice(0, 6).forEach(j => {
-      const { match, skills } = calculateSkillMatch(j.title, j.tags || []);
-      results.push({
-        id: jobIdCounter++,
-        title: j.title,
-        company: j.company_name,
-        source: 'Arbeitnow',
-        match, skills,
-        url: j.url,
-        location: j.location || 'Global',
-        salary: 'Not Listed',
-        applied: false
-      });
-    });
-  } catch(e) { console.warn('Arbeitnow fetch error:', e); }
-
-  // Sort by match score descending
-  results.sort((a, b) => b.match - a.match);
-  return results;
-}
-
-function initN8nJobAgent() {
-  const agentBtn = document.getElementById('n8nAgentBtn');
-  const overlay = document.getElementById('n8nAgentModalOverlay');
-  const closeBtn = document.getElementById('n8nAgentModalClose');
-  const fetchBtn = document.getElementById('triggerJobAgentBtn');
-  const statusEl = document.getElementById('n8nTriggerStatus');
-  const feedEl = document.getElementById('appliedJobsFeed');
-  const feedSection = document.getElementById('jobFeedSection');
-  const historySection = document.getElementById('appliedHistorySection');
-  const historyFeed = document.getElementById('appliedHistoryFeed');
-  const countBadge = document.getElementById('appliedCountBadge');
-
-  if (!agentBtn || !overlay) return;
-
-  function renderJobsFeed() {
-    if (!feedEl) return;
-    const pending = fetchedJobs.filter(j => !j.applied);
-    feedEl.innerHTML = pending.length === 0
-      ? '<p style="text-align:center;color:var(--text-muted);padding:12px;">No pending jobs. Click Refresh to fetch more!</p>'
-      : pending.map(job => `
-      <div class="job-card">
-        <div class="job-card-info">
-          <div class="job-card-title">${job.title} <span class="job-card-company">@ ${job.company}</span></div>
-          <div class="job-card-meta">Source: ${job.source} &bull; ${job.location} &bull; Match: ${job.match}% (${job.skills} skills) &bull; <span class="status-green">Ready to Apply</span></div>
-        </div>
-        <div class="job-card-actions">
-          <a href="${job.url}" target="_blank" rel="noopener" class="job-view-link">View</a>
-          <button class="job-apply-btn" onclick="applyToJob(${job.id})">Apply</button>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  function renderHistory() {
-    if (!historyFeed) return;
-    if (appliedHistory.length === 0) return;
-    historySection.style.display = 'block';
-    if (countBadge) countBadge.textContent = appliedHistory.length + ' Applied';
-    historyFeed.innerHTML = appliedHistory.map(job => `
-      <div class="job-card" style="border-color: rgba(16,185,129,0.3);">
-        <div class="job-card-info">
-          <div class="job-card-title">${job.title} <span class="job-card-company">@ ${job.company}</span></div>
-          <div class="job-card-meta">Source: ${job.source} &bull; Match: ${job.match}% &bull; Applied: ${job.appliedAt}</div>
-        </div>
-        <div class="job-card-actions">
-          <a href="${job.url}" target="_blank" rel="noopener" class="job-view-link">View</a>
-          <span class="applied-badge">Applied</span>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  // Apply opens the real job URL and marks as applied
-  window.applyToJob = function(jobId) {
-    const job = fetchedJobs.find(j => j.id === jobId);
-    if (!job || job.applied) return;
-
-    // Open the real job application page in new tab
-    window.open(job.url, '_blank');
-
-    job.applied = true;
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-    appliedHistory.unshift({ ...job, appliedAt: 'Today ' + timeStr });
-
-    renderJobsFeed();
-    renderHistory();
-
-    if (statusEl) {
-      statusEl.style.display = 'block';
-      statusEl.innerHTML = 'Opened application for <strong>' + job.title + ' @ ' + job.company + '</strong> &mdash; Complete the form on the job portal!';
-      setTimeout(() => { statusEl.style.display = 'none'; }, 5000);
-    }
-
-    if ('Notification' in window) {
-      if (Notification.permission === 'granted') {
-        new Notification('🚀 Job Application Opened!', { body: job.title + ' @ ' + job.company + ' — Complete it on the portal!' });
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(p => {
-          if (p === 'granted') new Notification('🚀 Job Application Opened!', { body: job.title + ' @ ' + job.company });
-        });
+      if (Math.abs(distX) < maxDistance && Math.abs(distY) < maxDistance) {
+        mouseTiltX = (distY / maxDistance) * -16;
+        mouseTiltY = (distX / maxDistance) * 16;
+      } else {
+        mouseTiltX = 0;
+        mouseTiltY = 0;
       }
     }
-  };
-
-  agentBtn.addEventListener('click', () => {
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  });
-
-  const closeModal = () => {
-    overlay.classList.remove('active');
-    document.body.style.overflow = '';
-  };
-
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) closeModal();
-  });
-
-  if (fetchBtn) {
-    fetchBtn.addEventListener('click', async () => {
-      fetchBtn.disabled = true;
-      fetchBtn.textContent = 'Fetching live jobs from global APIs...';
-
-      if (statusEl) {
-        statusEl.style.display = 'block';
-        statusEl.textContent = 'Connecting to RemoteOK, Remotive & Arbeitnow APIs...';
-      }
-
-      try {
-        const realJobs = await fetchRealJobs();
-        if (realJobs.length > 0) {
-          fetchedJobs = realJobs;
-        }
-        if (feedSection) feedSection.style.display = 'block';
-        renderJobsFeed();
-        renderHistory();
-        fetchBtn.disabled = false;
-        fetchBtn.textContent = 'Refresh Jobs';
-        if (statusEl) {
-          statusEl.innerHTML = 'Fetched <strong>' + fetchedJobs.filter(j => !j.applied).length + ' real jobs</strong> from live APIs. Click <strong>Apply</strong> to open the application!';
-        }
-      } catch(e) {
-        fetchBtn.disabled = false;
-        fetchBtn.textContent = 'Retry Fetch';
-        if (statusEl) {
-          statusEl.innerHTML = 'API connection issue. Try again or check your internet connection.';
-        }
-      }
-    });
-  }
-}
-
-/* ----------------------------------------------------------------
-   FREELANCE GIG FINDER AGENT — REAL LIVE API INTEGRATION
-   Fetches REAL freelance/contract gigs from public APIs globally.
-   ---------------------------------------------------------------- */
-const FREELANCE_SKILLS = ['python', 'machine learning', 'ai', 'data', 'web', 'api', 'automation', 'scraping', 'django', 'flask', 'react', 'node', 'design', 'mobile', 'cloud', 'devops'];
-
-let fetchedGigs = [];
-const bidHistory = [];
-let gigIdCounter = 1001;
-
-function calculateGigMatch(title, desc) {
-  const text = ((title || '') + ' ' + (desc || '')).toLowerCase();
-  let matched = 0;
-  FREELANCE_SKILLS.forEach(s => { if (text.includes(s)) matched++; });
-  const pct = Math.min(99, Math.round((matched / 4) * 100));
-  return { match: Math.max(pct, 55 + Math.floor(Math.random() * 30)), skills: Math.max(matched, 1) };
-}
-
-async function fetchRealGigs() {
-  const results = [];
-
-  // 1. RemoteOK (freelance/contract tags)
-  try {
-    const res = await fetch('https://remoteok.com/api');
-    const data = await res.json();
-    const gigs = data.filter(j => j.position && j.company);
-    gigs.slice(0, 6).forEach(j => {
-      const { match, skills } = calculateGigMatch(j.position, (j.tags || []).join(' '));
-      results.push({
-        id: gigIdCounter++,
-        title: j.position,
-        client: j.company,
-        source: 'RemoteOK',
-        budget: j.salary_min ? `$${j.salary_min}-${j.salary_max}` : 'Negotiable',
-        match, skills,
-        url: j.url || `https://remoteok.com/remote-jobs/${j.slug || ''}`,
-        applied: false
-      });
-    });
-  } catch(e) { console.warn('RemoteOK gigs error:', e); }
-
-  // 2. Remotive (contract/freelance gigs)
-  try {
-    const res = await fetch('https://remotive.com/api/remote-jobs?limit=8');
-    const data = await res.json();
-    (data.jobs || []).slice(0, 6).forEach(j => {
-      const { match, skills } = calculateGigMatch(j.title, j.description || '');
-      results.push({
-        id: gigIdCounter++,
-        title: j.title,
-        client: j.company_name,
-        source: 'Remotive',
-        budget: j.salary || 'Negotiable',
-        match, skills,
-        url: j.url,
-        applied: false
-      });
-    });
-  } catch(e) { console.warn('Remotive gigs error:', e); }
-
-  // 3. Arbeitnow (global contract gigs)
-  try {
-    const res = await fetch('https://www.arbeitnow.com/api/job-board-api');
-    const data = await res.json();
-    (data.data || []).slice(0, 4).forEach(j => {
-      const { match, skills } = calculateGigMatch(j.title, (j.tags || []).join(' '));
-      results.push({
-        id: gigIdCounter++,
-        title: j.title,
-        client: j.company_name,
-        source: 'Arbeitnow',
-        budget: 'Negotiable',
-        match, skills,
-        url: j.url,
-        applied: false
-      });
-    });
-  } catch(e) { console.warn('Arbeitnow gigs error:', e); }
-
-  results.sort((a, b) => b.match - a.match);
-  return results;
-}
-
-function initFreelanceAgent() {
-  const agentBtn = document.getElementById('freelanceAgentBtn');
-  const overlay = document.getElementById('freelanceModalOverlay');
-  const closeBtn = document.getElementById('freelanceModalClose');
-  const fetchBtn = document.getElementById('fetchFreelanceBtn');
-  const statusEl = document.getElementById('freelanceTriggerStatus');
-  const feedEl = document.getElementById('gigFeed');
-  const feedSection = document.getElementById('gigFeedSection');
-  const historySection = document.getElementById('bidHistorySection');
-  const historyFeed = document.getElementById('bidHistoryFeed');
-  const countBadge = document.getElementById('bidCountBadge');
-
-  if (!agentBtn || !overlay) return;
-
-  function renderGigsFeed() {
-    if (!feedEl) return;
-    const pending = fetchedGigs.filter(g => !g.applied);
-    feedEl.innerHTML = pending.length === 0
-      ? '<p style="text-align:center;color:var(--text-muted);padding:12px;">No pending gigs. Click Refresh to fetch more!</p>'
-      : pending.map(gig => `
-      <div class="job-card">
-        <div class="job-card-info">
-          <div class="job-card-title">${gig.title}</div>
-          <div class="job-card-meta">Client: <span class="job-card-company">${gig.client}</span> &bull; ${gig.source} &bull; Budget: <strong>${gig.budget}</strong> &bull; Match: ${gig.match}% &bull; <span class="status-green">Open for Bid</span></div>
-        </div>
-        <div class="job-card-actions">
-          <a href="${gig.url}" target="_blank" rel="noopener" class="job-view-link">View</a>
-          <button class="job-apply-btn" style="background:linear-gradient(135deg, #a855f7, #6366f1);" onclick="bidOnGig(${gig.id})">Bid</button>
-        </div>
-      </div>
-    `).join('');
   }
 
-  function renderBidHistory() {
-    if (!historyFeed) return;
-    if (bidHistory.length === 0) return;
-    historySection.style.display = 'block';
-    if (countBadge) countBadge.textContent = bidHistory.length + ' Bids Sent';
-    historyFeed.innerHTML = bidHistory.map(gig => `
-      <div class="job-card" style="border-color: rgba(168,85,247,0.3);">
-        <div class="job-card-info">
-          <div class="job-card-title">${gig.title}</div>
-          <div class="job-card-meta">Client: ${gig.client} &bull; ${gig.source} &bull; ${gig.budget} &bull; Bid: ${gig.bidAt}</div>
-        </div>
-        <div class="job-card-actions">
-          <a href="${gig.url}" target="_blank" rel="noopener" class="job-view-link">View</a>
-          <span class="applied-badge" style="background:rgba(168,85,247,0.15);color:#a855f7;">Bid Sent</span>
-        </div>
-      </div>
-    `).join('');
+  // Pointer Up
+  function onPointerUp() {
+    if (!isDragging) return;
+    isDragging = false;
+    card.classList.remove('is-dragging');
+    document.body.style.userSelect = '';
+
+    if (targetY >= PULL_THRESHOLD && !isEntering) {
+      isEntering = true;
+      if (pullText) pullText.textContent = 'Entering Portfolio... ✨';
+      card.classList.add('pull-snap');
+
+      // Smooth scroll to About section
+      setTimeout(() => {
+        if (aboutSection) {
+          const navHeight = 75;
+          const pos = aboutSection.getBoundingClientRect().top + window.pageYOffset - navHeight;
+          window.scrollTo({ top: pos, behavior: 'smooth' });
+        }
+      }, 150);
+
+      setTimeout(() => {
+        targetX = 0;
+        targetY = 0;
+        isEntering = false;
+        card.classList.remove('pull-snap');
+        if (pullText) pullText.textContent = 'Move · Tilt · Pull Down to Explore';
+        if (pullIndicator) pullIndicator.classList.remove('ready-to-release');
+      }, 1200);
+    } else {
+      targetX = 0;
+      targetY = 0;
+      if (pullText) pullText.textContent = 'Move · Tilt · Pull Down to Explore';
+      if (pullIndicator) pullIndicator.classList.remove('ready-to-release');
+    }
   }
 
-  // Bid opens the real gig page
-  window.bidOnGig = function(gigId) {
-    const gig = fetchedGigs.find(g => g.id === gigId);
-    if (!gig || gig.applied) return;
+  // Spring-Damper Physics Simulation Loop
+  const stiffness = 0.16;
+  const damping = 0.76;
 
-    window.open(gig.url, '_blank');
-
-    gig.applied = true;
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-    bidHistory.unshift({ ...gig, bidAt: 'Today ' + timeStr });
-
-    renderGigsFeed();
-    renderBidHistory();
-
-    if (statusEl) {
-      statusEl.style.display = 'block';
-      statusEl.innerHTML = 'Opened <strong>' + gig.title + '</strong> (' + gig.client + ') &mdash; Submit your proposal on the platform!';
-      setTimeout(() => { statusEl.style.display = 'none'; }, 5000);
+  function physicsLoop() {
+    if (!isDragging) {
+      // Spring back towards resting position (0,0)
+      const forceX = (targetX - currentX) * stiffness;
+      const forceY = (targetY - currentY) * stiffness;
+      velX = (velX + forceX) * damping;
+      velY = (velY + forceY) * damping;
+      currentX += velX;
+      currentY += velY;
+    } else {
+      // Follow cursor with silky interpolation
+      currentX += (targetX - currentX) * 0.38;
+      currentY += (targetY - currentY) * 0.38;
     }
 
-    if ('Notification' in window) {
-      if (Notification.permission === 'granted') {
-        new Notification('💼 Freelance Gig Opened!', { body: gig.title + ' (' + gig.client + ' - ' + gig.budget + ')' });
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(p => {
-          if (p === 'granted') new Notification('💼 Freelance Gig Opened!', { body: gig.title + ' (' + gig.client + ')' });
-        });
-      }
+    // Dynamic 3D rotation angles based on inertia and tilt
+    const rotX = isDragging ? currentY * -0.18 : mouseTiltX + currentY * -0.14;
+    const rotY = isDragging ? currentX * 0.18 : mouseTiltY + currentX * 0.14;
+    const rotZ = currentX * 0.08;
+
+    card.style.transform = `perspective(1000px) translate3d(${currentX.toFixed(2)}px, ${currentY.toFixed(2)}px, ${isDragging ? 35 : 0}px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) rotateZ(${rotZ.toFixed(2)}deg)`;
+
+    // Update lanyard ribbon strap stretch and angle
+    if (ribbon) {
+      const strapLength = Math.sqrt(currentX * currentX + Math.pow(125 + currentY, 2));
+      const strapAngle = Math.atan2(currentX, 125 + currentY) * (180 / Math.PI);
+      ribbon.style.transform = `translateX(-50%) rotate(${-strapAngle.toFixed(2)}deg)`;
+      ribbon.style.height = `${Math.max(100, strapLength).toFixed(1)}px`;
     }
-  };
 
-  agentBtn.addEventListener('click', () => {
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  });
+    // Dynamic specular lighting reflection on the card
+    const glareX = 50 + rotY * 2.5;
+    const glareY = 50 - rotX * 2.5;
+    card.style.setProperty('--mouse-x', `${glareX.toFixed(1)}%`);
+    card.style.setProperty('--mouse-y', `${glareY.toFixed(1)}%`);
 
-  const closeModal = () => {
-    overlay.classList.remove('active');
-    document.body.style.overflow = '';
-  };
-
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) closeModal();
-  });
-
-  if (fetchBtn) {
-    fetchBtn.addEventListener('click', async () => {
-      fetchBtn.disabled = true;
-      fetchBtn.textContent = 'Scanning freelance platforms...';
-
-      if (statusEl) {
-        statusEl.style.display = 'block';
-        statusEl.textContent = 'Connecting to RemoteOK, Remotive & Arbeitnow APIs for freelance gigs...';
-      }
-
-      try {
-        const realGigs = await fetchRealGigs();
-        if (realGigs.length > 0) {
-          fetchedGigs = realGigs;
-        }
-        if (feedSection) feedSection.style.display = 'block';
-        renderGigsFeed();
-        renderBidHistory();
-        fetchBtn.disabled = false;
-        fetchBtn.textContent = 'Refresh Gigs';
-        fetchBtn.style.background = 'linear-gradient(135deg, #a855f7, #6366f1)';
-        if (statusEl) {
-          statusEl.innerHTML = 'Fetched <strong>' + fetchedGigs.filter(g => !g.applied).length + ' real gigs</strong> from live APIs. Click <strong>Bid</strong> to open the project!';
-        }
-      } catch(e) {
-        fetchBtn.disabled = false;
-        fetchBtn.textContent = 'Retry Fetch';
-        fetchBtn.style.background = 'linear-gradient(135deg, #a855f7, #6366f1)';
-        if (statusEl) {
-          statusEl.innerHTML = 'API connection issue. Try again or check your internet.';
-        }
-      }
-    });
+    requestAnimationFrame(physicsLoop);
   }
+
+  requestAnimationFrame(physicsLoop);
+
+  // Event Listeners
+  card.addEventListener('mousedown', onPointerDown);
+  window.addEventListener('mousemove', onPointerMove, { passive: true });
+  window.addEventListener('mouseup', onPointerUp);
+
+  card.addEventListener('touchstart', onPointerDown, { passive: true });
+  window.addEventListener('touchmove', onPointerMove, { passive: false });
+  window.addEventListener('touchend', onPointerUp);
 }
