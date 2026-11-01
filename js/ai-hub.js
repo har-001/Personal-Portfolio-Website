@@ -338,3 +338,4 @@ function initCursorSpotlight() {
     spotlight.style.transform = `translate(${e.clientX - 250}px, ${e.clientY - 250}px)`;
   }, { passive: true });
 }
+

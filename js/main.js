@@ -826,26 +826,26 @@ function initPhysical3DIDCard() {
   if (oldCanvas) oldCanvas.remove();
   stage.appendChild(renderer.domElement);
 
-  // Lighting
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+  // Lighting: High-CRI Pure White Key Light with Cyber Rim Highlights
+  const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
   scene.add(ambientLight);
 
-  const mainLight = new THREE.DirectionalLight(0x00d4ff, 1.5);
-  mainLight.position.set(5, 8, 8);
-  mainLight.castShadow = true;
-  scene.add(mainLight);
+  const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+  keyLight.position.set(3, 5, 8);
+  keyLight.castShadow = true;
+  scene.add(keyLight);
 
-  const fillLight = new THREE.PointLight(0x8b5cf6, 1.4, 25);
-  fillLight.position.set(-5, -3, 6);
+  const fillLight = new THREE.DirectionalLight(0xe0f2fe, 0.8);
+  fillLight.position.set(-4, -2, 6);
   scene.add(fillLight);
 
-  const rimLight = new THREE.DirectionalLight(0x38bdf8, 1.0);
-  rimLight.position.set(0, -6, -4);
+  const rimLight = new THREE.DirectionalLight(0x00d4ff, 0.7);
+  rimLight.position.set(0, 6, -3);
   scene.add(rimLight);
 
   // Rear light for when card is flipped
-  const backLight = new THREE.DirectionalLight(0xffffff, 1.2);
-  backLight.position.set(0, 2, -8);
+  const backLight = new THREE.DirectionalLight(0xffffff, 1.4);
+  backLight.position.set(0, 0, -8);
   scene.add(backLight);
 
   // Top Suspension Anchor (Lanyard hangs from here)
@@ -884,68 +884,59 @@ function initPhysical3DIDCard() {
     return hole;
   }
 
-  // --- Inner & Outer Dimensions ---
-  const cardW = 3.3;
-  const cardH = 5.0;
-  const radius = 0.28;
-  const slotW = 0.62;
-  const slotH = 0.16;
-  const slotY = cardH / 2 - 0.40; // slot location relative to card center
+  // --- Solid Single-Body Titanium ID Card Dimensions ---
+  const cardW = 3.2;
+  const cardH = 4.9;
+  const radius = 0.25;
+  const slotW = 0.58;
+  const slotH = 0.14;
+  const slotY = cardH / 2 - 0.38; // 2.07
 
-  const innerW = 3.10;
-  const innerH = 4.78;
-  const innerRadius = 0.20;
+  // Single clean Shape with top slot hole
+  const cardShape = createRoundedRectShape(cardW, cardH, radius);
+  cardShape.holes.push(createSlotHole(slotW, slotH, slotY));
 
-  // --- Hollow Titanium Bezel Outer Frame ---
-  const frameShape = createRoundedRectShape(cardW, cardH, radius);
-  frameShape.holes.push(createSlotHole(slotW, slotH, slotY));
-  frameShape.holes.push(createRoundedRectShape(innerW, innerH, innerRadius));
-
+  // 1. Solid Extruded Aerospace Titanium Core
   const extrudeSettings = {
-    depth: 0.04,
+    depth: 0.035,
     bevelEnabled: true,
     bevelSegments: 3,
     steps: 1,
-    bevelSize: 0.02,
-    bevelThickness: 0.015
+    bevelSize: 0.015,
+    bevelThickness: 0.01
   };
-
-  const bodyGeo = new THREE.ExtrudeGeometry(frameShape, extrudeSettings);
-  bodyGeo.translate(0, 0, -0.02);
+  const bodyGeo = new THREE.ExtrudeGeometry(cardShape, extrudeSettings);
+  bodyGeo.translate(0, 0, -0.0175); // Centered at Z = 0
 
   const rimMaterial = new THREE.MeshStandardMaterial({
     color: 0x94a3b8, // Brushed Aerospace Titanium
-    roughness: 0.22,
+    roughness: 0.20,
     metalness: 0.95
   });
-
   const bodyMesh = new THREE.Mesh(bodyGeo, rimMaterial);
   bodyMesh.castShadow = true;
   bodyMesh.receiveShadow = true;
   cardGroup.add(bodyMesh);
 
-  const innerShape = createRoundedRectShape(innerW, innerH, innerRadius);
-  innerShape.holes.push(createSlotHole(slotW, slotH, slotY));
-
-  const innerGeo = new THREE.ShapeGeometry(innerShape);
-
-  const pos = innerGeo.attributes.position;
+  // 2. Front & Back Face Geometries
+  const frontGeo = new THREE.ShapeGeometry(cardShape);
+  const pos = frontGeo.attributes.position;
   const frontUvs = new Float32Array(pos.count * 2);
   const backUvs = new Float32Array(pos.count * 2);
 
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i);
     const y = pos.getY(i);
-    const u = (x + innerW / 2) / innerW;
-    const v = (y + innerH / 2) / innerH;
+    const u = (x + cardW / 2) / cardW;
+    const v = (y + cardH / 2) / cardH;
     frontUvs[i * 2] = u;
     frontUvs[i * 2 + 1] = v;
     backUvs[i * 2] = 1 - u;
     backUvs[i * 2 + 1] = v;
   }
-  innerGeo.setAttribute('uv', new THREE.BufferAttribute(frontUvs, 2));
+  frontGeo.setAttribute('uv', new THREE.BufferAttribute(frontUvs, 2));
 
-  const backGeo = innerGeo.clone();
+  const backGeo = frontGeo.clone();
   backGeo.setAttribute('uv', new THREE.BufferAttribute(backUvs, 2));
 
   // Canvas Textures
@@ -969,39 +960,41 @@ function initPhysical3DIDCard() {
   backTexture.minFilter = THREE.LinearFilter;
   backTexture.magFilter = THREE.LinearFilter;
 
+  // 3. Front Face Mesh (Crisp, unoccluded on front of core)
   const frontMat = new THREE.MeshStandardMaterial({
     map: frontTexture,
-    roughness: 0.30,
+    roughness: 0.28,
     metalness: 0.08,
     side: THREE.FrontSide
   });
-  const frontMesh = new THREE.Mesh(innerGeo, frontMat);
-  frontMesh.position.z = 0.005;
+  const frontMesh = new THREE.Mesh(frontGeo, frontMat);
+  frontMesh.position.z = 0.020;
   cardGroup.add(frontMesh);
 
+  // 4. Back Face Mesh (Crisp, unoccluded on back of core)
   const backMat = new THREE.MeshStandardMaterial({
     map: backTexture,
-    roughness: 0.30,
+    roughness: 0.28,
     metalness: 0.08,
     side: THREE.FrontSide
   });
   const backMesh = new THREE.Mesh(backGeo, backMat);
-  backMesh.position.z = -0.005;
+  backMesh.position.z = -0.020;
   backMesh.rotation.y = Math.PI;
   cardGroup.add(backMesh);
 
-  // Acrylic Glass Cover (Subtle protective sheen)
+  // 5. Acrylic Glass Protective Sheen
   const glassMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     transparent: true,
-    opacity: 0.14,
+    opacity: 0.12,
     roughness: 0.05,
-    metalness: 0.10,
+    metalness: 0.12,
     depthWrite: false,
     side: THREE.FrontSide
   });
-  const glassMesh = new THREE.Mesh(innerGeo, glassMat);
-  glassMesh.position.z = 0.012;
+  const glassMesh = new THREE.Mesh(frontGeo, glassMat);
+  glassMesh.position.z = 0.024;
   cardGroup.add(glassMesh);
 
   // Metallic Clasp & Swivel Ring
