@@ -463,9 +463,9 @@ function init3DMouseCompanion() {
   const drone = new THREE.Group();
   scene.add(drone);
 
-  // 1. Spherical Metallic Chassis
-  const coreRadius = 22;
-  const bodyGeo = new THREE.SphereGeometry(coreRadius, 32, 32);
+  // 1. Spherical Metallic Chassis (Compact Micro-Drone)
+  const coreRadius = 7.5;
+  const bodyGeo = new THREE.SphereGeometry(coreRadius, 24, 24);
   const bodyMat = new THREE.MeshStandardMaterial({
     color: 0x94a3b8, // Brushed Aerospace Titanium
     roughness: 0.18,
@@ -475,7 +475,7 @@ function init3DMouseCompanion() {
   drone.add(bodyMesh);
 
   // 2. Curved Cyber Visor
-  const visorGeo = new THREE.CylinderGeometry(coreRadius + 0.5, coreRadius + 0.5, 12, 32, 1, true, -Math.PI * 0.38, Math.PI * 0.76);
+  const visorGeo = new THREE.CylinderGeometry(coreRadius + 0.3, coreRadius + 0.3, 4.5, 24, 1, true, -Math.PI * 0.38, Math.PI * 0.76);
   const visorMat = new THREE.MeshStandardMaterial({
     color: 0x020617,
     roughness: 0.1,
@@ -484,32 +484,32 @@ function init3DMouseCompanion() {
   });
   const visorMesh = new THREE.Mesh(visorGeo, visorMat);
   visorMesh.rotation.x = Math.PI / 2;
-  visorMesh.position.z = 2;
+  visorMesh.position.z = 0.8;
   drone.add(visorMesh);
 
   // 3. Twin Glowing LED Eyes
   const eyeGroup = new THREE.Group();
-  eyeGroup.position.set(0, 1, coreRadius + 1.2);
+  eyeGroup.position.set(0, 0.4, coreRadius + 0.6);
   drone.add(eyeGroup);
 
-  const eyeGeo = new THREE.SphereGeometry(3.2, 16, 16);
+  const eyeGeo = new THREE.SphereGeometry(1.2, 12, 12);
   const eyeMat = new THREE.MeshBasicMaterial({ color: 0x00f5ff });
 
   const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-  leftEye.position.x = -6.5;
+  leftEye.position.x = -2.2;
   eyeGroup.add(leftEye);
 
   const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
-  rightEye.position.x = 6.5;
+  rightEye.position.x = 2.2;
   eyeGroup.add(rightEye);
 
-  // 4. Concentric 3D Gyroscopic Gimbal Rings
+  // 4. Concentric 3D Gyroscopic Gimbal Rings (Micro-Scale)
   // Ring 1 (Cyan Outer Ring)
-  const ring1Geo = new THREE.TorusGeometry(36, 1.6, 16, 64);
+  const ring1Geo = new THREE.TorusGeometry(12.5, 0.55, 12, 48);
   const ring1Mat = new THREE.MeshStandardMaterial({
     color: 0x00d4ff,
     emissive: 0x00d4ff,
-    emissiveIntensity: 0.35,
+    emissiveIntensity: 0.4,
     roughness: 0.25,
     metalness: 0.85
   });
@@ -517,11 +517,11 @@ function init3DMouseCompanion() {
   drone.add(ring1);
 
   // Ring 2 (Purple Inner Ring)
-  const ring2Geo = new THREE.TorusGeometry(29, 1.4, 16, 64);
+  const ring2Geo = new THREE.TorusGeometry(10.2, 0.45, 12, 48);
   const ring2Mat = new THREE.MeshStandardMaterial({
     color: 0xa855f7,
     emissive: 0xa855f7,
-    emissiveIntensity: 0.35,
+    emissiveIntensity: 0.4,
     roughness: 0.25,
     metalness: 0.85
   });
@@ -529,20 +529,20 @@ function init3DMouseCompanion() {
   drone.add(ring2);
 
   // 5. Top Antenna with Status Beacon
-  const antGeo = new THREE.CylinderGeometry(0.8, 0.8, 12, 8);
+  const antGeo = new THREE.CylinderGeometry(0.3, 0.3, 4.0, 8);
   const antMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.2 });
   const antenna = new THREE.Mesh(antGeo, antMat);
-  antenna.position.set(0, coreRadius + 6, 0);
+  antenna.position.set(0, coreRadius + 2.0, 0);
   drone.add(antenna);
 
-  const beaconGeo = new THREE.SphereGeometry(2.4, 16, 16);
+  const beaconGeo = new THREE.SphereGeometry(0.9, 12, 12);
   const beaconMat = new THREE.MeshBasicMaterial({ color: 0x22c55e });
   const beacon = new THREE.Mesh(beaconGeo, beaconMat);
-  beacon.position.set(0, coreRadius + 12, 0);
+  beacon.position.set(0, coreRadius + 4.0, 0);
   drone.add(beacon);
 
   // 6. Holographic Shockwave Ring (for click reactions)
-  const shockGeo = new THREE.RingGeometry(1, 3, 32);
+  const shockGeo = new THREE.RingGeometry(0.5, 1.5, 32);
   const shockMat = new THREE.MeshBasicMaterial({
     color: 0x00d4ff,
     side: THREE.DoubleSide,
@@ -835,13 +835,18 @@ function initPhysical3DIDCard() {
   mainLight.castShadow = true;
   scene.add(mainLight);
 
-  const fillLight = new THREE.PointLight(0x8b5cf6, 1.2, 20);
+  const fillLight = new THREE.PointLight(0x8b5cf6, 1.4, 25);
   fillLight.position.set(-5, -3, 6);
   scene.add(fillLight);
 
-  const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.8);
+  const rimLight = new THREE.DirectionalLight(0x38bdf8, 1.0);
   rimLight.position.set(0, -6, -4);
   scene.add(rimLight);
+
+  // Rear light for when card is flipped
+  const backLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  backLight.position.set(0, 2, -8);
+  scene.add(backLight);
 
   // Top Suspension Anchor (Lanyard hangs from here)
   const anchorY = 2.7;
@@ -879,7 +884,7 @@ function initPhysical3DIDCard() {
     return hole;
   }
 
-  // --- Outer Titanium/Obsidian Badge Frame ---
+  // --- Inner & Outer Dimensions ---
   const cardW = 3.3;
   const cardH = 5.0;
   const radius = 0.28;
@@ -887,36 +892,37 @@ function initPhysical3DIDCard() {
   const slotH = 0.16;
   const slotY = cardH / 2 - 0.40; // slot location relative to card center
 
-  const outerShape = createRoundedRectShape(cardW, cardH, radius);
-  outerShape.holes.push(createSlotHole(slotW, slotH, slotY));
+  const innerW = 3.10;
+  const innerH = 4.78;
+  const innerRadius = 0.20;
+
+  // --- Hollow Titanium Bezel Outer Frame ---
+  const frameShape = createRoundedRectShape(cardW, cardH, radius);
+  frameShape.holes.push(createSlotHole(slotW, slotH, slotY));
+  frameShape.holes.push(createRoundedRectShape(innerW, innerH, innerRadius));
 
   const extrudeSettings = {
-    depth: 0.05,
+    depth: 0.04,
     bevelEnabled: true,
-    bevelSegments: 4,
+    bevelSegments: 3,
     steps: 1,
-    bevelSize: 0.03,
-    bevelThickness: 0.02
+    bevelSize: 0.02,
+    bevelThickness: 0.015
   };
 
-  const bodyGeo = new THREE.ExtrudeGeometry(outerShape, extrudeSettings);
+  const bodyGeo = new THREE.ExtrudeGeometry(frameShape, extrudeSettings);
   bodyGeo.translate(0, 0, -0.02);
 
   const rimMaterial = new THREE.MeshStandardMaterial({
     color: 0x94a3b8, // Brushed Aerospace Titanium
-    roughness: 0.28,
-    metalness: 0.9
+    roughness: 0.22,
+    metalness: 0.95
   });
 
   const bodyMesh = new THREE.Mesh(bodyGeo, rimMaterial);
   bodyMesh.castShadow = true;
   bodyMesh.receiveShadow = true;
   cardGroup.add(bodyMesh);
-
-  // --- Inner Insert Badge Geometry ---
-  const innerW = 3.12;
-  const innerH = 4.80;
-  const innerRadius = 0.22;
 
   const innerShape = createRoundedRectShape(innerW, innerH, innerRadius);
   innerShape.holes.push(createSlotHole(slotW, slotH, slotY));
@@ -957,39 +963,45 @@ function initPhysical3DIDCard() {
   const backTexture = new THREE.CanvasTexture(backCanvas);
   backTexture.generateMipmaps = true;
 
+  // High clarity texture configuration
+  frontTexture.minFilter = THREE.LinearFilter;
+  frontTexture.magFilter = THREE.LinearFilter;
+  backTexture.minFilter = THREE.LinearFilter;
+  backTexture.magFilter = THREE.LinearFilter;
+
   const frontMat = new THREE.MeshStandardMaterial({
     map: frontTexture,
-    roughness: 0.38,
-    metalness: 0.12,
+    roughness: 0.30,
+    metalness: 0.08,
     side: THREE.FrontSide
   });
   const frontMesh = new THREE.Mesh(innerGeo, frontMat);
-  frontMesh.position.z = 0.038;
+  frontMesh.position.z = 0.005;
   cardGroup.add(frontMesh);
 
   const backMat = new THREE.MeshStandardMaterial({
     map: backTexture,
-    roughness: 0.38,
-    metalness: 0.12,
+    roughness: 0.30,
+    metalness: 0.08,
     side: THREE.FrontSide
   });
   const backMesh = new THREE.Mesh(backGeo, backMat);
-  backMesh.position.z = -0.038;
+  backMesh.position.z = -0.005;
   backMesh.rotation.y = Math.PI;
   cardGroup.add(backMesh);
 
-  // Acrylic Glass Cover
+  // Acrylic Glass Cover (Subtle protective sheen)
   const glassMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     transparent: true,
-    opacity: 0.12,
+    opacity: 0.14,
     roughness: 0.05,
-    metalness: 0.12,
+    metalness: 0.10,
     depthWrite: false,
     side: THREE.FrontSide
   });
   const glassMesh = new THREE.Mesh(innerGeo, glassMat);
-  glassMesh.position.z = 0.042;
+  glassMesh.position.z = 0.012;
   cardGroup.add(glassMesh);
 
   // Metallic Clasp & Swivel Ring

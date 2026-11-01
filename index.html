@@ -16,7 +16,7 @@
   <meta property="og:type" content="website" />
 
   <!-- Styles -->
-  <link rel="stylesheet" href="css/styles.css?v=3d-full-v5" />
+  <link rel="stylesheet" href="css/styles.css?v=3d-rebuild-v6" />
 
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
@@ -43,11 +43,15 @@
         <li><a href="#skills" class="nav-link" data-section="skills">Skills</a></li>
         <li><a href="#projects" class="nav-link" data-section="projects">Projects</a></li>
         <li><a href="#certificates" class="nav-link" data-section="certificates">Certificates</a></li>
-        <li><a href="ai-hub.html" class="nav-link nav-ai-hub" title="Dedicated AI Hub — N8N & NIVA">AI Hub 🤖</a></li>
-        <li><a href="#contact" class="nav-link" data-section="contact">Contact</a></li>
+                <li><a href="#contact" class="nav-link" data-section="contact">Contact</a></li>
       </ul>
 
       <div class="nav-actions">
+        <a href="ai-hub.html" class="nav-ai-hub-badge" title="Launch Autonomous AI Hub (NIVA & N8N Workflows)">
+          <span class="ai-hub-icon">⚡</span>
+          <span class="ai-hub-title">AI HUB</span>
+          <span class="ai-hub-live-dot"></span>
+        </a>
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
         <button class="hamburger" id="hamburger" aria-label="Toggle menu">
           <span></span>
@@ -60,13 +64,16 @@
 
   <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobileMenu">
+    <a href="ai-hub.html" class="mobile-ai-hub-badge">
+      <span>⚡ AI HUB (NIVA &amp; N8N)</span>
+      <span class="ai-hub-live-dot"></span>
+    </a>
     <a href="#hero" class="mobile-link" data-section="hero">Home</a>
     <a href="#about" class="mobile-link" data-section="about">About</a>
     <a href="#experience" class="mobile-link" data-section="experience">Experience</a>
     <a href="#skills" class="mobile-link" data-section="skills">Skills</a>
     <a href="#projects" class="mobile-link" data-section="projects">Projects</a>
     <a href="#certificates" class="mobile-link" data-section="certificates">Certificates</a>
-    <a href="ai-hub.html" class="mobile-link nav-ai-hub" style="color:var(--accent);">AI Hub 🤖</a>
     <a href="#contact" class="mobile-link" data-section="contact">Contact</a>
   </div>
 
@@ -260,27 +267,16 @@
               </div>
             </a>
 
-            <!-- n8n Autonomous Job Agent Card -->
-            <button class="action-card" id="n8nAgentBtn">
+            <!-- Contact Inquiry Card -->
+            <a href="#contact" class="action-card">
               <div class="action-card-icon">
-                ⚡
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
               </div>
               <div class="action-card-text">
-                <span class="action-card-tag">Autonomous Automation</span>
-                <span class="action-card-title">n8n Job Agent 🤖</span>
+                <span class="action-card-tag">Direct Inquiry</span>
+                <span class="action-card-title">Get In Touch</span>
               </div>
-            </button>
-
-            <!-- n8n Freelancing Agent Card -->
-            <button class="action-card" id="freelanceAgentBtn">
-              <div class="action-card-icon">
-                💼
-              </div>
-              <div class="action-card-text">
-                <span class="action-card-tag">Freelance Gig Finder</span>
-                <span class="action-card-title">Freelance Agent 🚀</span>
-              </div>
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -756,6 +752,6 @@
   <!-- Three.js 3D Engine Library -->
   <script src="js/three.min.js"></script>
   <!-- Main JavaScript -->
-  <script src="js/main.js?v=3d-full-v5"></script>
+  <script src="js/main.js?v=3d-rebuild-v6"></script>
 </body>
 </html>
