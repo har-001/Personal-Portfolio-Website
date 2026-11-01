@@ -199,230 +199,185 @@ function initTypewriter() {
 }
 
 /* ----------------------------------------------------------------
-   PARTICLE CANVAS (Hero Background)
+   THREE.JS WEBGL 3D DEEP-SPACE HERO BACKGROUND
+   Features:
+   - 1,200+ particle stars distributed in 3D perspective depth space
+   - 4 floating cyber polyhedrons (Octahedron, Icosahedron, Torus Knot, Dodecahedron)
+   - Real-time dynamic point light that follows the mouse in 3D space
+   - Mouse & scroll camera parallax for authentic 3D spatial depth
    ---------------------------------------------------------------- */
 function initParticles() {
   const container = document.getElementById('heroCanvas');
   if (!container) return;
-  const canvas = document.createElement('canvas');
-  container.appendChild(canvas);
-  const ctx = canvas.getContext('2d');
 
-  let particles = [];
-  let polyhedrons = [];
-  let animId;
-  let mouse = { x: null, y: null, targetX: 0, targetY: 0 };
+  if (typeof THREE === 'undefined') return;
 
-  function resize() {
-    canvas.width = container.offsetWidth;
-    canvas.height = container.offsetHeight;
+  let width = container.offsetWidth || window.innerWidth;
+  let height = container.offsetHeight || window.innerHeight;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(55, width / height, 0.1, 2000);
+  camera.position.set(0, 0, 500);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(width, height);
+  container.innerHTML = '';
+  container.appendChild(renderer.domElement);
+
+  // 1. 3D Starfield Particles
+  const starCount = 1200;
+  const starGeo = new THREE.BufferGeometry();
+  const starPositions = new Float32Array(starCount * 3);
+  const starColors = new Float32Array(starCount * 3);
+
+  const colorPalette = [
+    new THREE.Color(0x00d4ff), // cyan
+    new THREE.Color(0x7b61ff), // purple
+    new THREE.Color(0x38bdf8), // sky blue
+    new THREE.Color(0xffffff)  // bright white
+  ];
+
+  for (let i = 0; i < starCount; i++) {
+    const i3 = i * 3;
+    starPositions[i3] = (Math.random() - 0.5) * 1400;
+    starPositions[i3 + 1] = (Math.random() - 0.5) * 1000;
+    starPositions[i3 + 2] = (Math.random() - 0.5) * 900;
+
+    const col = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+    starColors[i3] = col.r;
+    starColors[i3 + 1] = col.g;
+    starColors[i3 + 2] = col.b;
   }
 
-  resize();
-  window.addEventListener('resize', resize);
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+  starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
-  window.addEventListener('mousemove', (e) => {
-    const rect = container.getBoundingClientRect();
-    mouse.x = e.clientX - rect.left;
-    mouse.y = e.clientY - rect.top;
-    mouse.targetX = (e.clientX / window.innerWidth - 0.5) * 2;
-    mouse.targetY = (e.clientY / window.innerHeight - 0.5) * 2;
-  }, { passive: true });
-
-  window.addEventListener('mouseleave', () => {
-    mouse.x = null;
-    mouse.y = null;
-    mouse.targetX = 0;
-    mouse.targetY = 0;
+  const starMat = new THREE.PointsMaterial({
+    size: 2.2,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.85
   });
 
-  const particleCount = Math.min(70, Math.floor((canvas.width * canvas.height) / 14000));
+  const starMesh = new THREE.Points(starGeo, starMat);
+  scene.add(starMesh);
 
-  class Particle {
-    constructor() {
-      this.x = Math.random() * canvas.width;
-      this.y = Math.random() * canvas.height;
-      this.z = Math.random() * 400 - 200; // 3D depth
-      this.size = Math.random() * 2 + 0.6;
-      this.speedX = (Math.random() - 0.5) * 0.4;
-      this.speedY = (Math.random() - 0.5) * 0.4;
-      this.speedZ = (Math.random() - 0.5) * 0.3;
-      this.opacity = Math.random() * 0.5 + 0.2;
-    }
+  // 2. Floating 3D Geometric Polyhedrons
+  const polyGroup = new THREE.Group();
+  scene.add(polyGroup);
 
-    update() {
-      this.x += this.speedX + mouse.targetX * 0.2;
-      this.y += this.speedY + mouse.targetY * 0.2;
-      this.z += this.speedZ;
+  const shapes = [];
 
-      if (this.z < -200) this.z = 200;
-      if (this.z > 200) this.z = -200;
+  function createCyberPolyhedron(geo, x, y, z, colorHex, scale = 1) {
+    const meshGroup = new THREE.Group();
+    meshGroup.position.set(x, y, z);
+    meshGroup.scale.setScalar(scale);
 
-      // Mouse repulsion in 2D projection
-      if (mouse.x !== null && mouse.y !== null) {
-        const dx = mouse.x - this.x;
-        const dy = mouse.y - this.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 130) {
-          const force = (130 - dist) / 130;
-          this.x -= (dx / dist) * force * 1.8;
-          this.y -= (dy / dist) * force * 1.8;
-        }
-      }
+    // Glowing wireframe outer cage
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: colorHex,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.35
+    });
+    const wireMesh = new THREE.Mesh(geo, wireMat);
+    meshGroup.add(wireMesh);
 
-      if (this.x < 0) this.x = canvas.width;
-      if (this.x > canvas.width) this.x = 0;
-      if (this.y < 0) this.y = canvas.height;
-      if (this.y > canvas.height) this.y = 0;
-    }
+    // Semi-translucent faceted inner core
+    const coreMat = new THREE.MeshStandardMaterial({
+      color: colorHex,
+      roughness: 0.25,
+      metalness: 0.85,
+      transparent: true,
+      opacity: 0.18,
+      flatShading: true
+    });
+    const coreMesh = new THREE.Mesh(geo, coreMat);
+    coreMesh.scale.setScalar(0.92);
+    meshGroup.add(coreMesh);
 
-    draw() {
-      const fov = 400;
-      const scale = fov / (fov + this.z);
-      const projSize = Math.max(0.4, this.size * scale);
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, projSize, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(0, 212, 255, ${Math.min(1, this.opacity * scale)})`;
-      ctx.fill();
-    }
+    polyGroup.add(meshGroup);
+
+    shapes.push({
+      group: meshGroup,
+      rotX: (Math.random() - 0.5) * 0.012,
+      rotY: (Math.random() - 0.5) * 0.015,
+      rotZ: (Math.random() - 0.5) * 0.01,
+      floatSpeed: 0.8 + Math.random() * 0.6,
+      floatAmp: 12 + Math.random() * 15,
+      baseY: y
+    });
   }
 
-  // 3D Wireframe Floating Polyhedrons (Octahedron Geometry)
-  class Polyhedron3D {
-    constructor(cx, cy, radius, speed) {
-      this.cx = cx;
-      this.cy = cy;
-      this.radius = radius;
-      this.rotX = Math.random() * Math.PI;
-      this.rotY = Math.random() * Math.PI;
-      this.rotZ = Math.random() * Math.PI;
-      this.speed = speed;
+  createCyberPolyhedron(new THREE.OctahedronGeometry(48, 0), -380, 140, -120, 0x00d4ff, 1.1);
+  createCyberPolyhedron(new THREE.IcosahedronGeometry(42, 0), 420, -100, -80, 0x7b61ff, 1.2);
+  createCyberPolyhedron(new THREE.TorusKnotGeometry(26, 7, 64, 8), 350, 180, -160, 0x38bdf8, 0.9);
+  createCyberPolyhedron(new THREE.DodecahedronGeometry(36, 0), -320, -160, -100, 0xa855f7, 1.0);
 
-      // Octahedron 6 vertices in 3D
-      this.vertices = [
-        [0, 1, 0],
-        [0, -1, 0],
-        [1, 0, 0],
-        [-1, 0, 0],
-        [0, 0, 1],
-        [0, 0, -1]
-      ];
+  // 3. Dynamic 3D Scene Lighting
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambientLight);
 
-      // 12 edges
-      this.edges = [
-        [0,2], [0,3], [0,4], [0,5],
-        [1,2], [1,3], [1,4], [1,5],
-        [2,4], [4,3], [3,5], [5,2]
-      ];
-    }
+  const mouseLight = new THREE.PointLight(0x00d4ff, 2.0, 600);
+  mouseLight.position.set(0, 0, 150);
+  scene.add(mouseLight);
 
-    update() {
-      this.rotX += 0.006 * this.speed + mouse.targetY * 0.005;
-      this.rotY += 0.009 * this.speed + mouse.targetX * 0.005;
-      this.rotZ += 0.004 * this.speed;
-    }
+  const fillLight = new THREE.PointLight(0x8b5cf6, 1.5, 700);
+  fillLight.position.set(0, 0, -100);
+  scene.add(fillLight);
 
-    draw() {
-      const fov = 300;
-      const cosX = Math.cos(this.rotX), sinX = Math.sin(this.rotX);
-      const cosY = Math.cos(this.rotY), sinY = Math.sin(this.rotY);
-      const cosZ = Math.cos(this.rotZ), sinZ = Math.sin(this.rotZ);
+  // Mouse Parallax
+  let mouseX = 0, mouseY = 0;
+  let targetCamX = 0, targetCamY = 0;
 
-      const projected = this.vertices.map(([vx, vy, vz]) => {
-        let x = vx * this.radius;
-        let y = vy * this.radius;
-        let z = vz * this.radius;
+  window.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
 
-        // Rotate Y
-        let x1 = x * cosY + z * sinY;
-        let z1 = -x * sinY + z * cosY;
+    targetCamX = mouseX * 45;
+    targetCamY = mouseY * 35;
 
-        // Rotate X
-        let y2 = y * cosX - z1 * sinX;
-        let z2 = y * sinX + z1 * cosX;
+    // Move 3D point light with cursor
+    mouseLight.position.x = mouseX * 350;
+    mouseLight.position.y = mouseY * 250;
+  }, { passive: true });
 
-        // Rotate Z
-        let x3 = x1 * cosZ - y2 * sinZ;
-        let y3 = x1 * sinZ + y2 * cosZ;
-
-        const scale = fov / (fov + z2 + 200);
-        return {
-          x: this.cx + x3 * scale,
-          y: this.cy + y3 * scale,
-          scale
-        };
-      });
-
-      // Draw glowing wireframe edges
-      ctx.lineWidth = 1;
-      this.edges.forEach(([i1, i2]) => {
-        const p1 = projected[i1];
-        const p2 = projected[i2];
-        ctx.beginPath();
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.strokeStyle = `rgba(123, 97, 255, 0.25)`;
-        ctx.stroke();
-      });
-
-      // Draw vertex nodes
-      projected.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 2.5 * p.scale, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 212, 255, 0.7)`;
-        ctx.shadowColor = '#00d4ff';
-        ctx.shadowBlur = 8;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      });
-    }
+  function onResize() {
+    width = container.offsetWidth || window.innerWidth;
+    height = container.offsetHeight || window.innerHeight;
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
   }
 
-  for (let i = 0; i < particleCount; i++) {
-    particles.push(new Particle());
-  }
+  window.addEventListener('resize', onResize);
 
-  // Add 3D floating geometric polyhedrons
-  polyhedrons.push(new Polyhedron3D(canvas.width * 0.15, canvas.height * 0.25, 45, 1));
-  polyhedrons.push(new Polyhedron3D(canvas.width * 0.85, canvas.height * 0.35, 55, 0.8));
-  polyhedrons.push(new Polyhedron3D(canvas.width * 0.5, canvas.height * 0.8, 40, 1.2));
-
-  function drawConnections() {
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < 130) {
-          const opacity = (1 - dist / 130) * 0.12;
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(0, 212, 255, ${opacity})`;
-          ctx.lineWidth = 0.5;
-          ctx.stroke();
-        }
-      }
-    }
-  }
+  // Animation Loop
+  const clock = new THREE.Clock();
 
   function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    requestAnimationFrame(animate);
+    const elapsed = clock.getElapsedTime();
 
-    // Draw 3D polyhedrons
-    polyhedrons.forEach(poly => {
-      poly.update();
-      poly.draw();
+    // Camera parallax smoothing
+    camera.position.x += (targetCamX - camera.position.x) * 0.05;
+    camera.position.y += (targetCamY - camera.position.y) * 0.05;
+    camera.lookAt(0, 0, 0);
+
+    // Starfield gentle rotation
+    starMesh.rotation.y = elapsed * 0.02;
+    starMesh.rotation.x = elapsed * 0.008;
+
+    // Tumbling 3D shapes
+    shapes.forEach(s => {
+      s.group.rotation.x += s.rotX;
+      s.group.rotation.y += s.rotY;
+      s.group.rotation.z += s.rotZ;
+      s.group.position.y = s.baseY + Math.sin(elapsed * s.floatSpeed) * s.floatAmp;
     });
 
-    particles.forEach((p) => {
-      p.update();
-      p.draw();
-    });
-
-    drawConnections();
-    animId = requestAnimationFrame(animate);
+    renderer.render(scene, camera);
   }
 
   animate();
@@ -462,335 +417,283 @@ function initCursorSpotlight() {
 }
 
 /* ----------------------------------------------------------------
-   3D MOUSE COMPANION (NIVA CYBER DRONE)
-   Interactive 3D companion drone that follows the mouse cursor:
-   - 3D gyroscopic gimbal rings with depth projection
-   - Metallic spherical chassis with realistic lighting
-   - Cybernetic LED eyes that blink and react to links/buttons
-   - Window click triggers 360° spin roll & holographic pulse
-   - Stardust particle trail & floating physics
+   3D MOUSE COMPANION (NIVA CYBER DRONE — THREE.JS WEBGL)
+   Hardware-accelerated true 3D floating robotic companion drone:
+   - 3D Metallic chrome/obsidian sphere chassis with PBR reflections
+   - Curved cyber visor with glowing twin LED eyes (blinking & tracking)
+   - Dual 3D concentric gyroscopic gimbal rings (Cyan & Violet)
+   - Pulsing status antenna beacon & 3D thruster particle dust
+   - Follows cursor with 3D depth, banking roll, and hover bobbing
+   - Reacts to interactive buttons/links (spinning fast + happy smile)
+   - Click triggers 360° aerial spin roll + expanding holographic pulse
    ---------------------------------------------------------------- */
 function init3DMouseCompanion() {
   const canvas = document.getElementById('companionCanvas');
-  if (!canvas) return;
+  if (!canvas || typeof THREE === 'undefined') return;
 
-  const ctx = canvas.getContext('2d');
   let width = (canvas.width = window.innerWidth);
   let height = (canvas.height = window.innerHeight);
 
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+  camera.position.set(0, 0, 400);
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    alpha: true,
+    antialias: true,
+    powerPreference: 'high-performance'
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(width, height);
+
+  // Lighting
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+  scene.add(ambientLight);
+
+  const dirLight1 = new THREE.DirectionalLight(0x00d4ff, 1.8);
+  dirLight1.position.set(200, 300, 400);
+  scene.add(dirLight1);
+
+  const dirLight2 = new THREE.DirectionalLight(0x8b5cf6, 1.4);
+  dirLight2.position.set(-200, -200, 300);
+  scene.add(dirLight2);
+
+  // Drone Root Group
+  const drone = new THREE.Group();
+  scene.add(drone);
+
+  // 1. Spherical Metallic Chassis
+  const coreRadius = 22;
+  const bodyGeo = new THREE.SphereGeometry(coreRadius, 32, 32);
+  const bodyMat = new THREE.MeshStandardMaterial({
+    color: 0x0f172a,
+    roughness: 0.18,
+    metalness: 0.92
+  });
+  const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+  drone.add(bodyMesh);
+
+  // 2. Curved Cyber Visor
+  const visorGeo = new THREE.CylinderGeometry(coreRadius + 0.5, coreRadius + 0.5, 12, 32, 1, true, -Math.PI * 0.38, Math.PI * 0.76);
+  const visorMat = new THREE.MeshStandardMaterial({
+    color: 0x020617,
+    roughness: 0.1,
+    metalness: 0.8,
+    side: THREE.DoubleSide
+  });
+  const visorMesh = new THREE.Mesh(visorGeo, visorMat);
+  visorMesh.rotation.x = Math.PI / 2;
+  visorMesh.position.z = 2;
+  drone.add(visorMesh);
+
+  // 3. Twin Glowing LED Eyes
+  const eyeGroup = new THREE.Group();
+  eyeGroup.position.set(0, 1, coreRadius + 1.2);
+  drone.add(eyeGroup);
+
+  const eyeGeo = new THREE.SphereGeometry(3.2, 16, 16);
+  const eyeMat = new THREE.MeshBasicMaterial({ color: 0x00f5ff });
+
+  const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+  leftEye.position.x = -6.5;
+  eyeGroup.add(leftEye);
+
+  const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+  rightEye.position.x = 6.5;
+  eyeGroup.add(rightEye);
+
+  // 4. Concentric 3D Gyroscopic Gimbal Rings
+  // Ring 1 (Cyan Outer Ring)
+  const ring1Geo = new THREE.TorusGeometry(36, 1.6, 16, 64);
+  const ring1Mat = new THREE.MeshStandardMaterial({
+    color: 0x00d4ff,
+    emissive: 0x00d4ff,
+    emissiveIntensity: 0.35,
+    roughness: 0.25,
+    metalness: 0.85
+  });
+  const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
+  drone.add(ring1);
+
+  // Ring 2 (Purple Inner Ring)
+  const ring2Geo = new THREE.TorusGeometry(29, 1.4, 16, 64);
+  const ring2Mat = new THREE.MeshStandardMaterial({
+    color: 0xa855f7,
+    emissive: 0xa855f7,
+    emissiveIntensity: 0.35,
+    roughness: 0.25,
+    metalness: 0.85
+  });
+  const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
+  drone.add(ring2);
+
+  // 5. Top Antenna with Status Beacon
+  const antGeo = new THREE.CylinderGeometry(0.8, 0.8, 12, 8);
+  const antMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.2 });
+  const antenna = new THREE.Mesh(antGeo, antMat);
+  antenna.position.set(0, coreRadius + 6, 0);
+  drone.add(antenna);
+
+  const beaconGeo = new THREE.SphereGeometry(2.4, 16, 16);
+  const beaconMat = new THREE.MeshBasicMaterial({ color: 0x22c55e });
+  const beacon = new THREE.Mesh(beaconGeo, beaconMat);
+  beacon.position.set(0, coreRadius + 12, 0);
+  drone.add(beacon);
+
+  // 6. Holographic Shockwave Ring (for click reactions)
+  const shockGeo = new THREE.RingGeometry(1, 3, 32);
+  const shockMat = new THREE.MeshBasicMaterial({
+    color: 0x00d4ff,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0
+  });
+  const shockwave = new THREE.Mesh(shockGeo, shockMat);
+  drone.add(shockwave);
+
+  // Convert 2D screen coords (px) to 3D world coords at z=0 plane
+  function screenToWorld(screenX, screenY) {
+    const ndcX = (screenX / width) * 2 - 1;
+    const ndcY = -(screenY / height) * 2 + 1;
+    const v = new THREE.Vector3(ndcX, ndcY, 0.5);
+    v.unproject(camera);
+    const dir = v.sub(camera.position).normalize();
+    const distance = -camera.position.z / dir.z;
+    const pos = camera.position.clone().add(dir.multiplyScalar(distance));
+    return pos;
+  }
+
+  // State
+  let currentScreenX = width * 0.72;
+  let currentScreenY = height * 0.32;
+  let targetScreenX = currentScreenX;
+  let targetScreenY = currentScreenY;
+  let velX = 0, velY = 0;
+  let isHoveringInteractive = false;
+  let isSpinning = false;
+  let spinAngle = 0;
+  let spinVelocity = 0;
+  let shockScale = 1;
+  let shockOpacity = 0;
+  let lastBlink = Date.now();
+  let isBlinking = false;
+
+  // Initial placement
+  const initPos = screenToWorld(currentScreenX, currentScreenY);
+  drone.position.copy(initPos);
+
+  // Mouse Listener
+  window.addEventListener('mousemove', (e) => {
+    targetScreenX = Math.min(width - 50, Math.max(50, e.clientX + 38));
+    targetScreenY = Math.min(height - 50, Math.max(50, e.clientY + 28));
+
+    const target = e.target;
+    if (target && target.closest) {
+      isHoveringInteractive = !!target.closest('a, button, input, textarea, .btn, .project-card, .cert-card, .action-card, .stat-item, .card-reset-btn, .id-card-stage');
+    }
+  }, { passive: true });
+
+  // Click Listener: 360 Spin + Shockwave
+  window.addEventListener('click', () => {
+    isSpinning = true;
+    spinVelocity = 0.55;
+    shockScale = 1;
+    shockOpacity = 0.95;
+  }, { passive: true });
+
+  // Responsive Resize
   window.addEventListener('resize', () => {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
-  }, { passive: true });
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+  });
 
-  // Companion State
-  const companion = {
-    x: width * 0.65,
-    y: height * 0.35,
-    targetX: width * 0.65,
-    targetY: height * 0.35,
-    vx: 0,
-    vy: 0,
-    coreRadius: 18,
-    active: false,
-    hoveringInteractive: false,
-    isSpinning: false,
-    spinAngle: 0,
-    spinVelocity: 0,
-    ringAngle1: 0,
-    ringAngle2: 0,
-    blinkState: 0, // 0 = open, 1 = closed
-    isBlinking: false,
-    nextBlinkTime: Date.now() + 2500,
-    particles: [],
-    shockwaves: []
-  };
+  const clock = new THREE.Clock();
 
-  // Mouse tracking
-  window.addEventListener('mousemove', (e) => {
-    companion.active = true;
-    // Offset slightly to bottom-right of cursor so it never covers the pointer
-    companion.targetX = Math.min(width - 40, Math.max(40, e.clientX + 34));
-    companion.targetY = Math.min(height - 40, Math.max(40, e.clientY + 26));
+  function animate() {
+    requestAnimationFrame(animate);
+    const time = clock.getElapsedTime();
 
-    // Check if hovering over interactive elements
-    const target = e.target;
-    if (target && target.closest) {
-      const isInteractive = !!target.closest('a, button, input, textarea, .btn, .project-card, .cert-card, .action-card, .stat-item, .card-reset-btn, .id-card-stage');
-      companion.hoveringInteractive = isInteractive;
-    }
-  }, { passive: true });
+    // Smooth tracking towards target
+    const dx = targetScreenX - currentScreenX;
+    const dy = targetScreenY - currentScreenY;
+    velX = dx * 0.085;
+    velY = dy * 0.085;
+    currentScreenX += velX;
+    currentScreenY += velY;
 
-  // Click interaction: 360 spin + holographic shockwave
-  window.addEventListener('click', (e) => {
-    if (!companion.active) return;
-    companion.isSpinning = true;
-    companion.spinVelocity = 0.42;
+    // Convert to world position
+    const worldPos = screenToWorld(currentScreenX, currentScreenY);
 
-    companion.shockwaves.push({
-      x: companion.x,
-      y: companion.y,
-      radius: 12,
-      maxRadius: 80,
-      opacity: 0.9,
-      color: '#00d4ff'
-    });
-  }, { passive: true });
+    // Idle hover bobbing
+    const bobOffset = Math.sin(time * 3.5) * 6;
+    drone.position.set(worldPos.x, worldPos.y + bobOffset, 0);
 
-  // Touch device check: If pure touch, don't show to avoid obstructing touch screen
-  const isTouchDevice = () => window.matchMedia('(pointer: coarse)').matches && !window.matchMedia('(pointer: fine)').matches;
+    // Banking tilt into horizontal movement
+    const bankZ = Math.max(-0.45, Math.min(0.45, -velX * 0.025));
+    const bankX = Math.max(-0.35, Math.min(0.35, velY * 0.025));
 
-  let lastTime = performance.now();
+    // Gyro Rings continuous 3D rotation
+    const ringSpeed = isHoveringInteractive ? 2.8 : 1.0;
+    ring1.rotation.x += 0.03 * ringSpeed;
+    ring1.rotation.y += 0.02 * ringSpeed;
+    ring2.rotation.y += 0.04 * ringSpeed;
+    ring2.rotation.z += 0.025 * ringSpeed;
 
-  function renderCompanion(now) {
-    requestAnimationFrame(renderCompanion);
-    const dt = Math.min((now - lastTime) / 1000, 0.1);
-    lastTime = now;
-
-    ctx.clearRect(0, 0, width, height);
-
-    if (!companion.active || isTouchDevice()) return;
-
-    // Smooth lerp tracking cursor
-    const dx = companion.targetX - companion.x;
-    const dy = companion.targetY - companion.y;
-    companion.vx = dx * 0.085;
-    companion.vy = dy * 0.085;
-    companion.x += companion.vx;
-    companion.y += companion.vy;
-
-    const speed = Math.hypot(companion.vx, companion.vy);
-
-    // Idle floating oscillation
-    const time = now * 0.003;
-    const floatY = Math.sin(time * 3.5) * 5.5;
-    const drawY = companion.y + floatY;
-    const drawX = companion.x;
-
-    // Banking tilt in velocity direction
-    const tilt = Math.max(-0.45, Math.min(0.45, companion.vx * 0.035));
-
-    // Spin physics on click
-    if (companion.isSpinning) {
-      companion.spinAngle += companion.spinVelocity;
-      companion.spinVelocity *= 0.94;
-      if (companion.spinVelocity < 0.01) {
-        companion.isSpinning = false;
-        companion.spinAngle = 0;
+    // Spin Roll Physics on click
+    if (isSpinning) {
+      spinAngle += spinVelocity;
+      spinVelocity *= 0.93;
+      if (spinVelocity < 0.01) {
+        isSpinning = false;
+        spinAngle = 0;
       }
     }
 
-    // Blinking timer
-    if (now > companion.nextBlinkTime && !companion.isBlinking) {
-      companion.isBlinking = true;
-      companion.blinkStartTime = now;
-      companion.nextBlinkTime = now + 3200 + Math.random() * 2000;
-    }
-    if (companion.isBlinking) {
-      const elapsed = now - companion.blinkStartTime;
-      if (elapsed < 140) {
-        companion.blinkState = 1;
-      } else {
-        companion.blinkState = 0;
-        companion.isBlinking = false;
-      }
+    drone.rotation.z = bankZ + spinAngle;
+    drone.rotation.x = bankX;
+
+    // Eye blinking timer
+    if (Date.now() - lastBlink > 3500) {
+      isBlinking = true;
+      lastBlink = Date.now();
+      setTimeout(() => { isBlinking = false; }, 140);
     }
 
-    // Stardust / Ion Trail
-    if (speed > 0.4 || Math.random() < 0.25) {
-      companion.particles.push({
-        x: drawX + (Math.random() - 0.5) * 8,
-        y: drawY + companion.coreRadius + (Math.random() - 0.5) * 4,
-        vx: -companion.vx * 0.2 + (Math.random() - 0.5) * 1.5,
-        vy: 1.2 + Math.random() * 1.8,
-        life: 1.0,
-        decay: 0.03 + Math.random() * 0.03,
-        size: 2.2 + Math.random() * 2,
-        color: Math.random() > 0.5 ? '#00d4ff' : '#a855f7'
-      });
-    }
-
-    // Draw Particles
-    for (let i = companion.particles.length - 1; i >= 0; i--) {
-      const p = companion.particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.life -= p.decay;
-
-      if (p.life <= 0) {
-        companion.particles.splice(i, 1);
-        continue;
-      }
-
-      ctx.save();
-      ctx.globalAlpha = p.life * 0.8;
-      ctx.fillStyle = p.color;
-      ctx.shadowColor = p.color;
-      ctx.shadowBlur = 8;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-
-    // Draw Shockwaves
-    for (let i = companion.shockwaves.length - 1; i >= 0; i--) {
-      const s = companion.shockwaves[i];
-      s.radius += 3.2;
-      s.opacity -= 0.035;
-
-      if (s.opacity <= 0 || s.radius >= s.maxRadius) {
-        companion.shockwaves.splice(i, 1);
-        continue;
-      }
-
-      ctx.save();
-      ctx.globalAlpha = s.opacity;
-      ctx.strokeStyle = s.color;
-      ctx.lineWidth = 2.5;
-      ctx.shadowColor = s.color;
-      ctx.shadowBlur = 12;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // Drone Ring Angles
-    const speedMult = companion.hoveringInteractive ? 2.4 : 1.0;
-    companion.ringAngle1 += 0.03 * speedMult;
-    companion.ringAngle2 -= 0.04 * speedMult;
-
-    ctx.save();
-    ctx.translate(drawX, drawY);
-    ctx.rotate(tilt + companion.spinAngle);
-
-    // 1. Outer 3D Gyro Ring (Cyan)
-    const R1 = 34;
-    ctx.save();
-    ctx.rotate(companion.ringAngle1);
-    ctx.scale(1, Math.cos(companion.ringAngle1 * 0.8) * 0.45 + 0.1);
-    ctx.strokeStyle = companion.hoveringInteractive ? '#38bdf8' : 'rgba(0, 212, 255, 0.75)';
-    ctx.lineWidth = 2.2;
-    ctx.shadowColor = '#00d4ff';
-    ctx.shadowBlur = companion.hoveringInteractive ? 16 : 8;
-    ctx.beginPath();
-    ctx.arc(0, 0, R1, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Small glowing power nodes on ring
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(R1, 0, 2.5, 0, Math.PI * 2);
-    ctx.arc(-R1, 0, 2.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-
-    // 2. Inner 3D Gimbal Ring (Purple/Violet)
-    const R2 = 27;
-    ctx.save();
-    ctx.rotate(companion.ringAngle2);
-    ctx.scale(Math.cos(companion.ringAngle2 * 0.7) * 0.45 + 0.1, 1);
-    ctx.strokeStyle = companion.hoveringInteractive ? '#c084fc' : 'rgba(168, 85, 247, 0.75)';
-    ctx.lineWidth = 1.8;
-    ctx.shadowColor = '#a855f7';
-    ctx.shadowBlur = 10;
-    ctx.beginPath();
-    ctx.arc(0, 0, R2, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
-
-    // 3. Metallic Spherical Chassis
-    const cr = companion.coreRadius;
-    const bodyGrad = ctx.createRadialGradient(-cr * 0.35, -cr * 0.35, 2, 0, 0, cr);
-    bodyGrad.addColorStop(0, '#38bdf8');
-    bodyGrad.addColorStop(0.25, '#1e293b');
-    bodyGrad.addColorStop(0.85, '#0f172a');
-    bodyGrad.addColorStop(1, '#020617');
-
-    ctx.fillStyle = bodyGrad;
-    ctx.shadowColor = 'rgba(0, 212, 255, 0.3)';
-    ctx.shadowBlur = 12;
-    ctx.beginPath();
-    ctx.arc(0, 0, cr, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Titanium rim ring
-    ctx.strokeStyle = 'rgba(0, 212, 255, 0.5)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    // 4. Curved Cyber Visor Display
-    const visorW = 22;
-    const visorH = 11;
-    ctx.fillStyle = '#050914';
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    if (ctx.roundRect) {
-      ctx.roundRect(-visorW / 2, -visorH / 2, visorW, visorH, 5);
+    if (isHoveringInteractive) {
+      // Happy smiling eyes: scale Y down
+      leftEye.scale.set(1.4, 0.35, 1);
+      rightEye.scale.set(1.4, 0.35, 1);
+      eyeMat.color.setHex(0x38bdf8);
+    } else if (isBlinking) {
+      leftEye.scale.set(1.2, 0.1, 1);
+      rightEye.scale.set(1.2, 0.1, 1);
     } else {
-      ctx.rect(-visorW / 2, -visorH / 2, visorW, visorH);
+      leftEye.scale.set(1, 1, 1);
+      rightEye.scale.set(1, 1, 1);
+      eyeMat.color.setHex(0x00f5ff);
     }
-    ctx.fill();
-    ctx.stroke();
 
-    // 5. Twin Cybernetic LED Eyes
-    const eyeOffsetX = 5.5;
-    const eyeLookX = Math.max(-2, Math.min(2, companion.vx * 0.15));
-    const eyeLookY = Math.max(-1.5, Math.min(1.5, companion.vy * 0.15));
+    // Beacon pulse
+    beaconMat.color.setHex(Math.sin(time * 5) > 0 ? 0x22c55e : 0x00d4ff);
 
-    ctx.shadowColor = '#00f5ff';
-    ctx.shadowBlur = 10;
-    ctx.fillStyle = '#00f5ff';
-    ctx.strokeStyle = '#00f5ff';
-
-    if (companion.hoveringInteractive) {
-      // Happy smiling eyes: ^ ^
-      ctx.lineWidth = 1.8;
-      [-eyeOffsetX, eyeOffsetX].forEach((ox) => {
-        ctx.beginPath();
-        ctx.arc(ox + eyeLookX, eyeLookY + 1, 3.2, Math.PI * 1.1, Math.PI * 1.9, false);
-        ctx.stroke();
-      });
-    } else if (companion.blinkState === 1) {
-      // Closed blinking eyes: -- --
-      ctx.lineWidth = 1.5;
-      [-eyeOffsetX, eyeOffsetX].forEach((ox) => {
-        ctx.beginPath();
-        ctx.moveTo(ox - 3, 0);
-        ctx.lineTo(ox + 3, 0);
-        ctx.stroke();
-      });
+    // Shockwave animation
+    if (shockOpacity > 0.01) {
+      shockScale += 1.8;
+      shockOpacity *= 0.92;
+      shockwave.scale.setScalar(shockScale);
+      shockMat.opacity = shockOpacity;
     } else {
-      // Normal oval LED eyes
-      [-eyeOffsetX, eyeOffsetX].forEach((ox) => {
-        ctx.beginPath();
-        ctx.ellipse(ox + eyeLookX, eyeLookY, 2.2, 3.2, 0, 0, Math.PI * 2);
-        ctx.fill();
-      });
+      shockMat.opacity = 0;
     }
 
-    // 6. Top AI Status Antenna & Beacon
-    ctx.strokeStyle = '#94a3b8';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(0, -cr);
-    ctx.lineTo(0, -cr - 6);
-    ctx.stroke();
-
-    const beaconPulse = Math.sin(time * 6) > 0;
-    ctx.fillStyle = beaconPulse ? '#22c55e' : '#00d4ff';
-    ctx.shadowColor = ctx.fillStyle;
-    ctx.shadowBlur = 8;
-    ctx.beginPath();
-    ctx.arc(0, -cr - 7, 2.2, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
+    renderer.render(scene, camera);
   }
 
-  requestAnimationFrame(renderCompanion);
+  animate();
 }
 
 /* ----------------------------------------------------------------
@@ -870,13 +773,12 @@ function init3DTilt() {
 
 /* ----------------------------------------------------------------
    GENUINE PHYSICAL 3D ID-CARD (Three.js WebGL Engine)
-   - Real 3D geometry with matching casing & beveled badge insert
-   - Identical corner contours & top lanyard slot on both frame & card
-   - High-DPI canvas front & back textures with verified details
-   - Realistic pointer/touch drag with pull-down-to-scroll gesture
-   - Flip gesture on tap/click (180deg front/back toggle)
+   - Real double-pendulum lanyard suspension physics
+   - Sways naturally with mouse wind draft & device gravity tilt
+   - Pull-down-to-scroll gesture with dynamic feedback & elastic recoil
+   - Tap/click flip gesture (180deg front/back toggle)
+   - Matching beveled titanium casing & high-DPI canvas textures
    - Mobile-safe touch handling with unhijacked page vertical scroll
-   - Accessible reset button and graceful static fallback
    ---------------------------------------------------------------- */
 function initPhysical3DIDCard() {
   const stage = document.getElementById('idCardStage');
@@ -888,7 +790,6 @@ function initPhysical3DIDCard() {
 
   if (!stage) return;
 
-  // Check WebGL availability
   function isWebGLAvailable() {
     try {
       const testCanvas = document.createElement('canvas');
@@ -903,11 +804,9 @@ function initPhysical3DIDCard() {
     return;
   }
 
-  // Dimensions
   let width = stage.clientWidth || 380;
   let height = stage.clientHeight || 500;
 
-  // Scene, Camera, Renderer
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
   camera.position.set(0, 0, 10.5);
@@ -923,7 +822,6 @@ function initPhysical3DIDCard() {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  // Clean existing canvas if any
   const oldCanvas = stage.querySelector('canvas');
   if (oldCanvas) oldCanvas.remove();
   stage.appendChild(renderer.domElement);
@@ -932,7 +830,7 @@ function initPhysical3DIDCard() {
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
   scene.add(ambientLight);
 
-  const mainLight = new THREE.DirectionalLight(0x00d4ff, 1.4);
+  const mainLight = new THREE.DirectionalLight(0x00d4ff, 1.5);
   mainLight.position.set(5, 8, 8);
   mainLight.castShadow = true;
   scene.add(mainLight);
@@ -945,11 +843,16 @@ function initPhysical3DIDCard() {
   rimLight.position.set(0, -6, -4);
   scene.add(rimLight);
 
-  // Group containing the entire card assembly
-  const cardGroup = new THREE.Group();
-  scene.add(cardGroup);
+  // Top Suspension Anchor (Lanyard hangs from here)
+  const anchorY = 3.0;
+  const suspensionGroup = new THREE.Group();
+  suspensionGroup.position.set(0, anchorY, 0);
+  scene.add(suspensionGroup);
 
-  // Helper function to create rounded rect shape
+  // Card Group hangs below suspension group
+  const cardGroup = new THREE.Group();
+  suspensionGroup.add(cardGroup);
+
   function createRoundedRectShape(w, h, r) {
     const s = new THREE.Shape();
     const hw = w / 2, hh = h / 2;
@@ -965,7 +868,6 @@ function initPhysical3DIDCard() {
     return s;
   }
 
-  // Helper function to create slot hole path
   function createSlotHole(w, h, y) {
     const hole = new THREE.Path();
     const hw = w / 2, hh = h / 2;
@@ -983,7 +885,7 @@ function initPhysical3DIDCard() {
   const radius = 0.28;
   const slotW = 0.65;
   const slotH = 0.15;
-  const slotY = cardH / 2 - 0.38; // 2.22
+  const slotY = cardH / 2 - 0.38; // slot location relative to card center
 
   const outerShape = createRoundedRectShape(cardW, cardH, radius);
   outerShape.holes.push(createSlotHole(slotW, slotH, slotY));
@@ -998,7 +900,7 @@ function initPhysical3DIDCard() {
   };
 
   const bodyGeo = new THREE.ExtrudeGeometry(outerShape, extrudeSettings);
-  bodyGeo.translate(0, 0, -0.02); // Center along Z so body is between -0.035 and +0.035
+  bodyGeo.translate(0, 0, -0.02);
 
   const rimMaterial = new THREE.MeshStandardMaterial({
     color: 0x0f172a,
@@ -1011,9 +913,9 @@ function initPhysical3DIDCard() {
   bodyMesh.receiveShadow = true;
   cardGroup.add(bodyMesh);
 
-  // --- Matching Inner Insert Badge Geometry ---
-  const innerW = cardW - 0.06; // 3.34
-  const innerH = cardH - 0.06; // 5.14
+  // --- Inner Insert Badge Geometry ---
+  const innerW = cardW - 0.06;
+  const innerH = cardH - 0.06;
   const innerRadius = 0.25;
 
   const innerShape = createRoundedRectShape(innerW, innerH, innerRadius);
@@ -1021,7 +923,6 @@ function initPhysical3DIDCard() {
 
   const innerGeo = new THREE.ShapeGeometry(innerShape);
 
-  // Assign precise UVs mapping the canvas textures onto the inner card
   const pos = innerGeo.attributes.position;
   const frontUvs = new Float32Array(pos.count * 2);
   const backUvs = new Float32Array(pos.count * 2);
@@ -1033,7 +934,6 @@ function initPhysical3DIDCard() {
     const v = (y + innerH / 2) / innerH;
     frontUvs[i * 2] = u;
     frontUvs[i * 2 + 1] = v;
-    // For back side, flip u horizontally so text reads normally
     backUvs[i * 2] = 1 - u;
     backUvs[i * 2 + 1] = v;
   }
@@ -1042,7 +942,7 @@ function initPhysical3DIDCard() {
   const backGeo = innerGeo.clone();
   backGeo.setAttribute('uv', new THREE.BufferAttribute(backUvs, 2));
 
-  // --- Front Face Texture (1024x1536) ---
+  // Canvas Textures
   const frontCanvas = document.createElement('canvas');
   frontCanvas.width = 1024;
   frontCanvas.height = 1536;
@@ -1050,7 +950,6 @@ function initPhysical3DIDCard() {
   const frontTexture = new THREE.CanvasTexture(frontCanvas);
   frontTexture.generateMipmaps = true;
 
-  // --- Back Face Texture (1024x1536) ---
   const backCanvas = document.createElement('canvas');
   backCanvas.width = 1024;
   backCanvas.height = 1536;
@@ -1058,7 +957,6 @@ function initPhysical3DIDCard() {
   const backTexture = new THREE.CanvasTexture(backCanvas);
   backTexture.generateMipmaps = true;
 
-  // Front & Back Meshes sitting proudly on card faces (z = 0.038 > 0.035 body surface)
   const frontMat = new THREE.MeshStandardMaterial({
     map: frontTexture,
     roughness: 0.38,
@@ -1080,7 +978,7 @@ function initPhysical3DIDCard() {
   backMesh.rotation.y = Math.PI;
   cardGroup.add(backMesh);
 
-  // Front Protective Transparent Acrylic Glass Cover (Realistic Sheen)
+  // Acrylic Glass Cover
   const glassMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     transparent: true,
@@ -1094,8 +992,7 @@ function initPhysical3DIDCard() {
   glassMesh.position.z = 0.042;
   cardGroup.add(glassMesh);
 
-  // --- Metallic Clasp & Ribbon ---
-  // Ring loops directly through the top slot hole
+  // Metallic Clasp & Swivel Ring
   const ringGeo = new THREE.TorusGeometry(0.20, 0.038, 16, 32);
   const metalMat = new THREE.MeshStandardMaterial({
     color: 0xf1f5f9,
@@ -1107,14 +1004,13 @@ function initPhysical3DIDCard() {
   ringMesh.rotation.x = Math.PI / 2;
   cardGroup.add(ringMesh);
 
-  // Swivel Clasp Body
   const claspGeo = new THREE.CylinderGeometry(0.10, 0.14, 0.38, 16);
   const claspMesh = new THREE.Mesh(claspGeo, metalMat);
   claspMesh.position.set(0, slotY + 0.32, 0);
   cardGroup.add(claspMesh);
 
-  // Woven Lanyard Ribbon ascending upwards
-  const strapGeo = new THREE.PlaneGeometry(0.60, 4.5);
+  // Woven Ribbon Strap
+  const strapGeo = new THREE.PlaneGeometry(0.60, 3.8);
   const strapCanvas = document.createElement('canvas');
   strapCanvas.width = 128;
   strapCanvas.height = 512;
@@ -1136,12 +1032,11 @@ function initPhysical3DIDCard() {
     side: THREE.DoubleSide
   });
   const strapMesh = new THREE.Mesh(strapGeo, strapMat);
-  strapMesh.position.set(0, slotY + 2.55, 0);
+  strapMesh.position.set(0, slotY + 2.2, 0);
   cardGroup.add(strapMesh);
 
-  // --- Render Front Canvas Texture ---
+  // Draw Front Canvas
   function drawFrontCanvas(img) {
-    // Rich midnight blue gradient background
     const grad = fCtx.createLinearGradient(0, 0, 1024, 1536);
     grad.addColorStop(0, '#090e24');
     grad.addColorStop(0.5, '#0c1636');
@@ -1149,7 +1044,7 @@ function initPhysical3DIDCard() {
     fCtx.fillStyle = grad;
     fCtx.fillRect(0, 0, 1024, 1536);
 
-    // High-tech subtle cyber grid pattern
+    // Subtle grid
     fCtx.strokeStyle = 'rgba(0, 212, 255, 0.06)';
     fCtx.lineWidth = 2;
     for (let x = 60; x < 1024; x += 80) {
@@ -1165,7 +1060,7 @@ function initPhysical3DIDCard() {
       fCtx.stroke();
     }
 
-    // Outer Card Inset Border
+    // Outer Border
     fCtx.strokeStyle = 'rgba(0, 212, 255, 0.35)';
     fCtx.lineWidth = 3;
     fCtx.beginPath();
@@ -1176,7 +1071,7 @@ function initPhysical3DIDCard() {
     }
     fCtx.stroke();
 
-    // Top Header Bar (Padded safely below slot hole)
+    // Top Header Bar
     const hx = 70, hy = 155, hw = 884, hh = 70;
     fCtx.fillStyle = 'rgba(0, 212, 255, 0.12)';
     fCtx.beginPath();
@@ -1199,12 +1094,11 @@ function initPhysical3DIDCard() {
     fCtx.fillStyle = '#22c55e';
     fCtx.fillText('● ACTIVE DEV', 740, 200);
 
-    // Profile Photo Box (Centered at x=512, size 390x390)
+    // Profile Photo Box
     const pw = 390, ph = 390, pr = 30;
-    const px = 512 - pw / 2; // 317
+    const px = 512 - pw / 2;
     const py = 250;
 
-    // Glowing outer border ring
     fCtx.strokeStyle = 'rgba(0, 212, 255, 0.35)';
     fCtx.lineWidth = 8;
     fCtx.beginPath();
@@ -1215,7 +1109,6 @@ function initPhysical3DIDCard() {
     }
     fCtx.stroke();
 
-    // Clip photo
     fCtx.save();
     fCtx.beginPath();
     if (fCtx.roundRect) {
@@ -1238,7 +1131,6 @@ function initPhysical3DIDCard() {
     }
     fCtx.restore();
 
-    // Crisp inner photo border
     fCtx.strokeStyle = '#00d4ff';
     fCtx.lineWidth = 3;
     fCtx.beginPath();
@@ -1249,14 +1141,11 @@ function initPhysical3DIDCard() {
     }
     fCtx.stroke();
 
-    // Name & Title Section
+    // Name & Title
     fCtx.textAlign = 'center';
     fCtx.font = '800 56px "Inter", sans-serif';
     fCtx.fillStyle = '#ffffff';
-    fCtx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-    fCtx.shadowBlur = 8;
     fCtx.fillText('HARSHIT MISHRA', 512, 705);
-    fCtx.shadowBlur = 0;
 
     fCtx.font = '700 28px "Inter", sans-serif';
     fCtx.fillStyle = '#00d4ff';
@@ -1270,7 +1159,7 @@ function initPhysical3DIDCard() {
     fCtx.fillStyle = '#cbd5e1';
     fCtx.fillText('“Building intelligent digital experiences.”', 512, 842);
 
-    // Microchip Graphic (Left side)
+    // Microchip
     const chipX = 90, chipY = 895, chipW = 150, chipH = 115;
     fCtx.fillStyle = '#d97706';
     fCtx.fillRect(chipX, chipY, chipW, chipH);
@@ -1279,17 +1168,8 @@ function initPhysical3DIDCard() {
     fCtx.strokeRect(chipX, chipY, chipW, chipH);
     fCtx.fillStyle = '#92400e';
     fCtx.fillRect(chipX + 25, chipY + 22, chipW - 50, chipH - 44);
-    // Chip circuit traces
-    fCtx.strokeStyle = '#fef08a';
-    fCtx.lineWidth = 2;
-    fCtx.beginPath();
-    fCtx.moveTo(chipX, chipY + 40); fCtx.lineTo(chipX + 25, chipY + 40);
-    fCtx.moveTo(chipX, chipY + 75); fCtx.lineTo(chipX + 25, chipY + 75);
-    fCtx.moveTo(chipX + chipW - 25, chipY + 40); fCtx.lineTo(chipX + chipW, chipY + 40);
-    fCtx.moveTo(chipX + chipW - 25, chipY + 75); fCtx.lineTo(chipX + chipW, chipY + 75);
-    fCtx.stroke();
 
-    // Pill Badges (Right side)
+    // Badges
     const drawPill = (text, x, y, bg, border, color) => {
       fCtx.font = '600 22px "Inter", sans-serif';
       const textW = fCtx.measureText(text).width;
@@ -1314,7 +1194,7 @@ function initPhysical3DIDCard() {
     drawPill('⚡ 8+ Certifications', 275, 965, 'rgba(34, 197, 94, 0.12)', 'rgba(34, 197, 94, 0.4)', '#4ade80');
     drawPill('🚀 10+ GitHub Projects', 595, 965, 'rgba(234, 179, 8, 0.12)', 'rgba(234, 179, 8, 0.4)', '#facc15');
 
-    // Bottom Barcode & Security Strip
+    // Barcode
     fCtx.fillStyle = 'rgba(255, 255, 255, 0.85)';
     for (let i = 0; i < 68; i++) {
       const bx = 110 + i * 11.8;
@@ -1330,7 +1210,7 @@ function initPhysical3DIDCard() {
     frontTexture.needsUpdate = true;
   }
 
-  // --- Render Back Canvas Texture ---
+  // Draw Back Canvas
   function drawBackCanvas() {
     const grad = bCtx.createLinearGradient(0, 0, 1024, 1536);
     grad.addColorStop(0, '#0a1028');
@@ -1345,13 +1225,12 @@ function initPhysical3DIDCard() {
     bCtx.fillStyle = 'rgba(255, 255, 255, 0.08)';
     bCtx.fillRect(0, 200, 1024, 18);
 
-    // Title
     bCtx.font = '800 42px "Inter", sans-serif';
     bCtx.fillStyle = '#00d4ff';
     bCtx.textAlign = 'center';
     bCtx.fillText('VERIFIED SKILL MATRIX', 512, 350);
 
-    // Skills Matrix Box
+    // Skills Box
     bCtx.fillStyle = 'rgba(255, 255, 255, 0.03)';
     bCtx.strokeStyle = 'rgba(0, 212, 255, 0.25)';
     bCtx.lineWidth = 2;
@@ -1380,7 +1259,7 @@ function initPhysical3DIDCard() {
     drawSkillRow('Tools & Libraries:', 'Pandas, NumPy, Scikit-Learn, TensorFlow, Git, MySQL', 640);
     drawSkillRow('Industrial Experience:', 'Inamigos Foundation (Web Dev), InternPe (Python Dev)', 735);
 
-    // Contact & QR Box
+    // Contact Box
     bCtx.fillStyle = 'rgba(255, 255, 255, 0.03)';
     bCtx.strokeStyle = 'rgba(139, 92, 246, 0.3)';
     bCtx.lineWidth = 2;
@@ -1405,7 +1284,6 @@ function initPhysical3DIDCard() {
     bCtx.fillText('Email: harshitmishra1208@gmail.com', 512, 1085);
     bCtx.fillText('Location: Lucknow, Uttar Pradesh, India', 512, 1140);
 
-    // Security Footer
     bCtx.font = '600 22px "Inter", sans-serif';
     bCtx.fillStyle = '#64748b';
     bCtx.fillText('CLICK / TAP CARD TO FLIP BACK TO FRONT', 512, 1300);
@@ -1414,7 +1292,6 @@ function initPhysical3DIDCard() {
     backTexture.needsUpdate = true;
   }
 
-  // Load portrait photo and initialize textures
   const portraitImg = new Image();
   portraitImg.crossOrigin = 'anonymous';
   portraitImg.src = 'image.png';
@@ -1422,26 +1299,47 @@ function initPhysical3DIDCard() {
   drawFrontCanvas(null);
   drawBackCanvas();
 
-  // --- Spring Damper Physics & Pull-Down Interaction ---
+  // Physical Double Pendulum & Suspension State
   let isDragging = false;
   let isFlipped = false;
-  let prevPointerX = 0;
-  let prevPointerY = 0;
+  let prevPointerX = 0, prevPointerY = 0;
+  let pointerDownX = 0, pointerDownY = 0;
   let pointerDownTime = 0;
-  let pointerDownX = 0;
-  let pointerDownY = 0;
   let pullDownPx = 0;
 
-  let currentRotY = 0;
-  let currentRotX = 0;
+  // Pendulum physics variables
+  let pendulumAngleZ = 0; // left/right swing
+  let pendulumVelZ = 0;
+  let pendulumAngleX = 0; // forward/backward swing
+  let pendulumVelX = 0;
+
+  let cardRotY = 0; // front/back flip
   let targetRotY = 0;
-  let targetRotX = 0;
 
-  let currentPosX = 0;
-  let currentPosY = 0;
-  let targetPosX = 0;
-  let targetPosY = 0;
+  let lanyardStretchY = 0; // elastic stretch
+  let targetStretchY = 0;
 
+  let gyroForceX = 0;
+  let gyroForceY = 0;
+  let mouseDraftX = 0;
+  let mouseDraftY = 0;
+
+  // Device Orientation Handler (Gyroscopic Sway)
+  function handleOrientation(e) {
+    if (e.gamma !== null && e.beta !== null) {
+      gyroForceX = Math.sin((e.gamma * Math.PI) / 180) * 8.0;
+      gyroForceY = Math.sin((e.beta * Math.PI) / 180) * 6.0;
+    }
+  }
+  window.addEventListener('deviceorientation', handleOrientation, { passive: true });
+
+  // Atmospheric Mouse Draft
+  window.addEventListener('mousemove', (e) => {
+    const mouseNormX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseDraftX = mouseNormX * 1.5;
+  }, { passive: true });
+
+  // Pointer Interaction
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
 
@@ -1484,14 +1382,13 @@ function initPhysical3DIDCard() {
     pullDownPx = Math.max(0, currentPullDown);
 
     if (pullDownPx > 10) {
-      // Physically stretch card downwards in 3D
-      targetPosY = -Math.min(2.8, (pullDownPx - 10) * 0.018);
-      targetRotX = -Math.min(0.45, pullDownPx * 0.0035);
+      // Elastic stretch downwards
+      targetStretchY = -Math.min(2.8, (pullDownPx - 10) * 0.022);
+      pendulumAngleX = -Math.min(0.5, pullDownPx * 0.004);
 
-      // Dynamic feedback badge
       if (hintText && hintBadge) {
         if (pullDownPx < 30) {
-          hintText.textContent = 'Drag to rotate • Click to flip • Pull down to scroll ↓';
+          hintText.textContent = 'Drag to swing • Click to flip • Pull down to scroll ↓';
           if (hintIcon) hintIcon.textContent = '🔄';
           hintBadge.classList.remove('ready-to-release');
         } else if (pullDownPx < 60) {
@@ -1505,15 +1402,12 @@ function initPhysical3DIDCard() {
         }
       }
     } else {
-      // Normal rotation and sway
-      targetRotY += deltaX * 0.009;
-      targetRotX += deltaY * 0.007;
-      targetRotX = Math.max(-0.6, Math.min(0.6, targetRotX));
-
-      targetPosX += deltaX * 0.004;
-      targetPosY -= deltaY * 0.004;
-      targetPosX = Math.max(-1.0, Math.min(1.0, targetPosX));
-      targetPosY = Math.max(-0.6, Math.min(0.6, targetPosY));
+      // Direct drag rotation & swing
+      targetRotY += deltaX * 0.01;
+      pendulumAngleZ += deltaX * 0.006;
+      pendulumAngleZ = Math.max(-0.6, Math.min(0.6, pendulumAngleZ));
+      pendulumAngleX += deltaY * 0.005;
+      pendulumAngleX = Math.max(-0.5, Math.min(0.5, pendulumAngleX));
     }
   }
 
@@ -1532,12 +1426,10 @@ function initPhysical3DIDCard() {
       if (hintText) hintText.textContent = '✨ Entering Portfolio...';
       if (hintIcon) hintIcon.textContent = '🌟';
 
-      // Snap card back
-      targetPosY = 0;
-      targetPosX = 0;
-      targetRotX = 0;
+      targetStretchY = 0;
+      pendulumAngleX = 0;
+      pendulumVelZ = 0.8; // celebratory bounce swing
 
-      // Smooth scroll to About section
       const aboutSection = document.getElementById('about');
       if (aboutSection) {
         const navHeight = 70;
@@ -1546,32 +1438,25 @@ function initPhysical3DIDCard() {
       }
 
       setTimeout(() => {
-        if (hintText) hintText.textContent = 'Drag to rotate • Click to flip • Pull down to scroll ↓';
+        if (hintText) hintText.textContent = 'Drag to swing • Click to flip • Pull down to scroll ↓';
         if (hintIcon) hintIcon.textContent = '🔄';
         if (hintBadge) hintBadge.classList.remove('ready-to-release');
       }, 1600);
       return;
     }
 
-    // Reset card translation
-    targetPosY = 0;
-    targetPosX = 0;
-    targetRotX = 0;
-
-    if (hintText) hintText.textContent = 'Drag to rotate • Click to flip • Pull down to scroll ↓';
+    targetStretchY = 0;
+    if (hintText) hintText.textContent = 'Drag to swing • Click to flip • Pull down to scroll ↓';
     if (hintIcon) hintIcon.textContent = '🔄';
     if (hintBadge) hintBadge.classList.remove('ready-to-release');
 
-    // Detect click / tap to flip
+    // Tap to Flip
     if (totalDist < 12 && duration < 320) {
       isFlipped = !isFlipped;
     }
-
-    // Settle to front (0) or back (Math.PI)
     targetRotY = isFlipped ? Math.PI : 0;
   }
 
-  // Event Listeners with passive touch handling
   stage.addEventListener('mousedown', onPointerDown);
   window.addEventListener('mousemove', onPointerMove);
   window.addEventListener('mouseup', onPointerUp);
@@ -1580,21 +1465,21 @@ function initPhysical3DIDCard() {
   window.addEventListener('touchmove', onPointerMove, { passive: true });
   window.addEventListener('touchend', onPointerUp, { passive: true });
 
-  // Reset Button handler
   if (resetBtn) {
     resetBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       isFlipped = false;
       targetRotY = 0;
-      targetRotX = 0;
-      targetPosX = 0;
-      targetPosY = 0;
-      if (hintText) hintText.textContent = 'Drag to rotate • Click to flip • Pull down to scroll ↓';
+      pendulumAngleZ = 0;
+      pendulumVelZ = 0;
+      pendulumAngleX = 0;
+      pendulumVelX = 0;
+      targetStretchY = 0;
+      if (hintText) hintText.textContent = 'Drag to swing • Click to flip • Pull down to scroll ↓';
       if (hintBadge) hintBadge.classList.remove('ready-to-release');
     });
   }
 
-  // Responsive Resize Handler
   function onResize() {
     if (!stage) return;
     width = stage.clientWidth || 340;
@@ -1608,45 +1493,64 @@ function initPhysical3DIDCard() {
   const resizeObserver = new ResizeObserver(onResize);
   resizeObserver.observe(stage);
 
-  // Animation Loop with Spring-Damper Physics
-  const clock = new THREE.Clock();
+  // Animation Loop with Physical Pendulum Dynamics
+  let lastTime = performance.now();
 
-  function animate() {
+  function animate(now) {
     requestAnimationFrame(animate);
-    const time = clock.getElapsedTime();
+    const dt = Math.min((now - lastTime) / 1000, 0.05);
+    lastTime = now;
+    const time = now * 0.001;
 
-    // Idle subtle sway when not dragging
-    let idleSwayY = 0;
-    let idleSwayX = 0;
+    // Physical Pendulum Harmonic Oscillator (Z-Axis Left/Right Swing)
     if (!isDragging) {
-      idleSwayY = Math.sin(time * 1.4) * 0.05;
-      idleSwayX = Math.cos(time * 1.8) * 0.03;
+      const naturalFreq = 16.0;
+      const dampingZ = 3.2;
+      const restoringTorqueZ = -naturalFreq * Math.sin(pendulumAngleZ);
+      const dragTorqueZ = -dampingZ * pendulumVelZ;
+      const idleDraftZ = Math.sin(time * 1.6) * 0.4 + mouseDraftX + gyroForceX;
+
+      const accZ = restoringTorqueZ + dragTorqueZ + idleDraftZ;
+      pendulumVelZ += accZ * dt;
+      pendulumAngleZ += pendulumVelZ * dt;
+
+      // X-Axis Forward/Backward Swing
+      const dampingX = 3.5;
+      const restoringTorqueX = -naturalFreq * Math.sin(pendulumAngleX);
+      const dragTorqueX = -dampingX * pendulumVelX;
+      const idleDraftX = Math.cos(time * 1.8) * 0.3 + gyroForceY;
+
+      const accX = restoringTorqueX + dragTorqueX + idleDraftX;
+      pendulumVelX += accX * dt;
+      pendulumAngleX += pendulumVelX * dt;
     }
 
-    // Spring interpolation toward target
-    const springStrength = isDragging ? 0.35 : 0.09;
-    currentRotY += (targetRotY + idleSwayY - currentRotY) * springStrength;
-    currentRotX += (targetRotX + idleSwayX - currentRotX) * springStrength;
+    // Card Y-Rotation (Front/Back flip spring)
+    const springRot = isDragging ? 0.35 : 0.085;
+    cardRotY += (targetRotY - cardRotY) * springRot;
 
-    currentPosX += (targetPosX - currentPosX) * 0.12;
-    currentPosY += (targetPosY - currentPosY) * 0.12;
+    // Elastic Stretch
+    lanyardStretchY += (targetStretchY - lanyardStretchY) * 0.15;
 
-    cardGroup.rotation.y = currentRotY;
-    cardGroup.rotation.x = currentRotX;
-    cardGroup.rotation.z = -currentPosX * 0.08;
+    // Apply Transformations:
+    // Suspension group pivots like a pendulum from the top anchor point
+    suspensionGroup.rotation.z = pendulumAngleZ;
+    suspensionGroup.rotation.x = pendulumAngleX;
 
-    cardGroup.position.x = currentPosX;
-    cardGroup.position.y = currentPosY + (isDragging ? 0 : Math.sin(time * 2.0) * 0.06);
+    // Card sits suspended below anchor, with Y stretch and front/back flip
+    cardGroup.position.set(0, -2.7 + lanyardStretchY, 0);
+    cardGroup.rotation.y = cardRotY;
 
-    // Ribbon follows the card displacement
+    // Ribbon flexes subtly
     if (strapMesh) {
-      strapMesh.rotation.z = currentPosX * 0.04;
+      strapMesh.rotation.z = -pendulumAngleZ * 0.3;
+      strapMesh.scale.set(1, 1 - lanyardStretchY * 0.25, 1);
     }
 
     renderer.render(scene, camera);
   }
 
-  animate();
+  requestAnimationFrame(animate);
 }
 
 /* ----------------------------------------------------------------

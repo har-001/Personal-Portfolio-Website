@@ -36,3 +36,6 @@ tmp/
 # Build kit / Local assets (Do not push)
 Harshit_Mishra_Portfolio_Antigravity_Build_Kit/
 *Build_Kit*
+.morluto-rea/
+skills-lock.json
+.agents/
