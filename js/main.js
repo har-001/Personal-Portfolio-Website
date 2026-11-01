@@ -467,7 +467,7 @@ function init3DMouseCompanion() {
   const coreRadius = 22;
   const bodyGeo = new THREE.SphereGeometry(coreRadius, 32, 32);
   const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0x0f172a,
+    color: 0x94a3b8, // Brushed Aerospace Titanium
     roughness: 0.18,
     metalness: 0.92
   });
@@ -844,7 +844,7 @@ function initPhysical3DIDCard() {
   scene.add(rimLight);
 
   // Top Suspension Anchor (Lanyard hangs from here)
-  const anchorY = 3.0;
+  const anchorY = 2.7;
   const suspensionGroup = new THREE.Group();
   suspensionGroup.position.set(0, anchorY, 0);
   scene.add(suspensionGroup);
@@ -880,30 +880,30 @@ function initPhysical3DIDCard() {
   }
 
   // --- Outer Titanium/Obsidian Badge Frame ---
-  const cardW = 3.4;
-  const cardH = 5.2;
+  const cardW = 3.3;
+  const cardH = 5.0;
   const radius = 0.28;
-  const slotW = 0.65;
-  const slotH = 0.15;
-  const slotY = cardH / 2 - 0.38; // slot location relative to card center
+  const slotW = 0.62;
+  const slotH = 0.16;
+  const slotY = cardH / 2 - 0.40; // slot location relative to card center
 
   const outerShape = createRoundedRectShape(cardW, cardH, radius);
   outerShape.holes.push(createSlotHole(slotW, slotH, slotY));
 
   const extrudeSettings = {
-    depth: 0.04,
+    depth: 0.05,
     bevelEnabled: true,
-    bevelSegments: 3,
+    bevelSegments: 4,
     steps: 1,
-    bevelSize: 0.02,
-    bevelThickness: 0.015
+    bevelSize: 0.03,
+    bevelThickness: 0.02
   };
 
   const bodyGeo = new THREE.ExtrudeGeometry(outerShape, extrudeSettings);
   bodyGeo.translate(0, 0, -0.02);
 
   const rimMaterial = new THREE.MeshStandardMaterial({
-    color: 0x0f172a,
+    color: 0x94a3b8, // Brushed Aerospace Titanium
     roughness: 0.28,
     metalness: 0.9
   });
@@ -914,9 +914,9 @@ function initPhysical3DIDCard() {
   cardGroup.add(bodyMesh);
 
   // --- Inner Insert Badge Geometry ---
-  const innerW = cardW - 0.06;
-  const innerH = cardH - 0.06;
-  const innerRadius = 0.25;
+  const innerW = 3.12;
+  const innerH = 4.80;
+  const innerRadius = 0.22;
 
   const innerShape = createRoundedRectShape(innerW, innerH, innerRadius);
   innerShape.holes.push(createSlotHole(slotW, slotH, slotY));
@@ -1006,11 +1006,13 @@ function initPhysical3DIDCard() {
 
   const claspGeo = new THREE.CylinderGeometry(0.10, 0.14, 0.38, 16);
   const claspMesh = new THREE.Mesh(claspGeo, metalMat);
-  claspMesh.position.set(0, slotY + 0.32, 0);
+  claspMesh.position.set(0, slotY + 0.26, 0);
   cardGroup.add(claspMesh);
 
   // Woven Ribbon Strap
-  const strapGeo = new THREE.PlaneGeometry(0.60, 3.8);
+  const restDist = 3.0;
+  const strapLength = 0.50;
+  const strapGeo = new THREE.PlaneGeometry(0.50, strapLength);
   const strapCanvas = document.createElement('canvas');
   strapCanvas.width = 128;
   strapCanvas.height = 512;
@@ -1032,8 +1034,8 @@ function initPhysical3DIDCard() {
     side: THREE.DoubleSide
   });
   const strapMesh = new THREE.Mesh(strapGeo, strapMat);
-  strapMesh.position.set(0, slotY + 2.2, 0);
-  cardGroup.add(strapMesh);
+  strapMesh.position.set(0, -strapLength / 2, 0);
+  suspensionGroup.add(strapMesh);
 
   // Draw Front Canvas
   function drawFrontCanvas(img) {
@@ -1069,6 +1071,19 @@ function initPhysical3DIDCard() {
     } else {
       fCtx.rect(30, 30, 964, 1476);
     }
+    fCtx.stroke();
+
+    // Top Slot Bezel Graphic (aligned with 3D slot cut-out)
+    fCtx.fillStyle = '#020617';
+    fCtx.strokeStyle = 'rgba(148, 163, 184, 0.7)';
+    fCtx.lineWidth = 4;
+    fCtx.beginPath();
+    if (fCtx.roundRect) {
+      fCtx.roundRect(512 - 95, 84, 190, 48, 14);
+    } else {
+      fCtx.rect(512 - 95, 84, 190, 48);
+    }
+    fCtx.fill();
     fCtx.stroke();
 
     // Top Header Bar
@@ -1538,13 +1553,14 @@ function initPhysical3DIDCard() {
     suspensionGroup.rotation.x = pendulumAngleX;
 
     // Card sits suspended below anchor, with Y stretch and front/back flip
-    cardGroup.position.set(0, -2.7 + lanyardStretchY, 0);
+    cardGroup.position.set(0, -restDist + lanyardStretchY, 0);
     cardGroup.rotation.y = cardRotY;
 
     // Ribbon flexes subtly
     if (strapMesh) {
-      strapMesh.rotation.z = -pendulumAngleZ * 0.3;
-      strapMesh.scale.set(1, 1 - lanyardStretchY * 0.25, 1);
+      const curLen = Math.max(0.1, strapLength - lanyardStretchY);
+      strapMesh.position.set(0, -curLen / 2, 0);
+      strapMesh.scale.set(1, curLen / strapLength, 1);
     }
 
     renderer.render(scene, camera);

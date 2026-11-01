@@ -531,24 +531,73 @@ button { cursor: pointer; font-family: var(--font-body); }
   position: relative;
   width: 100%;
   max-width: 440px;
-  height: 520px;
+  height: 540px;
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: 28px;
+  background: radial-gradient(circle at 50% 30%, rgba(0, 212, 255, 0.08) 0%, rgba(12, 23, 48, 0.45) 55%, rgba(7, 13, 26, 0.7) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 0 35px rgba(0, 212, 255, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.stage-top-mount {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.mount-bracket {
+  width: 64px;
+  height: 10px;
+  background: linear-gradient(180deg, #e2e8f0, #64748b);
+  border-radius: 6px 6px 2px 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.mount-clip {
+  width: 26px;
+  height: 14px;
+  background: linear-gradient(180deg, #94a3b8, #334155);
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  position: relative;
+}
+
+.mount-clip::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  background: #00d4ff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #00d4ff, 0 0 14px #00d4ff;
 }
 
 .id-card-stage {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: var(--radius-xl);
+  border-radius: inherit;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: grab;
   user-select: none;
   touch-action: pan-y;
-  background: radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.05), transparent 70%);
+  background: transparent;
 }
 
 .id-card-stage:active {
