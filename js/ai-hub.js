@@ -176,7 +176,7 @@ function generateNivaResponse(rawQuery) {
     return `
       Harshit has developed <strong>10+ technical repositories</strong> across Data Science, Machine Learning, and Web Development:<br/><br/>
       • 🧠 <strong>Crop Disease Predictor:</strong> Deep learning model utilizing Convolutional Neural Networks (CNN) and OpenCV for instant leaf blight and disease diagnostics.<br/>
-      • 📈 <strong>Personal Portfolio (3D WebGL):</strong> Hardware-accelerated Three.js portfolio with physical pendulum ID badge, custom particle space field, and this AI Hub.<br/>
+      • 📈 <strong>Personal Portfolio:</strong> Hardware-accelerated interactive portfolio with physical pendulum ID badge, custom particle space field, and this AI Hub.<br/>
       • ⚡ <strong>Autonomous n8n Job & Gig Agent:</strong> Multi-agent orchestrator connecting public job feeds with 5-channel instant alerts (Telegram, WhatsApp, Email, Discord).<br/>
       • 🐍 <strong>Python Data Analytics Suite:</strong> Pandas & Scikit-learn pipelines for exploratory data analysis, feature engineering, and statistical modeling.<br/><br/>
       🔗 <em>GitHub Accounts:</em> <a href="https://github.com/harshit-001-it" target="_blank" style="color:var(--accent);">@harshit-001-it</a> & <a href="https://github.com/har-001" target="_blank" style="color:var(--accent);">@har-001</a>.
@@ -237,7 +237,7 @@ function generateNivaResponse(rawQuery) {
     I understand your query: "<em>${escapeHtml(rawQuery)}</em>".<br/><br/>
     As Harshit's AI assistant, I can provide verified details on:<br/>
     • 👤 <strong>Harshit's Background:</strong> Education, college, location, contact.<br/>
-    • 🚀 <strong>Technical Projects:</strong> Machine Learning, CNN disease detection, 3D WebGL website.<br/>
+    • 🚀 <strong>Technical Projects:</strong> Machine Learning, CNN disease detection, intelligent web systems.<br/>
     • 🛠️ <strong>Skills & Certifications:</strong> Python, Data Analytics, 7 authentic certificates.<br/>
     • ⚡ <strong>n8n Autonomous Workflows:</strong> Multi-channel alert dispatch pipelines.<br/><br/>
     Try asking: <em>"What are his machine learning projects?"</em> or <em>"How can I contact Harshit?"</em>
