@@ -502,9 +502,28 @@
     </div>
   </div>
 
+  <!-- Floating Companion Character Selector Dock -->
+  <div class="companion-dock" id="companionDock">
+    <button class="dock-toggle-btn" id="dockToggleBtn" title="Choose Companion Character" aria-label="Toggle Companion Selector">
+      <span class="dock-icon" id="activeCompanionIcon">🛸</span>
+      <span class="dock-label">Companion</span>
+      <span class="dock-arrow">▾</span>
+    </button>
+    <div class="dock-menu" id="dockMenu">
+      <div class="dock-header">Choose Companion</div>
+      <button class="dock-char-btn active" data-char="drone"><span class="char-icon">🛸</span><span class="char-name">Cyber Drone</span></button>
+      <button class="dock-char-btn" data-char="astronaut"><span class="char-icon">👨‍🚀</span><span class="char-name">Astronaut</span></button>
+      <button class="dock-char-btn" data-char="robocat"><span class="char-icon">🐱</span><span class="char-name">Robo-Cat</span></button>
+      <button class="dock-char-btn" data-char="spark"><span class="char-icon">✨</span><span class="char-name">Neural Spark</span></button>
+      <button class="dock-char-btn" data-char="mecha"><span class="char-icon">🤖</span><span class="char-name">Mecha Bot</span></button>
+    </div>
+  </div>
+
   <!-- Three.js Engine -->
   <script src="js/three.min.js"></script>
+  <!-- 5-in-1 Interactive Companion Engine -->
+  <script src="js/companion.js?v=multi-char-v1"></script>
   <!-- Main Application Script -->
-  <script src="js/main.js?v=unified-v8"></script>
+  <script src="js/main.js?v=unified-v9"></script>
 </body>
 </html>

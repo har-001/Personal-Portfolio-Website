@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Autonomous AI Hub | Harshit Mishra — Live NIVA & N8N Agent</title>
+  <title>Autonomous AI Hub | Harshit Mishra — Live NIVA & N8N Agents</title>
   <meta name="description" content="Operable AI Hub: Interact with Harshit Mishra's live Neural Virtual Assistant (NIVA) and test the automated n8n multi-agent job & freelance pipelines." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/ai-hub.css?v=live-niva-v1" />
+  <link rel="stylesheet" href="css/ai-hub.css?v=live-niva-v2" />
 </head>
 <body class="ai-hub-page">
   <!-- Background Glow & Grid -->
@@ -20,9 +20,12 @@
   <div class="ai-hub-glow-2"></div>
   <div class="cursor-spotlight" id="cursorSpotlight"></div>
 
+  <!-- Interactive Companion Canvas -->
+  <canvas class="companion-canvas" id="companionCanvas"></canvas>
+
   <!-- Top Navigation -->
   <nav class="ai-hub-nav">
-    <a href="index.html" class="back-btn">
+    <a href="index.html" class="back-btn" title="Return to Main Portfolio">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       <span>Back to Portfolio</span>
     </a>
@@ -35,48 +38,95 @@
 
     <div class="nav-status-pill">
       <span class="pulse-dot-green"></span>
-      <span>2 AGENTS LIVE</span>
+      <span>3 AGENTS READY</span>
     </div>
   </nav>
 
-  <!-- Hero Header -->
+  <!-- Hero Header with Autonomous Roaming Mini-Bot -->
   <header class="ai-hub-header">
     <div class="hub-hero-badge">⚡ Neural Intelligence &bull; Production Automation</div>
     <h1 class="hub-title">Autonomous AI Hub</h1>
     <p class="hub-subtitle">
-      Chat directly with <strong>NIVA</strong> (Harshit's grounded virtual assistant) or execute a live test run of the <strong>n8n multi-agent pipeline</strong>.
+      Explore Harshit's intelligent agent suite — ground-truth conversational assistant <strong>NIVA</strong>, alongside dual <strong>n8n multi-platform pipelines</strong>.
     </p>
 
-    <!-- 3D Parallax Mascot -->
-    <div class="robot-mascot-stage">
-      <div class="robot-mascot-container" id="robotMascot" title="Click to interact with NIVA Mascot">
-        <img src="assets/robot_mascot.svg" alt="NIVA AI Robot Mascot" class="robot-mascot-svg" id="robotSvg" />
-      </div>
-      <div class="robot-platform"></div>
-      <div class="robot-status-bubble">
+    <!-- 3D Roaming Mini-Bot Patrol Stage -->
+    <div class="roaming-bot-stage">
+      <canvas id="roamingBotCanvas" width="520" height="180"></canvas>
+      <div class="robot-status-bubble" id="roamingBotBubble">
         <span class="pulse-dot-green"></span>
-        <span id="robotSpeech">NIVA Online: Ready for queries below!</span>
+        <span id="robotSpeech">Patrol Active: All 3 autonomous agents standing by.</span>
       </div>
     </div>
   </header>
 
-  <!-- Dual Workstations: Live NIVA Terminal & N8N Automation Console -->
-  <main class="ai-hub-stations">
+  <!-- 3 Dedicated Agent Showcase Cards -->
+  <main class="ai-hub-cards-container">
+    <div class="workstation-cards-grid">
 
-    <!-- Station 1: Live Operable NIVA Terminal -->
-    <section class="station-card" id="nivaStation">
-      <div class="station-header">
-        <div class="station-title-box">
-          <div class="station-icon">🧠</div>
-          <div>
-            <h2 class="station-h2">NIVA Terminal</h2>
-            <div class="station-sub">Neural Intelligent Virtual Assistant • Live Operable Chat</div>
-          </div>
+      <!-- Card 1: NIVA Terminal -->
+      <div class="agent-showcase-card">
+        <div class="card-top-row">
+          <div class="agent-icon-box">🧠</div>
+          <span class="agent-badge-pill green">LIVE OPERABLE</span>
         </div>
-        <span class="station-status-pill">LIVE OPERABLE</span>
+        <h2 class="agent-card-title">NIVA Virtual Assistant</h2>
+        <p class="agent-card-desc">
+          Harshit's grounded portfolio intelligence agent. Ask questions regarding machine learning models, B.Tech IT curriculum, 7 authentic certificates, or contact info.
+        </p>
+        <button class="btn btn-primary launch-agent-btn" id="openNivaBtn">
+          <span>Launch NIVA Terminal</span> ⚡
+        </button>
       </div>
 
-      <div class="niva-terminal-wrapper">
+      <!-- Card 2: n8n Job Search Agent -->
+      <div class="agent-showcase-card">
+        <div class="card-top-row">
+          <div class="agent-icon-box" style="background:rgba(0,212,255,0.12);border-color:rgba(0,212,255,0.35);color:var(--accent-cyan);">💼</div>
+          <span class="agent-badge-pill cyan">API LIVE</span>
+        </div>
+        <h2 class="agent-card-title">n8n Job Search Agent</h2>
+        <p class="agent-card-desc">
+          Autonomous multi-board scraper (RemoteOK, ArbeitNow, Remotive). Evaluates job descriptions against Python/ML skills and dispatches 5-channel instant alerts.
+        </p>
+        <button class="btn btn-primary launch-agent-btn" id="openJobAgentBtn">
+          <span>Launch Job Agent</span> 🔍
+        </button>
+      </div>
+
+      <!-- Card 3: n8n Freelance Gig Finder -->
+      <div class="agent-showcase-card">
+        <div class="card-top-row">
+          <div class="agent-icon-box" style="background:rgba(168,85,247,0.12);border-color:rgba(168,85,247,0.35);color:#c084fc;">🚀</div>
+          <span class="agent-badge-pill purple">READY TO BID</span>
+        </div>
+        <h2 class="agent-card-title">n8n Freelance Gig Finder</h2>
+        <p class="agent-card-desc">
+          Automated freelance pipeline for Upwork, Fiverr, and Freelancer. Matches project scopes with ML, Python, and Web development skills and crafts personalized bids.
+        </p>
+        <button class="btn btn-primary launch-agent-btn" id="openFreelanceBtn">
+          <span>Launch Freelance Agent</span> 💼
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODAL / EXPANDED WORKSTATION 1: NIVA TERMINAL -->
+  <div class="agent-modal-overlay" id="nivaModalOverlay">
+    <div class="agent-modal-window glass">
+      <div class="modal-window-header">
+        <div class="header-left">
+          <span class="modal-icon">🧠</span>
+          <div>
+            <h3>NIVA Terminal</h3>
+            <span class="modal-subtitle">Neural Intelligent Virtual Assistant • Live Grounded Chat</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeNivaBtn" aria-label="Close NIVA Terminal">&times;</button>
+      </div>
+
+      <div class="modal-window-body">
         <!-- Quick Query Suggestion Chips -->
         <div class="niva-quick-chips">
           <button class="niva-chip-btn" data-query="Who is Harshit Mishra?">👤 About Harshit</button>
@@ -88,7 +138,6 @@
 
         <!-- Scrollable Messages Container -->
         <div class="niva-chat-messages" id="nivaChatMessages">
-          <!-- Initial NIVA Greeting -->
           <div class="niva-msg niva-bot-msg">
             <span class="bot-avatar">⚡</span>
             <div class="msg-bubble">
@@ -96,7 +145,7 @@
               I am grounded in Harshit's verified portfolio data — including his <strong>B.Tech IT background</strong>, <strong>Machine Learning projects</strong>, <strong>7 authentic certifications</strong>, and <strong>n8n automation workflows</strong>.<br/><br/>
               <em>Click any quick chip above or ask me a custom question below!</em>
               <div class="msg-meta">
-                <span>NIVA v2.4 • Grounded Portfolio Intelligence</span>
+                <span>NIVA v2.5 • Grounded Portfolio Intelligence</span>
                 <button class="copy-msg-btn" onclick="copyBubbleText(this)">Copy</button>
               </div>
             </div>
@@ -117,68 +166,139 @@
           <button type="button" class="clear-btn" id="clearChatBtn" title="Clear terminal chat">Clear</button>
         </form>
       </div>
-    </section>
+    </div>
+  </div>
 
-    <!-- Station 2: Live N8N Automation Pipeline Console -->
-    <section class="station-card" id="n8nStation">
-      <div class="station-header">
-        <div class="station-title-box">
-          <div class="station-icon">⚡</div>
+  <!-- MODAL / EXPANDED WORKSTATION 2: N8N JOB SEARCH AGENT -->
+  <div class="agent-modal-overlay" id="jobModalOverlay">
+    <div class="agent-modal-window glass">
+      <div class="modal-window-header">
+        <div class="header-left">
+          <span class="modal-icon" style="color:var(--accent-cyan);">💼</span>
           <div>
-            <h2 class="station-h2">N8N Agent Console</h2>
-            <div class="station-sub">Autonomous Job Scraper &amp; 5-Channel Alert Orchestrator</div>
+            <h3>n8n Job Search Agent Console</h3>
+            <span class="modal-subtitle">Auto-Scrape • Resume Keyword Match • 5-Channel Dispatch</span>
           </div>
         </div>
-        <span class="station-status-pill" id="n8nConsoleStatus">STANDBY // READY</span>
+        <button class="modal-close-btn" id="closeJobBtn" aria-label="Close Job Agent">&times;</button>
       </div>
 
-      <div class="n8n-console-wrapper">
-        <!-- Visual Node Pipeline Flow -->
+      <div class="modal-window-body">
+        <div class="agent-status-bar">
+          <span class="pulse-dot-green"></span>
+          <span id="jobAgentStatusText">Agent Status: Ready to query RemoteOK, Remotive &amp; ArbeitNow</span>
+        </div>
+
+        <!-- Pipeline Nodes -->
         <div class="pipeline-visualizer">
-          <div class="pipeline-node" id="nodeCron">
-            <span class="node-icon">⏰</span>
-            <span class="node-name">Cron Trigger</span>
-          </div>
+          <div class="pipeline-node"><span class="node-icon">⏰</span><span class="node-name">Cron Trigger</span></div>
           <span class="node-arrow">➔</span>
-          <div class="pipeline-node" id="nodeScraper">
-            <span class="node-icon">🌐</span>
-            <span class="node-name">Multi-API Ingest</span>
-          </div>
+          <div class="pipeline-node"><span class="node-icon">🌐</span><span class="node-name">Multi-API Ingest</span></div>
           <span class="node-arrow">➔</span>
-          <div class="pipeline-node" id="nodeMatcher">
-            <span class="node-icon">🧠</span>
-            <span class="node-name">AI Matcher</span>
-          </div>
+          <div class="pipeline-node"><span class="node-icon">🧠</span><span class="node-name">AI Matcher</span></div>
           <span class="node-arrow">➔</span>
-          <div class="pipeline-node" id="nodeDispatch">
-            <span class="node-icon">📲</span>
-            <span class="node-name">5-Channel Alert</span>
-          </div>
+          <div class="pipeline-node"><span class="node-icon">📲</span><span class="node-name">5-Channel Alert</span></div>
         </div>
 
-        <!-- Execution Terminal Logs -->
-        <div class="n8n-log-terminal" id="n8nLogTerminal">
-          <span class="log-line log-info">[STATUS] n8n Orchestrator loaded in client test harness.</span>
-          <span class="log-line log-info">[PIPELINE] Node routes verified: RemoteOK, Remotive, ArbeitNow.</span>
-          <span class="log-line log-info">[DISPATCH] Channels ready: Email (SMTP), Telegram Bot, WhatsApp, Discord.</span>
-          <span class="log-line" style="color:var(--accent-cyan);">[READY] Click "Execute Live Test Run" below to trigger the workflow simulation.</span>
-        </div>
-
-        <!-- Action Controls -->
-        <div class="n8n-console-actions">
-          <button class="btn-run-n8n" id="runN8nTestBtn">
-            Execute Live Pipeline Test ⚡
+        <!-- Controls -->
+        <div class="modal-actions-bar">
+          <button class="btn btn-primary" id="fetchRealJobsBtn" style="width:100%;">
+            🔍 Fetch Latest Tech Jobs (Live APIs)
           </button>
-          <a href="docs/NOTIFICATION_SETUP_GUIDE.md" target="_blank" class="btn-n8n-spec">
-            Setup Guide ↗
-          </a>
+        </div>
+        <div id="jobFetchStatus" class="feed-status-msg"></div>
+
+        <!-- Live Fetched Jobs Feed -->
+        <div class="jobs-feed-wrapper" id="jobFeedSection" style="display:none;">
+          <div class="feed-header">
+            <h4>Matched Opportunities</h4>
+            <span class="feed-live-tag">● Live Ingest</span>
+          </div>
+          <div class="jobs-cards-feed" id="jobsFeed"></div>
+        </div>
+
+        <!-- Applied History -->
+        <div class="applied-history-wrapper" id="jobHistorySection" style="display:none;">
+          <div class="feed-header">
+            <h4>✅ Application History</h4>
+            <span class="applied-count-badge" id="jobAppliedCount">0 Applied</span>
+          </div>
+          <div class="applied-history-feed" id="jobHistoryFeed"></div>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
 
-  </main>
+  <!-- MODAL / EXPANDED WORKSTATION 3: N8N FREELANCE GIG FINDER -->
+  <div class="agent-modal-overlay" id="freelanceModalOverlay">
+    <div class="agent-modal-window glass">
+      <div class="modal-window-header">
+        <div class="header-left">
+          <span class="modal-icon" style="color:#c084fc;">🚀</span>
+          <div>
+            <h3>n8n Freelance Gig Finder Console</h3>
+            <span class="modal-subtitle">Upwork, Fiverr &amp; Freelancer Scraper • 1-Click Proposal &bull; Smart Bid</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeFreelanceBtn" aria-label="Close Freelance Agent">&times;</button>
+      </div>
 
-  <!-- JavaScript -->
-  <script src="js/ai-hub.js?v=live-niva-v1"></script>
+      <div class="modal-window-body">
+        <div class="agent-status-bar" style="background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.3);">
+          <span class="pulse-dot-green"></span>
+          <span id="freelanceStatusText" style="color:#c084fc;">Agent Status: Ready to Search Freelance Portals</span>
+        </div>
+
+        <div class="modal-actions-bar">
+          <button class="btn btn-primary" id="fetchFreelanceGigsBtn" style="width:100%;background:linear-gradient(135deg, #a855f7, #6366f1);">
+            🔍 Fetch Latest Freelance Gigs
+          </button>
+        </div>
+        <div id="freelanceFetchStatus" class="feed-status-msg"></div>
+
+        <!-- Matched Gigs Feed -->
+        <div class="jobs-feed-wrapper" id="gigFeedSection" style="display:none;">
+          <div class="feed-header">
+            <h4>Available Freelance Contracts</h4>
+            <span class="feed-live-tag" style="color:#c084fc;">● Matched Scope</span>
+          </div>
+          <div class="jobs-cards-feed" id="gigFeed"></div>
+        </div>
+
+        <!-- Bid History -->
+        <div class="applied-history-wrapper" id="bidHistorySection" style="display:none;">
+          <div class="feed-header">
+            <h4>✅ Bid History</h4>
+            <span class="applied-count-badge" id="bidCountBadge">0 Bids Sent</span>
+          </div>
+          <div class="applied-history-feed" id="bidHistoryFeed"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Companion Character Selector Dock -->
+  <div class="companion-dock" id="companionDock">
+    <button class="dock-toggle-btn" id="dockToggleBtn" title="Choose Companion Character" aria-label="Toggle Companion Selector">
+      <span class="dock-icon" id="activeCompanionIcon">🛸</span>
+      <span class="dock-label">Companion</span>
+      <span class="dock-arrow">▾</span>
+    </button>
+    <div class="dock-menu" id="dockMenu">
+      <div class="dock-header">Choose Companion</div>
+      <button class="dock-char-btn active" data-char="drone"><span class="char-icon">🛸</span><span class="char-name">Cyber Drone</span></button>
+      <button class="dock-char-btn" data-char="astronaut"><span class="char-icon">👨‍🚀</span><span class="char-name">Astronaut</span></button>
+      <button class="dock-char-btn" data-char="robocat"><span class="char-icon">🐱</span><span class="char-name">Robo-Cat</span></button>
+      <button class="dock-char-btn" data-char="spark"><span class="char-icon">✨</span><span class="char-name">Neural Spark</span></button>
+      <button class="dock-char-btn" data-char="mecha"><span class="char-icon">🤖</span><span class="char-name">Mecha Bot</span></button>
+    </div>
+  </div>
+
+  <!-- Three.js Engine -->
+  <script src="js/three.min.js"></script>
+  <!-- 5-in-1 Interactive Companion Engine -->
+  <script src="js/companion.js?v=multi-char-v1"></script>
+  <!-- AI Hub Logic (Roaming Bot, NIVA, n8n Job Agent & Freelance Agent) -->
+  <script src="js/ai-hub.js?v=live-niva-v2"></script>
 </body>
 </html>

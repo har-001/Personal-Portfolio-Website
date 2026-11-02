@@ -1867,3 +1867,120 @@ img {
     font-size: 1.4rem;
   }
 }
+
+
+/* ---------- FLOATING 3D COMPANION CHARACTER DOCK ---------- */
+.companion-dock {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1002;
+  font-family: var(--font-body);
+}
+
+.dock-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  background: rgba(11, 15, 29, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), var(--glow-cyan);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.dock-toggle-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 12px 35px rgba(0, 212, 255, 0.4);
+}
+
+.dock-icon {
+  font-size: 1.15rem;
+}
+
+.dock-label {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--accent-cyan);
+}
+
+.dock-arrow {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: transform 0.25s ease;
+}
+
+.dock-menu {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  right: 0;
+  width: 210px;
+  background: rgba(11, 15, 29, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 0.6rem;
+  display: none;
+  flex-direction: column;
+  gap: 0.35rem;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);
+  transform: translateY(10px);
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.dock-menu.open {
+  display: flex;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.dock-header {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.3rem 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 0.25rem;
+}
+
+.dock-char-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.dock-char-btn:hover {
+  background: rgba(0, 212, 255, 0.12);
+  color: var(--accent-cyan);
+}
+
+.dock-char-btn.active {
+  background: rgba(0, 212, 255, 0.2);
+  color: #ffffff;
+  border: 1px solid rgba(0, 212, 255, 0.35);
+}
+

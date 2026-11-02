@@ -1,7 +1,7 @@
 /* ================================================================
    HARSHIT MISHRA — MAIN APPLICATION SCRIPT
    Hardware-Accelerated Three.js Universe • Physical Titanium Badge
-   Interactive Companion Drone • 3D Card Tilt • Real Portfolio Data
+   Interactive Lanyard & Rivets • 3D Card Tilt • Real Portfolio Data
    ================================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
   initTypewriter();
   initFullPageSpace3D();
-  initInteractiveCompanion();
   initPhysicalTitaniumIDCard();
   initDynamic3DCardTilt();
   initRevealAnimations();
@@ -327,178 +326,13 @@ function initFullPageSpace3D() {
 }
 
 /* ----------------------------------------------------------------
-   6. INTERACTIVE MICRO-DRONE COMPANION (THREE.JS)
-   High-tech micro-drone with dual rotating gimbal rings & reactor
-   Smooth spring mouse follow with 3D banking velocity tilt
-   ---------------------------------------------------------------- */
-function initInteractiveCompanion() {
-  const canvas = document.getElementById('companionCanvas');
-  if (!canvas || typeof THREE === 'undefined') return;
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(0, 0, 300);
-
-  const renderer = new THREE.WebGLRenderer({
-    canvas: canvas,
-    alpha: true,
-    antialias: true,
-    powerPreference: 'high-performance'
-  });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.setSize(window.innerWidth, window.innerHeight);
-
-  // Lighting
-  const ambient = new THREE.AmbientLight(0xffffff, 1.2);
-  scene.add(ambient);
-  const dirLight = new THREE.DirectionalLight(0x00d4ff, 1.5);
-  dirLight.position.set(100, 100, 200);
-  scene.add(dirLight);
-
-  // Micro-Drone Master Group (~32px compact footprint)
-  const drone = new THREE.Group();
-  scene.add(drone);
-
-  // Central Glowing Energy Core
-  const coreGeo = new THREE.SphereGeometry(6.5, 24, 24);
-  const coreMat = new THREE.MeshStandardMaterial({
-    color: 0x00d4ff,
-    emissive: 0x00d4ff,
-    emissiveIntensity: 0.85,
-    roughness: 0.2,
-    metalness: 0.8
-  });
-  const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-  drone.add(coreMesh);
-
-  // Outer Outer Halo Glow
-  const haloGeo = new THREE.SphereGeometry(7.8, 16, 16);
-  const haloMat = new THREE.MeshBasicMaterial({
-    color: 0x00d4ff,
-    transparent: true,
-    opacity: 0.25,
-    wireframe: true
-  });
-  const haloMesh = new THREE.Mesh(haloGeo, haloMat);
-  drone.add(haloMesh);
-
-  // Gimbal Ring 1 (Titanium Blue)
-  const ring1Geo = new THREE.TorusGeometry(12, 1.0, 12, 32);
-  const ring1Mat = new THREE.MeshStandardMaterial({
-    color: 0x38bdf8,
-    metalness: 0.9,
-    roughness: 0.2
-  });
-  const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
-  drone.add(ring1);
-
-  // Gimbal Ring 2 (Violet Neon)
-  const ring2Geo = new THREE.TorusGeometry(9.8, 0.8, 12, 32);
-  const ring2Mat = new THREE.MeshStandardMaterial({
-    color: 0x8b5cf6,
-    metalness: 0.9,
-    roughness: 0.2
-  });
-  const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
-  drone.add(ring2);
-
-  // Micro Thruster Pods (3 Nodes)
-  const thrusters = [];
-  for (let i = 0; i < 3; i++) {
-    const angle = (i * Math.PI * 2) / 3;
-    const podGeo = new THREE.CylinderGeometry(1.2, 1.2, 4, 8);
-    const podMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.8 });
-    const pod = new THREE.Mesh(podGeo, podMat);
-    pod.position.set(Math.cos(angle) * 14, Math.sin(angle) * 14, 0);
-    pod.rotation.z = angle + Math.PI / 2;
-    drone.add(pod);
-    thrusters.push(pod);
-  }
-
-  // Smooth Cursor Follow State (Coordinates in Three.js world space)
-  let targetWorldX = 0;
-  let targetWorldY = 0;
-  let currentWorldX = 0;
-  let currentWorldY = 0;
-  let velX = 0;
-  let velY = 0;
-
-  function updateTargetWorldPos(clientX, clientY) {
-    // Project 2D screen coordinates into Three.js 3D world coordinates at z = 0
-    const vector = new THREE.Vector3(
-      (clientX / window.innerWidth) * 2 - 1,
-      -(clientY / window.innerHeight) * 2 + 1,
-      0.5
-    );
-    vector.unproject(camera);
-    const dir = vector.sub(camera.position).normalize();
-    const distance = -camera.position.z / dir.z;
-    const pos = camera.position.clone().add(dir.multiplyScalar(distance));
-    // Offset slightly so it floats near the cursor
-    targetWorldX = pos.x + 28;
-    targetWorldY = pos.y - 28;
-  }
-
-  window.addEventListener('mousemove', (e) => {
-    updateTargetWorldPos(e.clientX, e.clientY);
-  }, { passive: true });
-
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
-
-  // Start with drone near top-right
-  targetWorldX = 80;
-  targetWorldY = 60;
-  currentWorldX = targetWorldX;
-  currentWorldY = targetWorldY;
-
-  let compClock = new THREE.Clock();
-
-  function animateCompanion() {
-    requestAnimationFrame(animateCompanion);
-    const elapsed = compClock.getElapsedTime();
-
-    // Smooth Spring Lag Interpolation
-    const prevX = currentWorldX;
-    const prevY = currentWorldY;
-
-    currentWorldX += (targetWorldX - currentWorldX) * 0.085;
-    currentWorldY += (targetWorldY - currentWorldY) * 0.085;
-
-    velX = currentWorldX - prevX;
-    velY = currentWorldY - prevY;
-
-    // Apply Position with subtle hover levitation bob
-    const hoverBob = Math.sin(elapsed * 3.5) * 2.5;
-    drone.position.set(currentWorldX, currentWorldY + hoverBob, 0);
-
-    // 3D Banking & Tilt in direction of movement
-    drone.rotation.z = -velX * 0.08;
-    drone.rotation.x = velY * 0.08;
-
-    // Counter-Rotating Gyroscope Gimbal Rings
-    ring1.rotation.x = elapsed * 1.8;
-    ring1.rotation.y = elapsed * 1.2;
-    ring2.rotation.y = -elapsed * 2.2;
-    ring2.rotation.z = elapsed * 1.5;
-
-    // Core pulsing glow
-    coreMat.emissiveIntensity = 0.7 + Math.sin(elapsed * 5) * 0.3;
-
-    renderer.render(scene, camera);
-  }
-
-  animateCompanion();
-}
-
-/* ----------------------------------------------------------------
-   7. PHYSICAL TITANIUM ID-CARD (THREE.JS)
-   - Single-body beveled titanium casing
-   - High-DPI canvas texture with verified photo, badges, QR/barcode
-   - Double-pendulum gravitational physics & realistic inertia
+   6. ULTRA-REALISTIC PHYSICAL ID CARD WITH LANYARD & WEIGHT
+   - Braided fabric lanyard ribbons descending from top mount
+   - Chrome swivel carabiner clip hooking directly into card slot
+   - Double-layered cardholder: frosted acrylic bumper + titanium core + 4 rivets
+   - Dynamic soft ambient drop-shadow plane
+   - High-DPI canvas front & back with photo, badges, QR/barcode
+   - Double-pendulum gravitational physics & elastic recoil
    - Drag to rotate 360°, click to flip 180°, pull-down to scroll
    ---------------------------------------------------------------- */
 function initPhysicalTitaniumIDCard() {
@@ -516,11 +350,11 @@ function initPhysicalTitaniumIDCard() {
   }
 
   let width = stage.clientWidth || 380;
-  let height = stage.clientHeight || 520;
+  let height = stage.clientHeight || 540;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
-  camera.position.set(0, -0.3, 5.2);
+  camera.position.set(0, -0.2, 5.2);
 
   const renderer = new THREE.WebGLRenderer({
     alpha: true,
@@ -534,49 +368,99 @@ function initPhysicalTitaniumIDCard() {
   stage.appendChild(renderer.domElement);
 
   // High-CRI 3-Point Studio Lighting
-  const ambient = new THREE.AmbientLight(0xffffff, 1.1);
+  const ambient = new THREE.AmbientLight(0xffffff, 1.2);
   scene.add(ambient);
 
-  const keyLight = new THREE.DirectionalLight(0xffffff, 1.8);
+  const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
   keyLight.position.set(2, 4, 6);
   scene.add(keyLight);
 
-  const cyanFill = new THREE.DirectionalLight(0x00d4ff, 0.8);
+  const cyanFill = new THREE.DirectionalLight(0x00d4ff, 0.9);
   cyanFill.position.set(-4, -1, 3);
   scene.add(cyanFill);
 
-  const violetRim = new THREE.DirectionalLight(0x8b5cf6, 0.9);
+  const violetRim = new THREE.DirectionalLight(0x8b5cf6, 1.0);
   violetRim.position.set(0, -4, -4);
   scene.add(violetRim);
 
-  // Lanyard Mount Anchor Group
-  const lanyardAnchor = new THREE.Group();
-  lanyardAnchor.position.set(0, 1.6, 0);
-  scene.add(lanyardAnchor);
+  // 1. Dynamic Drop Shadow Plane
+  function createShadowTexture() {
+    const sCanvas = document.createElement('canvas');
+    sCanvas.width = 256;
+    sCanvas.height = 256;
+    const sCtx = sCanvas.getContext('2d');
+    const grad = sCtx.createRadialGradient(128, 128, 10, 128, 128, 120);
+    grad.addColorStop(0, 'rgba(0, 0, 0, 0.7)');
+    grad.addColorStop(0.5, 'rgba(0, 0, 0, 0.35)');
+    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    sCtx.fillStyle = grad;
+    sCtx.fillRect(0, 0, 256, 256);
+    return new THREE.CanvasTexture(sCanvas);
+  }
 
-  // Titanium Clasp Mesh
-  const claspGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.35, 16);
-  const claspMat = new THREE.MeshStandardMaterial({
-    color: 0x94a3b8,
-    metalness: 0.95,
+  const shadowGeo = new THREE.PlaneGeometry(3.0, 4.0);
+  const shadowMat = new THREE.MeshBasicMaterial({
+    map: createShadowTexture(),
+    transparent: true,
+    opacity: 0.65,
+    depthWrite: false
+  });
+  const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
+  shadowMesh.position.set(0, -0.4, -0.35);
+  scene.add(shadowMesh);
+
+  // 2. Lanyard Master Anchor at Top
+  const lanyardMaster = new THREE.Group();
+  lanyardMaster.position.set(0, 2.1, 0);
+  scene.add(lanyardMaster);
+
+  // Braided Fabric Strap Material
+  const strapMat = new THREE.MeshStandardMaterial({
+    color: 0x181e2e,
+    roughness: 0.85,
+    metalness: 0.1
+  });
+
+  // Left & Right Lanyard Strap Ribbons
+  const strapGeo = new THREE.BoxGeometry(0.14, 1.6, 0.02);
+  const strapL = new THREE.Mesh(strapGeo, strapMat);
+  strapL.position.set(-0.25, 0.45, 0);
+  strapL.rotation.z = -0.16;
+  lanyardMaster.add(strapL);
+
+  const strapR = new THREE.Mesh(strapGeo, strapMat);
+  strapR.position.set(0.25, 0.45, 0);
+  strapR.rotation.z = 0.16;
+  lanyardMaster.add(strapR);
+
+  // Chrome Swivel Carabiner Hook Assembly
+  const chromeMat = new THREE.MeshStandardMaterial({
+    color: 0xf1f5f9,
+    metalness: 0.98,
     roughness: 0.15
   });
-  const claspMesh = new THREE.Mesh(claspGeo, claspMat);
-  claspMesh.position.set(0, -0.15, 0);
-  lanyardAnchor.add(claspMesh);
 
-  // Card Main Pendulum Group
+  const swivelBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.28, 16), chromeMat);
+  swivelBarrel.position.set(0, -0.4, 0);
+  lanyardMaster.add(swivelBarrel);
+
+  const carabinerHook = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.035, 12, 24, Math.PI * 1.5), chromeMat);
+  carabinerHook.position.set(0, -0.62, 0);
+  carabinerHook.rotation.z = Math.PI / 4;
+  lanyardMaster.add(carabinerHook);
+
+  // 3. Card Pendulum Group (Suspended from Hook)
   const cardGroup = new THREE.Group();
-  cardGroup.position.set(0, -0.3, 0);
-  lanyardAnchor.add(cardGroup);
+  cardGroup.position.set(0, -0.75, 0);
+  lanyardMaster.add(cardGroup);
 
-  // Dimensions
-  const cardW = 1.9;
-  const cardH = 2.9;
+  // Card Dimensions
+  const cardW = 1.95;
+  const cardH = 2.95;
   const cardR = 0.14;
-  const thickness = 0.038;
+  const thickness = 0.042;
 
-  // Single-Body Rounded Rectangle Shape with Lanyard Slot Hole
+  // Single-Body Rounded Rectangle with Top Lanyard Slot
   const cardShape = new THREE.Shape();
   cardShape.moveTo(-cardW / 2 + cardR, cardH / 2);
   cardShape.lineTo(cardW / 2 - cardR, cardH / 2);
@@ -589,8 +473,8 @@ function initPhysicalTitaniumIDCard() {
   cardShape.quadraticCurveTo(-cardW / 2, cardH / 2, -cardW / 2 + cardR, cardH / 2);
 
   // Lanyard slot hole at top
-  const slotW = 0.38;
-  const slotH = 0.07;
+  const slotW = 0.42;
+  const slotH = 0.08;
   const slotY = cardH / 2 - 0.16;
   const slotHole = new THREE.Path();
   slotHole.moveTo(-slotW / 2, slotY - slotH / 2);
@@ -600,7 +484,7 @@ function initPhysicalTitaniumIDCard() {
   slotHole.closePath();
   cardShape.holes.push(slotHole);
 
-  // Extrude Titanium Casing
+  // Inner Aerospace Titanium Core
   const extrudeSettings = {
     depth: thickness,
     bevelEnabled: true,
@@ -615,22 +499,50 @@ function initPhysicalTitaniumIDCard() {
   bodyGeo.center();
 
   const titaniumMat = new THREE.MeshPhysicalMaterial({
-    color: 0x1a2133,
-    metalness: 0.88,
-    roughness: 0.28,
-    clearcoat: 0.35,
+    color: 0x151b29,
+    metalness: 0.92,
+    roughness: 0.25,
+    clearcoat: 0.4,
     clearcoatRoughness: 0.2
   });
-
   const bodyMesh = new THREE.Mesh(bodyGeo, titaniumMat);
   cardGroup.add(bodyMesh);
 
-  // 1. FRONT FACE CANVAS TEXTURE (1024 x 1600 High-DPI)
+  // Outer Frosted Acrylic Protective Bumper Case
+  const bumperMat = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.26,
+    roughness: 0.12,
+    transmission: 0.82,
+    ior: 1.45,
+    clearcoat: 1.0,
+    metalness: 0.08
+  });
+  const bumperGeo = new THREE.BoxGeometry(cardW + 0.1, cardH + 0.1, thickness + 0.028);
+  const bumperMesh = new THREE.Mesh(bumperGeo, bumperMat);
+  cardGroup.add(bumperMesh);
+
+  // 4 Chrome Corner Rivets
+  const rivetGeo = new THREE.CylinderGeometry(0.04, 0.04, thickness + 0.035, 12);
+  const cornerOffsets = [
+    [-cardW / 2 + 0.1, cardH / 2 - 0.1],
+    [cardW / 2 - 0.1, cardH / 2 - 0.1],
+    [-cardW / 2 + 0.1, -cardH / 2 + 0.1],
+    [cardW / 2 - 0.1, -cardH / 2 + 0.1]
+  ];
+  cornerOffsets.forEach(([rx, ry]) => {
+    const rivet = new THREE.Mesh(rivetGeo, chromeMat);
+    rivet.rotation.x = Math.PI / 2;
+    rivet.position.set(rx, ry, 0);
+    cardGroup.add(rivet);
+  });
+
+  // FRONT FACE CANVAS TEXTURE (1024 x 1600 High-DPI)
   const frontCanvas = document.createElement('canvas');
   frontCanvas.width = 1024;
   frontCanvas.height = 1600;
   const fCtx = frontCanvas.getContext('2d');
-
   const frontTexture = new THREE.CanvasTexture(frontCanvas);
   frontTexture.anisotropy = 8;
 
@@ -638,29 +550,22 @@ function initPhysicalTitaniumIDCard() {
   const faceH = cardH - 0.08;
   const facePlaneGeo = new THREE.PlaneGeometry(faceW, faceH);
 
-  const frontMat = new THREE.MeshBasicMaterial({
-    map: frontTexture,
-    transparent: true
-  });
+  const frontMat = new THREE.MeshBasicMaterial({ map: frontTexture, transparent: true });
   const frontMesh = new THREE.Mesh(facePlaneGeo, frontMat);
-  frontMesh.position.z = thickness / 2 + 0.022;
+  frontMesh.position.z = thickness / 2 + 0.026;
   cardGroup.add(frontMesh);
 
-  // 2. BACK FACE CANVAS TEXTURE
+  // BACK FACE CANVAS TEXTURE
   const backCanvas = document.createElement('canvas');
   backCanvas.width = 1024;
   backCanvas.height = 1600;
   const bCtx = backCanvas.getContext('2d');
-
   const backTexture = new THREE.CanvasTexture(backCanvas);
   backTexture.anisotropy = 8;
 
-  const backMat = new THREE.MeshBasicMaterial({
-    map: backTexture,
-    transparent: true
-  });
+  const backMat = new THREE.MeshBasicMaterial({ map: backTexture, transparent: true });
   const backMesh = new THREE.Mesh(facePlaneGeo, backMat);
-  backMesh.position.z = -(thickness / 2 + 0.022);
+  backMesh.position.z = -(thickness / 2 + 0.026);
   backMesh.rotation.y = Math.PI;
   cardGroup.add(backMesh);
 
@@ -669,15 +574,15 @@ function initPhysicalTitaniumIDCard() {
     const w = 1024;
     const h = 1600;
 
-    // Dark titanium brushed cyber background
+    // Brushed Cyber Background
     const bgGrad = fCtx.createLinearGradient(0, 0, w, h);
-    bgGrad.addColorStop(0, '#0c101d');
+    bgGrad.addColorStop(0, '#0d111e');
     bgGrad.addColorStop(0.5, '#070912');
     bgGrad.addColorStop(1, '#0e1424');
     fCtx.fillStyle = bgGrad;
     fCtx.fillRect(0, 0, w, h);
 
-    // Subtle Circuit Accent Lines
+    // Subtle Metallic Grid Lines
     fCtx.strokeStyle = 'rgba(0, 212, 255, 0.12)';
     fCtx.lineWidth = 3;
     fCtx.beginPath();
@@ -718,7 +623,6 @@ function initPhysicalTitaniumIDCard() {
     const cy = 490;
     const r = 220;
 
-    // Outer glow ring
     fCtx.save();
     fCtx.beginPath();
     fCtx.arc(cx, cy, r + 10, 0, Math.PI * 2);
@@ -781,10 +685,9 @@ function initPhysicalTitaniumIDCard() {
     });
 
     // Holographic Micro-Chip
-    fCtx.fillStyle = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
+    fCtx.fillStyle = '#d97706';
     fCtx.beginPath();
     fCtx.roundRect(80, 1170, 140, 100, 14);
-    fCtx.fillStyle = '#d97706';
     fCtx.fill();
     fCtx.strokeStyle = '#fef3c7';
     fCtx.lineWidth = 2;
@@ -827,7 +730,7 @@ function initPhysicalTitaniumIDCard() {
     const h = 1600;
 
     const bgGrad = bCtx.createLinearGradient(0, 0, w, h);
-    bgGrad.addColorStop(0, '#0c101d');
+    bgGrad.addColorStop(0, '#0d111e');
     bgGrad.addColorStop(0.5, '#070912');
     bgGrad.addColorStop(1, '#0e1424');
     bCtx.fillStyle = bgGrad;
@@ -898,13 +801,12 @@ function initPhysicalTitaniumIDCard() {
     bCtx.fillText('• 7 Authentic Certifications (AnalytixLabs, InternPe, Softpro, etc.)', 110, 1100);
     bCtx.fillText('• 2 Verified Internships: Web Development & Python Scripting', 110, 1150);
 
-    // Digital Security Hash & QR Box
+    // Digital Security Hash
     bCtx.fillStyle = '#64748b';
     bCtx.font = '22px "JetBrains Mono", monospace';
     bCtx.fillText('SHA256: 8a4f91b7d30c82e6e1f045a2c91834bd', 110, 1310);
     bCtx.fillText('REPOSITORY: github.com/harshit-001-it', 110, 1350);
 
-    // Bottom Notice
     bCtx.fillStyle = '#94a3b8';
     bCtx.textAlign = 'center';
     bCtx.font = 'bold 24px "Space Grotesk", sans-serif';
@@ -914,19 +816,15 @@ function initPhysicalTitaniumIDCard() {
     backTexture.needsUpdate = true;
   }
 
-  // Load Authentic Avatar
+  // Load Avatar
   const avatarImg = new Image();
   avatarImg.crossOrigin = 'anonymous';
   avatarImg.src = 'image.png';
-  avatarImg.onload = () => {
-    drawFrontFace(avatarImg);
-  };
-  avatarImg.onerror = () => {
-    drawFrontFace(null);
-  };
+  avatarImg.onload = () => drawFrontFace(avatarImg);
+  avatarImg.onerror = () => drawFrontFace(null);
   drawBackFace();
 
-  // 4. Double-Pendulum Gravitational Physics & Gesture System
+  // 4. Elastic Physics & Gesture Tracking
   let isDragging = false;
   let isFlipped = false;
   let dragStartX = 0;
@@ -937,7 +835,8 @@ function initPhysicalTitaniumIDCard() {
   let targetRotX = 0;
   let currentPullY = 0;
   let targetPullY = 0;
-  let pullDownThreshold = 140;
+  let pullVelocity = 0;
+  let pullDownThreshold = 100;
 
   function onPointerDown(e) {
     isDragging = true;
@@ -956,12 +855,12 @@ function initPhysicalTitaniumIDCard() {
       targetRotY += deltaX * 0.012;
       targetRotX += deltaY * 0.008;
 
-      // Pull down gesture
+      // Elastic pull down
       if (deltaY > 0) {
-        targetPullY = Math.min(deltaY * 0.003, 0.45);
+        targetPullY = Math.min(deltaY * 0.0028, 0.42);
         if (deltaY > pullDownThreshold && hintBadge && hintText) {
           hintBadge.style.borderColor = 'var(--accent-cyan)';
-          hintText.textContent = 'Release to explore About section ↓';
+          hintText.textContent = 'Release to launch About section ↓';
         }
       }
 
@@ -974,8 +873,8 @@ function initPhysicalTitaniumIDCard() {
       const relY = -(((clientY - rect.top) / rect.height) * 2 - 1);
 
       if (!isFlipped) {
-        targetRotY = relX * 0.4;
-        targetRotX = -relY * 0.3;
+        targetRotY = relX * 0.45;
+        targetRotX = -relY * 0.35;
       }
     }
   }
@@ -983,8 +882,7 @@ function initPhysicalTitaniumIDCard() {
   function onPointerUp(e) {
     if (isDragging) {
       isDragging = false;
-      // Check pull down release
-      if (targetPullY > 0.32) {
+      if (targetPullY > 0.28) {
         const aboutSec = document.getElementById('about');
         if (aboutSec) {
           aboutSec.scrollIntoView({ behavior: 'smooth' });
@@ -999,8 +897,7 @@ function initPhysicalTitaniumIDCard() {
   }
 
   // Click to flip 180deg
-  stage.addEventListener('click', (e) => {
-    // Only flip if not a long drag
+  stage.addEventListener('click', () => {
     if (Math.abs(targetPullY) < 0.05) {
       isFlipped = !isFlipped;
       targetRotY = isFlipped ? Math.PI : 0;
@@ -1027,28 +924,40 @@ function initPhysicalTitaniumIDCard() {
     });
   }
 
-  // Animation Loop with Double-Pendulum Damping
+  // Animation Loop with Harmonic Elastic Recoil
   let physClock = new THREE.Clock();
 
   function animatePhysics() {
     requestAnimationFrame(animatePhysics);
     const elapsed = physClock.getElapsedTime();
 
-    // Natural gentle sway when idle
+    // Natural idle pendulum sway
     const idleSway = isDragging ? 0 : Math.sin(elapsed * 1.6) * 0.05;
 
     // Smooth lerp rotations with inertia
     currentRotY += (targetRotY + idleSway - currentRotY) * 0.08;
     currentRotX += (targetRotX - currentRotX) * 0.08;
-    currentPullY += (targetPullY - currentPullY) * 0.12;
+
+    // Harmonic spring oscillation on Y
+    const springForce = (targetPullY - currentPullY) * 0.16;
+    pullVelocity = (pullVelocity + springForce) * 0.78;
+    currentPullY += pullVelocity;
 
     cardGroup.rotation.y = currentRotY;
     cardGroup.rotation.x = currentRotX;
-    cardGroup.position.y = -0.3 - currentPullY;
+    cardGroup.position.y = -0.75 - currentPullY;
 
-    // Clasp reaction
-    claspMesh.rotation.y = currentRotY * 0.4;
-    claspMesh.position.y = -0.15 - (currentPullY * 0.5);
+    // Dynamic strap stretching
+    const stretchFactor = 1.0 + currentPullY * 1.8;
+    strapL.scale.y = stretchFactor;
+    strapR.scale.y = stretchFactor;
+    swivelBarrel.position.y = -0.4 - (currentPullY * 0.5);
+    carabinerHook.position.y = -0.62 - (currentPullY * 0.7);
+
+    // Dynamic drop shadow tracks card position
+    shadowMesh.position.x = currentRotY * 0.35;
+    shadowMesh.position.y = -0.4 - currentPullY * 0.8;
+    shadowMesh.scale.set(1.0 + currentPullY * 0.3, 1.0 + currentPullY * 0.3, 1);
 
     renderer.render(scene, camera);
   }
@@ -1058,7 +967,7 @@ function initPhysicalTitaniumIDCard() {
   // Resize handler
   window.addEventListener('resize', () => {
     width = stage.clientWidth || 380;
-    height = stage.clientHeight || 520;
+    height = stage.clientHeight || 540;
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
@@ -1066,7 +975,7 @@ function initPhysicalTitaniumIDCard() {
 }
 
 /* ----------------------------------------------------------------
-   8. DYNAMIC 3D PERSPECTIVE CARD TILT
+   7. DYNAMIC 3D PERSPECTIVE CARD TILT
    Applies to all `.tilt-card` elements with dynamic specular glare
    ---------------------------------------------------------------- */
 function initDynamic3DCardTilt() {
@@ -1096,7 +1005,7 @@ function initDynamic3DCardTilt() {
 }
 
 /* ----------------------------------------------------------------
-   9. REVEAL ANIMATIONS ON SCROLL
+   8. REVEAL ANIMATIONS ON SCROLL
    ---------------------------------------------------------------- */
 function initRevealAnimations() {
   const reveals = document.querySelectorAll('.reveal');
@@ -1113,7 +1022,7 @@ function initRevealAnimations() {
 }
 
 /* ----------------------------------------------------------------
-   10. HERO COUNTERS
+   9. HERO COUNTERS
    ---------------------------------------------------------------- */
 function initCounters() {
   const counters = document.querySelectorAll('.stat-number');
@@ -1145,7 +1054,7 @@ function initCounters() {
 }
 
 /* ----------------------------------------------------------------
-   11. RENDER SKILLS
+   10. RENDER SKILLS
    ---------------------------------------------------------------- */
 function renderSkills() {
   const container = document.getElementById('skillsGrid');
@@ -1221,7 +1130,7 @@ function renderSkills() {
 }
 
 /* ----------------------------------------------------------------
-   12. FETCH AND RENDER GITHUB PROJECTS
+   11. FETCH AND RENDER GITHUB PROJECTS
    ---------------------------------------------------------------- */
 async function fetchAndRenderProjects() {
   const filtersContainer = document.getElementById('projectFilters');
@@ -1263,14 +1172,12 @@ async function fetchAndRenderProjects() {
     }
   ];
 
-  // Try live fetch from GitHub, with graceful fallback
   let projects = curatedProjects;
   try {
     const res = await fetch('https://api.github.com/users/har-001/repos?sort=updated&per_page=6');
     if (res.ok) {
       const repos = await res.json();
       if (Array.isArray(repos) && repos.length > 0) {
-        // Merge or augment
         projects = curatedProjects;
       }
     }
@@ -1324,7 +1231,7 @@ async function fetchAndRenderProjects() {
 }
 
 /* ----------------------------------------------------------------
-   13. RENDER 7 AUTHENTIC CERTIFICATES
+   12. RENDER 7 AUTHENTIC CERTIFICATES
    ---------------------------------------------------------------- */
 const certificateData = [
   {
@@ -1426,7 +1333,7 @@ function renderCertificates() {
 }
 
 /* ----------------------------------------------------------------
-   14. CERTIFICATE MODAL VIEWER
+   13. CERTIFICATE MODAL VIEWER
    ---------------------------------------------------------------- */
 function initCertificateModal() {
   const overlay = document.getElementById('certModalOverlay');
@@ -1438,7 +1345,6 @@ function initCertificateModal() {
 
   if (!overlay) return;
 
-  // Event Delegation for Certificate Cards
   document.addEventListener('click', (e) => {
     const card = e.target.closest('.cert-card');
     if (!card) return;
@@ -1479,7 +1385,7 @@ function initCertificateModal() {
 }
 
 /* ----------------------------------------------------------------
-   15. CONTACT FORM
+   14. CONTACT FORM
    ---------------------------------------------------------------- */
 function initContactForm() {
   const form = document.getElementById('contactForm');
@@ -1494,7 +1400,6 @@ function initContactForm() {
     status.style.color = 'var(--accent-cyan)';
     status.textContent = 'Transmitting message...';
 
-    // Simulate reliable dispatch
     setTimeout(() => {
       status.style.color = '#34d399';
       status.textContent = '✓ Message received! Harshit will get in touch shortly.';
@@ -1505,7 +1410,7 @@ function initContactForm() {
 }
 
 /* ----------------------------------------------------------------
-   16. THEME TOGGLE
+   15. THEME TOGGLE
    ---------------------------------------------------------------- */
 function initThemeToggle() {
   const btn = document.getElementById('themeToggle');
