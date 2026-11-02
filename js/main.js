@@ -354,7 +354,7 @@ function initPhysicalTitaniumIDCard() {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
-  camera.position.set(0, -0.2, 5.2);
+  camera.position.set(0, 0, 4.7);
 
   const renderer = new THREE.WebGLRenderer({
     alpha: true,
@@ -406,12 +406,12 @@ function initPhysicalTitaniumIDCard() {
     depthWrite: false
   });
   const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
-  shadowMesh.position.set(0, -0.4, -0.35);
+  shadowMesh.position.set(0, 0, -0.35);
   scene.add(shadowMesh);
 
   // 2. Lanyard Master Anchor at Top
   const lanyardMaster = new THREE.Group();
-  lanyardMaster.position.set(0, 2.1, 0);
+  lanyardMaster.position.set(0, 1.48, 0);
   scene.add(lanyardMaster);
 
   // Braided Fabric Strap Material
@@ -441,17 +441,17 @@ function initPhysicalTitaniumIDCard() {
   });
 
   const swivelBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.28, 16), chromeMat);
-  swivelBarrel.position.set(0, -0.4, 0);
+  swivelBarrel.position.set(0, 0.02, 0);
   lanyardMaster.add(swivelBarrel);
 
   const carabinerHook = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.035, 12, 24, Math.PI * 1.5), chromeMat);
-  carabinerHook.position.set(0, -0.62, 0);
+  carabinerHook.position.set(0, -0.15, 0);
   carabinerHook.rotation.z = Math.PI / 4;
   lanyardMaster.add(carabinerHook);
 
   // 3. Card Pendulum Group (Suspended from Hook)
   const cardGroup = new THREE.Group();
-  cardGroup.position.set(0, -0.75, 0);
+  cardGroup.position.set(0, -1.48, 0);
   lanyardMaster.add(cardGroup);
 
   // Card Dimensions
@@ -521,7 +521,7 @@ function initPhysicalTitaniumIDCard() {
   });
   const bumperGeo = new THREE.BoxGeometry(cardW + 0.1, cardH + 0.1, thickness + 0.028);
   const bumperMesh = new THREE.Mesh(bumperGeo, bumperMat);
-  cardGroup.add(bumperMesh);
+  // bumper removed for clean bevel
 
   // 4 Chrome Corner Rivets
   const rivetGeo = new THREE.CylinderGeometry(0.04, 0.04, thickness + 0.035, 12);
@@ -945,14 +945,14 @@ function initPhysicalTitaniumIDCard() {
 
     cardGroup.rotation.y = currentRotY;
     cardGroup.rotation.x = currentRotX;
-    cardGroup.position.y = -0.75 - currentPullY;
+    cardGroup.position.y = -1.48 - currentPullY;
 
     // Dynamic strap stretching
     const stretchFactor = 1.0 + currentPullY * 1.8;
     strapL.scale.y = stretchFactor;
     strapR.scale.y = stretchFactor;
-    swivelBarrel.position.y = -0.4 - (currentPullY * 0.5);
-    carabinerHook.position.y = -0.62 - (currentPullY * 0.7);
+    swivelBarrel.position.y = 0.02 - (currentPullY * 0.4);
+    carabinerHook.position.y = -0.15 - (currentPullY * 0.7);
 
     // Dynamic drop shadow tracks card position
     shadowMesh.position.x = currentRotY * 0.35;

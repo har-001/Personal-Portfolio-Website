@@ -91,11 +91,10 @@ function initRoamingBot() {
   visor.position.set(0, 8, 4.2);
   botGroup.add(visor);
 
-  // Sweeping Laser Beam Cone
-  const beamMat = new THREE.MeshBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.25 });
-  const laserBeam = new THREE.Mesh(new THREE.ConeGeometry(8, 22, 16), beamMat);
-  laserBeam.position.set(0, 8, 14);
-  laserBeam.rotation.x = -Math.PI / 2;
+  // Subtle Holographic Scanner Ring
+  const beamMat = new THREE.MeshBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.35, wireframe: true });
+  const laserBeam = new THREE.Mesh(new THREE.RingGeometry(3, 8, 16), beamMat);
+  laserBeam.position.set(0, 0, 6);
   botGroup.add(laserBeam);
 
   // Dual Legs (Bipedal walk)
