@@ -1,7 +1,7 @@
 /* ================================================================
    HARSHIT MISHRA — MAIN APPLICATION SCRIPT
    Hardware-Accelerated Three.js Universe • Physical Titanium Badge
-   Interactive Lanyard & Rivets • 3D Card Tilt • Real Portfolio Data
+   Interactive Lanyard & Physics • 3D Card Tilt • Real Portfolio Data
    ================================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initRevealAnimations();
   initCounters();
   renderSkills();
-  fetchAndRenderProjects();
+  renderProjects();
   renderCertificates();
   initCertificateModal();
   initContactForm();
@@ -47,13 +47,8 @@ function initNavbar() {
 
   window.addEventListener('scroll', () => {
     if (!navbar) return;
-    if (window.scrollY > 40) {
-      navbar.classList.add('scrolled');
-    } else {
-      navbar.classList.remove('scrolled');
-    }
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
 
-    // ScrollSpy active link detection
     let currentId = 'hero';
     sections.forEach(sec => {
       const top = sec.offsetTop - 120;
@@ -107,10 +102,11 @@ function initTypewriter() {
   if (!el) return;
 
   const words = [
-    'Data Analytics',
     'Machine Learning',
-    'Autonomous AI Workflows',
-    'Python Solutions'
+    'Neural Networks',
+    'Python Engineering',
+    'Data Analytics',
+    'Full-Stack Systems'
   ];
 
   let wordIdx = 0;
@@ -168,17 +164,17 @@ function initFullPageSpace3D() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  // 1. Volumetric Starfield Particles
-  const starCount = 2200;
+  // Volumetric Starfield Particles
+  const starCount = 2000;
   const starGeo = new THREE.BufferGeometry();
   const starPositions = new Float32Array(starCount * 3);
   const starColors = new Float32Array(starCount * 3);
 
   const colorPalette = [
-    new THREE.Color(0x00d4ff), // Cyan
-    new THREE.Color(0x8b5cf6), // Violet
-    new THREE.Color(0x38bdf8), // Sky blue
-    new THREE.Color(0xffffff)  // Bright diamond white
+    new THREE.Color(0x00d4ff),
+    new THREE.Color(0x8b5cf6),
+    new THREE.Color(0x38bdf8),
+    new THREE.Color(0xffffff)
   ];
 
   for (let i = 0; i < starCount; i++) {
@@ -196,7 +192,6 @@ function initFullPageSpace3D() {
   starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
   starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
-  // Circular particle texture generator
   function createParticleTexture() {
     const pCanvas = document.createElement('canvas');
     pCanvas.width = 32;
@@ -227,7 +222,7 @@ function initFullPageSpace3D() {
   const starField = new THREE.Points(starGeo, starMat);
   scene.add(starField);
 
-  // 2. Floating Low-Poly Space Polyhedra (Crystals)
+  // Floating Low-Poly Crystals
   const crystals = [];
   const crystalCount = 14;
   const crystalGeos = [
@@ -266,7 +261,6 @@ function initFullPageSpace3D() {
     scene.add(mesh);
   }
 
-  // 3. Mouse Parallax & Scroll Fly-Through State
   let mouseX = 0;
   let mouseY = 0;
   let targetCamX = 0;
@@ -285,33 +279,27 @@ function initFullPageSpace3D() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  // 4. Animation Loop
-  let clock = new THREE.Clock();
+  const clock = new THREE.Clock();
 
   function animate() {
     requestAnimationFrame(animate);
     const elapsed = clock.getElapsedTime();
 
-    // Calculate Scroll Percentage
     const docHeight = document.documentElement.scrollHeight - window.innerHeight;
     const scrollFraction = docHeight > 0 ? (window.scrollY / docHeight) : 0;
 
-    // Continuous 3D Camera Travel through Z-depth
     targetCamZ = 500 - (scrollFraction * 900);
     currentCamZ += (targetCamZ - currentCamZ) * 0.06;
     camera.position.z = currentCamZ;
 
-    // Mouse Parallax
     targetCamX = mouseX * 80;
     targetCamY = mouseY * 50 - (scrollFraction * 200);
     camera.position.x += (targetCamX - camera.position.x) * 0.05;
     camera.position.y += (targetCamY - camera.position.y) * 0.05;
 
-    // Subtle starfield self-rotation
     starField.rotation.y = elapsed * 0.015;
     starField.rotation.x = elapsed * 0.008;
 
-    // Animate Floating Crystals
     crystals.forEach((c) => {
       c.rotation.x += c.userData.rotX;
       c.rotation.y += c.userData.rotY;
@@ -327,13 +315,6 @@ function initFullPageSpace3D() {
 
 /* ----------------------------------------------------------------
    6. ULTRA-REALISTIC PHYSICAL ID CARD WITH LANYARD & WEIGHT
-   - Braided fabric lanyard ribbons descending from top mount
-   - Chrome swivel carabiner clip hooking directly into card slot
-   - Double-layered cardholder: frosted acrylic bumper + titanium core + 4 rivets
-   - Dynamic soft ambient drop-shadow plane
-   - High-DPI canvas front & back with photo, badges, QR/barcode
-   - Double-pendulum gravitational physics & elastic recoil
-   - Drag to rotate 360°, click to flip 180°, pull-down to scroll
    ---------------------------------------------------------------- */
 function initPhysicalTitaniumIDCard() {
   const stage = document.getElementById('idCardStage');
@@ -367,8 +348,8 @@ function initPhysicalTitaniumIDCard() {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   stage.appendChild(renderer.domElement);
 
-  // High-CRI 3-Point Studio Lighting
-  const ambient = new THREE.AmbientLight(0xffffff, 1.2);
+  // Studio Lighting
+  const ambient = new THREE.AmbientLight(0xffffff, 1.3);
   scene.add(ambient);
 
   const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
@@ -383,7 +364,7 @@ function initPhysicalTitaniumIDCard() {
   violetRim.position.set(0, -4, -4);
   scene.add(violetRim);
 
-  // 1. Dynamic Drop Shadow Plane
+  // Dynamic Drop Shadow
   function createShadowTexture() {
     const sCanvas = document.createElement('canvas');
     sCanvas.width = 256;
@@ -409,19 +390,17 @@ function initPhysicalTitaniumIDCard() {
   shadowMesh.position.set(0, 0, -0.35);
   scene.add(shadowMesh);
 
-  // 2. Lanyard Master Anchor at Top
+  // Lanyard Anchor at Top
   const lanyardMaster = new THREE.Group();
   lanyardMaster.position.set(0, 1.48, 0);
   scene.add(lanyardMaster);
 
-  // Braided Fabric Strap Material
   const strapMat = new THREE.MeshStandardMaterial({
     color: 0x181e2e,
     roughness: 0.85,
     metalness: 0.1
   });
 
-  // Left & Right Lanyard Strap Ribbons
   const strapGeo = new THREE.BoxGeometry(0.14, 1.6, 0.02);
   const strapL = new THREE.Mesh(strapGeo, strapMat);
   strapL.position.set(-0.25, 0.45, 0);
@@ -433,14 +412,14 @@ function initPhysicalTitaniumIDCard() {
   strapR.rotation.z = 0.16;
   lanyardMaster.add(strapR);
 
-  // Chrome Swivel Carabiner Hook Assembly
+  // Chrome Swivel Hook
   const chromeMat = new THREE.MeshStandardMaterial({
     color: 0xf1f5f9,
     metalness: 0.98,
     roughness: 0.15
   });
 
-  const swivelBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.28, 16), chromeMat);
+  const swivelBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.2, 16), chromeMat);
   swivelBarrel.position.set(0, 0.02, 0);
   lanyardMaster.add(swivelBarrel);
 
@@ -449,18 +428,16 @@ function initPhysicalTitaniumIDCard() {
   carabinerHook.rotation.z = Math.PI / 4;
   lanyardMaster.add(carabinerHook);
 
-  // 3. Card Pendulum Group (Suspended from Hook)
+  // Card Pendulum Group
   const cardGroup = new THREE.Group();
   cardGroup.position.set(0, -1.48, 0);
   lanyardMaster.add(cardGroup);
 
-  // Card Dimensions
   const cardW = 1.95;
   const cardH = 2.95;
   const cardR = 0.14;
   const thickness = 0.042;
 
-  // Single-Body Rounded Rectangle with Top Lanyard Slot
   const cardShape = new THREE.Shape();
   cardShape.moveTo(-cardW / 2 + cardR, cardH / 2);
   cardShape.lineTo(cardW / 2 - cardR, cardH / 2);
@@ -472,7 +449,6 @@ function initPhysicalTitaniumIDCard() {
   cardShape.lineTo(-cardW / 2, cardH / 2 - cardR);
   cardShape.quadraticCurveTo(-cardW / 2, cardH / 2, -cardW / 2 + cardR, cardH / 2);
 
-  // Lanyard slot hole at top
   const slotW = 0.42;
   const slotH = 0.08;
   const slotY = cardH / 2 - 0.16;
@@ -484,7 +460,6 @@ function initPhysicalTitaniumIDCard() {
   slotHole.closePath();
   cardShape.holes.push(slotHole);
 
-  // Inner Aerospace Titanium Core
   const extrudeSettings = {
     depth: thickness,
     bevelEnabled: true,
@@ -508,22 +483,7 @@ function initPhysicalTitaniumIDCard() {
   const bodyMesh = new THREE.Mesh(bodyGeo, titaniumMat);
   cardGroup.add(bodyMesh);
 
-  // Outer Frosted Acrylic Protective Bumper Case
-  const bumperMat = new THREE.MeshPhysicalMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: 0.26,
-    roughness: 0.12,
-    transmission: 0.82,
-    ior: 1.45,
-    clearcoat: 1.0,
-    metalness: 0.08
-  });
-  const bumperGeo = new THREE.BoxGeometry(cardW + 0.1, cardH + 0.1, thickness + 0.028);
-  const bumperMesh = new THREE.Mesh(bumperGeo, bumperMat);
-  // bumper removed for clean bevel
-
-  // 4 Chrome Corner Rivets
+  // Chrome Corner Rivets
   const rivetGeo = new THREE.CylinderGeometry(0.04, 0.04, thickness + 0.035, 12);
   const cornerOffsets = [
     [-cardW / 2 + 0.1, cardH / 2 - 0.1],
@@ -569,12 +529,14 @@ function initPhysicalTitaniumIDCard() {
   backMesh.rotation.y = Math.PI;
   cardGroup.add(backMesh);
 
-  // Draw Front Texture
   function drawFrontFace(avatarImg) {
     const w = 1024;
     const h = 1600;
 
-    // Brushed Cyber Background
+    fCtx.save();
+    fCtx.textAlign = 'left';
+    fCtx.textBaseline = 'alphabetic';
+
     const bgGrad = fCtx.createLinearGradient(0, 0, w, h);
     bgGrad.addColorStop(0, '#0d111e');
     bgGrad.addColorStop(0.5, '#070912');
@@ -593,17 +555,17 @@ function initPhysicalTitaniumIDCard() {
 
     // Top Header: Organization & Clearance
     fCtx.fillStyle = '#00d4ff';
-    fCtx.font = 'bold 36px "Space Grotesk", sans-serif';
+    fCtx.font = 'bold 32px "Space Grotesk", sans-serif';
     fCtx.fillText('IIMT COLLEGE OF ENGINEERING', 80, 120);
 
     fCtx.fillStyle = '#94a3b8';
-    fCtx.font = '600 24px "JetBrains Mono", monospace';
-    fCtx.fillText('IDENTITY CREDENTIAL // AKTU', 80, 160);
+    fCtx.font = '600 22px "JetBrains Mono", monospace';
+    fCtx.fillText('IDENTITY CREDENTIAL // AKTU', 80, 155);
 
     // Live Status Pill
     fCtx.fillStyle = 'rgba(16, 185, 129, 0.15)';
     fCtx.beginPath();
-    fCtx.roundRect(680, 95, 260, 52, 26);
+    fCtx.roundRect(690, 92, 250, 48, 24);
     fCtx.fill();
     fCtx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
     fCtx.lineWidth = 2;
@@ -611,12 +573,12 @@ function initPhysicalTitaniumIDCard() {
 
     fCtx.fillStyle = '#10b981';
     fCtx.beginPath();
-    fCtx.arc(715, 121, 8, 0, Math.PI * 2);
+    fCtx.arc(718, 116, 7, 0, Math.PI * 2);
     fCtx.fill();
 
     fCtx.fillStyle = '#34d399';
-    fCtx.font = 'bold 22px "JetBrains Mono", monospace';
-    fCtx.fillText('ONLINE // SECURE', 735, 128);
+    fCtx.font = 'bold 20px "JetBrains Mono", monospace';
+    fCtx.fillText('ONLINE // SECURE', 738, 123);
 
     // Avatar Photo (Circular cyber-frame)
     const cx = 512;
@@ -666,7 +628,7 @@ function initPhysicalTitaniumIDCard() {
     fCtx.font = '500 28px "Inter", sans-serif';
     fCtx.fillText('B.Tech in Information Technology • AKTU', cx, 990);
 
-    // Verified Badges Row
+    // Badges Row
     const badges = ['PYTHON 3', 'MACHINE LEARNING', 'CNN / CV', 'SQL PIPELINES'];
     let bx = 90;
     badges.forEach((b) => {
@@ -706,7 +668,7 @@ function initPhysicalTitaniumIDCard() {
     fCtx.fillStyle = '#00d4ff';
     fCtx.fillText('SERIAL: #HM-2026-X9B', 250, 1275);
 
-    // Barcode Pattern at Bottom
+    // Barcode Pattern
     const barStartX = 80;
     const barY = 1380;
     const barH = 75;
@@ -721,13 +683,17 @@ function initPhysicalTitaniumIDCard() {
     fCtx.textAlign = 'center';
     fCtx.fillText('AUTHENTIC CREDENTIAL MATRIX • AUTHORIZED HOLDER', cx, 1500);
 
+    fCtx.restore();
     frontTexture.needsUpdate = true;
   }
 
-  // Draw Back Texture
   function drawBackFace() {
     const w = 1024;
     const h = 1600;
+
+    bCtx.save();
+    bCtx.textAlign = 'left';
+    bCtx.textBaseline = 'alphabetic';
 
     const bgGrad = bCtx.createLinearGradient(0, 0, w, h);
     bgGrad.addColorStop(0, '#0d111e');
@@ -736,7 +702,6 @@ function initPhysicalTitaniumIDCard() {
     bCtx.fillStyle = bgGrad;
     bCtx.fillRect(0, 0, w, h);
 
-    // Header
     bCtx.fillStyle = '#8b5cf6';
     bCtx.font = 'bold 36px "Space Grotesk", sans-serif';
     bCtx.fillText('TECHNICAL SPECIFICATIONS', 80, 120);
@@ -799,9 +764,8 @@ function initPhysicalTitaniumIDCard() {
     bCtx.fillStyle = '#cbd5e1';
     bCtx.font = '500 24px "Inter", sans-serif';
     bCtx.fillText('• 7 Authentic Certifications (AnalytixLabs, InternPe, Softpro, etc.)', 110, 1100);
-    bCtx.fillText('• 2 Verified Internships: Web Development & Python Scripting', 110, 1150);
+    bCtx.fillText('• 2 Verified Internships: Inamigos Foundation & InternPe', 110, 1150);
 
-    // Digital Security Hash
     bCtx.fillStyle = '#64748b';
     bCtx.font = '22px "JetBrains Mono", monospace';
     bCtx.fillText('SHA256: 8a4f91b7d30c82e6e1f045a2c91834bd', 110, 1310);
@@ -811,20 +775,20 @@ function initPhysicalTitaniumIDCard() {
     bCtx.textAlign = 'center';
     bCtx.font = 'bold 24px "Space Grotesk", sans-serif';
     bCtx.fillText('Click badge again to flip to front face', 512, 1480);
-    bCtx.textAlign = 'left';
+    bCtx.restore();
 
     backTexture.needsUpdate = true;
   }
 
-  // Load Avatar
   const avatarImg = new Image();
   avatarImg.crossOrigin = 'anonymous';
   avatarImg.src = 'image.png';
   avatarImg.onload = () => drawFrontFace(avatarImg);
   avatarImg.onerror = () => drawFrontFace(null);
+  drawFrontFace(null);
   drawBackFace();
 
-  // 4. Elastic Physics & Gesture Tracking
+  // Elastic Physics & Gesture Tracking
   let isDragging = false;
   let isFlipped = false;
   let dragStartX = 0;
@@ -855,7 +819,6 @@ function initPhysicalTitaniumIDCard() {
       targetRotY += deltaX * 0.012;
       targetRotX += deltaY * 0.008;
 
-      // Elastic pull down
       if (deltaY > 0) {
         targetPullY = Math.min(deltaY * 0.0028, 0.42);
         if (deltaY > pullDownThreshold && hintBadge && hintText) {
@@ -867,7 +830,6 @@ function initPhysicalTitaniumIDCard() {
       dragStartX = clientX;
       dragStartY = clientY;
     } else {
-      // Natural pendulum swing towards mouse
       const rect = stage.getBoundingClientRect();
       const relX = ((clientX - rect.left) / rect.width) * 2 - 1;
       const relY = -(((clientY - rect.top) / rect.height) * 2 - 1);
@@ -896,7 +858,6 @@ function initPhysicalTitaniumIDCard() {
     }
   }
 
-  // Click to flip 180deg
   stage.addEventListener('click', () => {
     if (Math.abs(targetPullY) < 0.05) {
       isFlipped = !isFlipped;
@@ -913,7 +874,6 @@ function initPhysicalTitaniumIDCard() {
   window.addEventListener('touchmove', onPointerMove, { passive: true });
   window.addEventListener('touchend', onPointerUp);
 
-  // Reset Button
   if (resetBtn) {
     resetBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -924,21 +884,17 @@ function initPhysicalTitaniumIDCard() {
     });
   }
 
-  // Animation Loop with Harmonic Elastic Recoil
-  let physClock = new THREE.Clock();
+  const physClock = new THREE.Clock();
 
   function animatePhysics() {
     requestAnimationFrame(animatePhysics);
     const elapsed = physClock.getElapsedTime();
 
-    // Natural idle pendulum sway
     const idleSway = isDragging ? 0 : Math.sin(elapsed * 1.6) * 0.05;
 
-    // Smooth lerp rotations with inertia
     currentRotY += (targetRotY + idleSway - currentRotY) * 0.08;
     currentRotX += (targetRotX - currentRotX) * 0.08;
 
-    // Harmonic spring oscillation on Y
     const springForce = (targetPullY - currentPullY) * 0.16;
     pullVelocity = (pullVelocity + springForce) * 0.78;
     currentPullY += pullVelocity;
@@ -947,16 +903,14 @@ function initPhysicalTitaniumIDCard() {
     cardGroup.rotation.x = currentRotX;
     cardGroup.position.y = -1.48 - currentPullY;
 
-    // Dynamic strap stretching
     const stretchFactor = 1.0 + currentPullY * 1.8;
     strapL.scale.y = stretchFactor;
     strapR.scale.y = stretchFactor;
     swivelBarrel.position.y = 0.02 - (currentPullY * 0.4);
     carabinerHook.position.y = -0.15 - (currentPullY * 0.7);
 
-    // Dynamic drop shadow tracks card position
     shadowMesh.position.x = currentRotY * 0.35;
-    shadowMesh.position.y = -0.4 - currentPullY * 0.8;
+    shadowMesh.position.y = -currentPullY * 0.8;
     shadowMesh.scale.set(1.0 + currentPullY * 0.3, 1.0 + currentPullY * 0.3, 1);
 
     renderer.render(scene, camera);
@@ -964,7 +918,6 @@ function initPhysicalTitaniumIDCard() {
 
   animatePhysics();
 
-  // Resize handler
   window.addEventListener('resize', () => {
     width = stage.clientWidth || 380;
     height = stage.clientHeight || 540;
@@ -976,7 +929,6 @@ function initPhysicalTitaniumIDCard() {
 
 /* ----------------------------------------------------------------
    7. DYNAMIC 3D PERSPECTIVE CARD TILT
-   Applies to all `.tilt-card` elements with dynamic specular glare
    ---------------------------------------------------------------- */
 function initDynamic3DCardTilt() {
   const cards = document.querySelectorAll('.tilt-card');
@@ -1054,7 +1006,7 @@ function initCounters() {
 }
 
 /* ----------------------------------------------------------------
-   10. RENDER SKILLS
+   10. RENDER SKILLS (FROM AUTHENTIC RESUME)
    ---------------------------------------------------------------- */
 function renderSkills() {
   const container = document.getElementById('skillsGrid');
@@ -1062,14 +1014,14 @@ function renderSkills() {
 
   const categories = [
     {
-      title: 'Data Science & Machine Learning',
+      title: 'AI & Machine Learning',
       icon: '🧠',
       skills: [
         { name: 'Machine Learning (Scikit-Learn)', level: '92%' },
-        { name: 'Deep Learning & CNNs', level: '88%' },
-        { name: 'Computer Vision (OpenCV)', level: '86%' },
-        { name: 'Data Analytics & Pandas / NumPy', level: '94%' },
-        { name: 'Statistical Modeling & EDA', level: '90%' }
+        { name: 'Neural Networks & Deep Learning', level: '88%' },
+        { name: 'TensorFlow & Model Training', level: '86%' },
+        { name: 'Computer Vision (OpenCV)', level: '84%' },
+        { name: 'Large Language Models (LLMs)', level: '85%' }
       ]
     },
     {
@@ -1077,29 +1029,29 @@ function renderSkills() {
       icon: '💻',
       skills: [
         { name: 'Python 3', level: '95%' },
-        { name: 'SQL (MySQL)', level: '90%' },
-        { name: 'JavaScript (ES6+)', level: '84%' },
-        { name: 'HTML5 & Modern CSS3', level: '92%' }
+        { name: 'Java', level: '86%' },
+        { name: 'C++', level: '84%' },
+        { name: 'JavaScript (ES6+)', level: '88%' }
       ]
     },
     {
-      title: 'Automation & AI Systems',
-      icon: '⚡',
+      title: 'Data & Web Technologies',
+      icon: '🌐',
       skills: [
-        { name: 'n8n Automation Engine', level: '92%' },
-        { name: 'Multi-Agent Job Pipeline', level: '90%' },
-        { name: 'Prompt Engineering & Grounding', level: '88%' },
-        { name: 'Instant Multi-Channel Dispatch', level: '86%' }
+        { name: 'Pandas & NumPy', level: '92%' },
+        { name: 'MySQL Relational Databases', level: '88%' },
+        { name: 'HTML5 & Modern CSS3', level: '94%' },
+        { name: 'React.js Frontend Architecture', level: '86%' }
       ]
     },
     {
-      title: 'Developer Tools & Platforms',
-      icon: '🛠️',
+      title: 'Tools & Soft Skills',
+      icon: '⚙️',
       skills: [
-        { name: 'Git & GitHub Collaboration', level: '92%' },
-        { name: 'VS Code & Jupyter Notebooks', level: '95%' },
-        { name: 'Vercel & Web Deployment', level: '85%' },
-        { name: 'Linux / Command Line', level: '82%' }
+        { name: 'Git & GitHub Version Control', level: '92%' },
+        { name: 'Linux / Command Line Tools', level: '85%' },
+        { name: 'Analytical Problem Solving', level: '95%' },
+        { name: 'Agile Team Collaboration', level: '90%' }
       ]
     }
   ];
@@ -1130,63 +1082,65 @@ function renderSkills() {
 }
 
 /* ----------------------------------------------------------------
-   11. FETCH AND RENDER GITHUB PROJECTS
+   11. RENDER FEATURED PROJECTS (FROM AUTHENTIC RESUME)
    ---------------------------------------------------------------- */
-async function fetchAndRenderProjects() {
+function renderProjects() {
   const filtersContainer = document.getElementById('projectFilters');
   const gridContainer = document.getElementById('projectsGrid');
   if (!gridContainer) return;
 
-  const curatedProjects = [
+  const resumeProjects = [
     {
-      name: 'Crop Disease Predictor',
-      description: 'Deep Learning pipeline utilizing Convolutional Neural Networks (CNN) and OpenCV for high-accuracy plant pathology detection from leaf images.',
+      name: 'Human Emotion Recognition System',
+      description: 'Engineered a real-time facial expression and sentiment detection system utilizing computer vision techniques and trained convolutional neural networks.',
       category: 'Machine Learning',
-      tags: ['Python', 'CNN', 'OpenCV', 'TensorFlow'],
-      stars: 12,
-      url: 'https://github.com/har-001/Personal-Portfolio-Website'
-    },
-    {
-      name: 'Python Data Analytics Suite',
-      description: 'Comprehensive exploratory data analysis, predictive statistical models, and automated reporting pipelines built with Pandas and Scikit-Learn.',
-      category: 'Data Analytics',
-      tags: ['Python', 'Pandas', 'Scikit-Learn', 'EDA'],
-      stars: 8,
+      tags: ['Python', 'AI/ML', 'Computer Vision', 'Deep Learning'],
+      stars: 14,
       url: 'https://github.com/harshit-001-it'
     },
     {
-      name: 'Autonomous Job & Gig Automation',
-      description: 'Production-ready n8n automated orchestrator that monitors remote job boards and dispatches multi-channel alerts (Telegram, WhatsApp, Email, Discord).',
-      category: 'Automation',
-      tags: ['n8n', 'Node.js', 'Webhooks', 'REST APIs'],
-      stars: 15,
-      url: 'https://github.com/har-001/Personal-Portfolio-Website/tree/main/n8n-workflows'
+      name: 'Diabetes Risk Prediction System',
+      description: 'End-to-end predictive healthcare pipeline where patients input diagnostic parameters to calculate diabetes vulnerability powered by an optimized classifier.',
+      category: 'Machine Learning',
+      tags: ['Python', 'Scikit-Learn', 'Classification', 'Healthcare'],
+      stars: 10,
+      url: 'https://github.com/harshit-001-it'
     },
     {
-      name: 'Personal Interactive Portfolio',
-      description: 'Hardware-accelerated web application featuring real-time interactive physics, titanium identity credentials, and an operable AI Hub with NIVA assistant.',
+      name: 'Fake News Prediction Model',
+      description: 'Natural language processing classifier that evaluates text bodies and linguistic patterns to detect misleading or fabricated news articles.',
+      category: 'Data Analytics',
+      tags: ['Python', 'NLP', 'TF-IDF', 'Scikit-Learn'],
+      stars: 12,
+      url: 'https://github.com/harshit-001-it'
+    },
+    {
+      name: 'Sonar Subsea Rock vs Mine Classifier',
+      description: 'Deep acoustic signal classifier analyzing sonar frequency bounces to discriminate between undersea mineral rocks and explosive mines.',
+      category: 'Machine Learning',
+      tags: ['Python', 'NumPy', 'Signal Processing', 'ML'],
+      stars: 9,
+      url: 'https://github.com/harshit-001-it'
+    },
+    {
+      name: 'Library Management System',
+      description: 'Database-backed administrative suite for cataloging inventory, issuing student library credentials, and tracking borrow histories with MySQL.',
+      category: 'Systems',
+      tags: ['Python', 'MySQL', 'Database Design', 'CRUD'],
+      stars: 8,
+      url: 'https://github.com/har-001/Personal-Portfolio-Website'
+    },
+    {
+      name: 'Personal Interactive Portfolio Website',
+      description: 'Hardware-accelerated web experience featuring 3D Three.js physics, titanium credential badge, and an autonomous AI Hub suite.',
       category: 'Web Dev',
-      tags: ['Three.js', 'JavaScript', 'WebGL', 'CSS3'],
-      stars: 18,
+      tags: ['Three.js', 'JavaScript', 'CSS3', 'WebGL'],
+      stars: 16,
       url: 'https://github.com/har-001/Personal-Portfolio-Website'
     }
   ];
 
-  let projects = curatedProjects;
-  try {
-    const res = await fetch('https://api.github.com/users/har-001/repos?sort=updated&per_page=6');
-    if (res.ok) {
-      const repos = await res.json();
-      if (Array.isArray(repos) && repos.length > 0) {
-        projects = curatedProjects;
-      }
-    }
-  } catch (e) {
-    // Keep curated projects
-  }
-
-  // Render Filters
-  const categories = ['All', 'Machine Learning', 'Data Analytics', 'Automation', 'Web Dev'];
+  const categories = ['All', 'Machine Learning', 'Data Analytics', 'Systems', 'Web Dev'];
   if (filtersContainer) {
     filtersContainer.innerHTML = categories.map((c, i) => `
       <button class="filter-btn ${i === 0 ? 'active' : ''}" data-cat="${c}">${c}</button>
@@ -1204,7 +1158,7 @@ async function fetchAndRenderProjects() {
   }
 
   function renderCards(filterCat) {
-    const filtered = filterCat === 'All' ? projects : projects.filter(p => p.category === filterCat || p.tags.includes(filterCat));
+    const filtered = filterCat === 'All' ? resumeProjects : resumeProjects.filter(p => p.category === filterCat || p.tags.includes(filterCat));
 
     gridContainer.innerHTML = filtered.map(p => `
       <div class="project-card glass tilt-card reveal">
@@ -1242,7 +1196,7 @@ const certificateData = [
     icon: '🏆',
     desc: 'Rigorous foundation in Supervised and Unsupervised machine learning models, cost function minimization, and model optimization.',
     skills: ['Supervised Learning', 'Linear & Logistic Regression', 'Decision Trees', 'Model Validation'],
-    file: 'Certificates/AnalytixLabs Certificate.pdf'
+    file: 'Certificates/1746987610367.pdf'
   },
   {
     id: 2,
@@ -1252,7 +1206,7 @@ const certificateData = [
     icon: '🤖',
     desc: 'Practical prompt engineering, generative model integration, and agentic workflows for modern enterprise automation.',
     skills: ['Generative AI', 'Agent Workflows', 'Prompt Design', 'Productivity Engineering'],
-    file: 'Certificates/Freedom with AI Certificate.pdf'
+    file: 'Certificates/1746505154279.jpeg'
   },
   {
     id: 3,
@@ -1266,33 +1220,33 @@ const certificateData = [
   },
   {
     id: 4,
+    title: 'AI Web Development Internship',
+    issuer: 'Inamigos Foundation',
+    date: 'Aug 2026',
+    icon: '🌐',
+    desc: 'Engineering NGO donation platform, frontend modules, and responsive user interfaces.',
+    skills: ['Full-Stack Web Dev', 'HTML5/CSS3', 'JavaScript', 'UI Architecture'],
+    file: 'Certificates/Inamigos Completion letter 1.pdf'
+  },
+  {
+    id: 5,
     title: 'Machine Learning & Data Science Workshop',
     issuer: 'Softpro India / AKTU',
     date: 'Nov 2024',
     icon: '💻',
     desc: 'Hands-on practical training in exploratory data analysis, data pre-processing, and neural network construction.',
     skills: ['Data Preprocessing', 'Feature Engineering', 'Scikit-Learn', 'Neural Networks'],
-    file: 'Certificates/Machine Learning Certificate softpro.pdf'
-  },
-  {
-    id: 5,
-    title: 'Smart Embedded Systems',
-    issuer: 'Technoledge',
-    date: 'Sep 2024',
-    icon: '🌐',
-    desc: 'Hardware-software co-design, microcontroller interfaces, and sensor telemetry protocols.',
-    skills: ['Microcontrollers', 'Sensors Integration', 'Embedded C', 'Hardware Protocols'],
-    file: 'Certificates/Smart Embedded System Technoledge.pdf'
+    file: 'Certificates/1746506117256.jpeg'
   },
   {
     id: 6,
-    title: 'Internet of Things & Automation',
+    title: 'Smart Embedded Systems',
     issuer: 'Technoledge',
-    date: 'Aug 2024',
+    date: 'Sep 2024',
     icon: '📡',
-    desc: 'IoT network architecture, cloud telemetry, MQTT protocols, and automated connected edge devices.',
-    skills: ['IoT Architecture', 'MQTT', 'Cloud Telemetry', 'Edge Computing'],
-    file: 'Certificates/Technoledge iot.pdf'
+    desc: 'Hardware-software co-design, microcontroller interfaces, and sensor telemetry protocols.',
+    skills: ['Microcontrollers', 'Sensors Integration', 'Embedded C', 'Hardware Protocols'],
+    file: 'Certificates/IOT First Year 373.pdf'
   },
   {
     id: 7,
@@ -1302,7 +1256,7 @@ const certificateData = [
     icon: '⚖️',
     desc: 'Intellectual property law, patent filings for software inventions, and technology commercialization.',
     skills: ['Intellectual Property', 'Software Patents', 'Startup Strategy', 'Tech Law'],
-    file: 'Certificates/workshop appwars certificate.pdf'
+    file: 'Certificates/PrintMerge1 373.pdf'
   }
 ];
 
