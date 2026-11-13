@@ -120,7 +120,7 @@
 
         <div class="hero-stats-row">
           <div class="hero-stat-item">
-            <span class="stat-number" data-target="6">6</span>
+            <span class="stat-number" data-target="11">11</span>
             <span class="stat-label">Projects Built</span>
           </div>
           <div class="stat-divider"></div>
@@ -352,6 +352,17 @@
         <div class="decor-line"><span class="dot"></span></div>
       </div>
 
+      <!-- Interactive Skill Learning Callout Banner -->
+      <div class="skill-instruction-banner reveal">
+        <div class="instruction-content">
+          <span class="instruction-icon">💡</span>
+          <div>
+            <span class="instruction-title">Interactive Learning Pathways &amp; Free Curated Roadmaps</span>
+            <p class="instruction-desc">Click on any skill badge below to view a comprehensive 5-step curriculum, official documentation, free courses, and hands-on projects so anyone can learn and master it.</p>
+          </div>
+        </div>
+      </div>
+
       <div class="skills-grid" id="skillsGrid">
         <!-- Injected dynamically by main.js with 3D tilt -->
       </div>
@@ -364,7 +375,7 @@
       <div class="section-heading reveal">
         <span class="section-kicker">Portfolio Works</span>
         <h2 class="gradient-text">Featured Projects</h2>
-        <p>Real machine learning models, predictive pipelines, and applications documented in Harshit's resume.</p>
+        <p>Verified machine learning models, autonomous workflows, and full-stack applications — featuring this 3D portfolio live at the top.</p>
         <div class="decor-line"><span class="dot"></span></div>
       </div>
 
@@ -498,6 +509,61 @@
     </div>
   </footer>
 
+  <!-- ===== SKILL LEARNING ROADMAP & RESOURCES MODAL ===== -->
+  <div class="skill-modal-overlay" id="skillModalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalSkillTitle">
+    <div class="skill-modal glass">
+      <button class="skill-modal-close" id="skillModalClose" aria-label="Close skill learning modal">&times;</button>
+      <div class="skill-modal-header">
+        <div class="skill-modal-icon" id="modalSkillIcon">💡</div>
+        <div class="skill-modal-titles">
+          <div class="skill-modal-badge-row">
+            <span class="skill-modal-badge" id="modalSkillCategory">AI &amp; Machine Learning</span>
+            <span class="skill-modal-subtag">Curated Learning Pathway</span>
+          </div>
+          <h3 class="skill-modal-title" id="modalSkillTitle">Skill Name</h3>
+          <p class="skill-modal-subtitle">Master this capability step-by-step with verified documentation, free courses, and practical projects.</p>
+        </div>
+      </div>
+      <div class="skill-modal-body">
+        <div class="skill-modal-section">
+          <h4 class="section-subtitle">
+            <span class="subtitle-icon">🗺️</span>
+            <span>Step-by-Step Learning Roadmap (Beginner to Production)</span>
+          </h4>
+          <div class="roadmap-timeline" id="modalRoadmapTimeline">
+            <!-- Dynamically injected roadmap steps -->
+          </div>
+        </div>
+
+        <div class="skill-modal-section">
+          <h4 class="section-subtitle">
+            <span class="subtitle-icon">📚</span>
+            <span>Recommended Free Learning Resources &amp; Documentation</span>
+          </h4>
+          <div class="resources-grid" id="modalResourcesGrid">
+            <!-- Dynamically injected resource cards -->
+          </div>
+        </div>
+
+        <div class="skill-modal-section">
+          <h4 class="section-subtitle">
+            <span class="subtitle-icon">🛠️</span>
+            <span>Suggested Real-World Projects to Build</span>
+          </h4>
+          <ul class="projects-idea-list" id="modalProjectsList">
+            <!-- Dynamically injected project ideas -->
+          </ul>
+        </div>
+      </div>
+      <div class="skill-modal-footer">
+        <button class="btn btn-secondary" id="skillModalCloseFooter">Done Learning</button>
+        <a href="https://github.com/har-001/Personal-Portfolio-Website" target="_blank" rel="noopener" class="btn btn-primary">
+          <span>Star on GitHub ⭐</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
   <!-- Certificate Modal -->
   <div class="cert-modal-overlay" id="certModalOverlay">
     <div class="cert-modal glass">
@@ -547,9 +613,9 @@
   <!-- Three.js Engine -->
   <script src="js/three.min.js"></script>
   <!-- 5-in-1 Interactive Companion Engine -->
-  <script src="js/companion.js?v=fresh-build-v1"></script>
+  <script src="js/companion.js?v=v3-companion-upgrade"></script>
   <!-- Main Application Script -->
-  <script src="js/main.js?v=fresh-build-v1"></script>
+  <script src="js/main.js?v=v3-companion-upgrade"></script>
 </body>
 </html>
 

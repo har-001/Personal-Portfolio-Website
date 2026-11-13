@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCounters();
   renderEducation();
   renderSkills();
+  initSkillModal();
   renderProjects();
   renderCertificates();
   initCertificateModal();
@@ -1141,8 +1142,531 @@ function renderEducation() {
 }
 
 /* ----------------------------------------------------------------
-   11. RENDER SKILLS (VERIFIED RESUME CATEGORIES, NO FAKE NUMBERS)
+   11. RENDER SKILLS & INTERACTIVE LEARNING PATHWAYS
    ---------------------------------------------------------------- */
+const SKILL_ROADMAP_DATABASE = {
+  'Machine Learning': {
+    icon: '🧠',
+    roadmap: [
+      { step: '01', title: 'Mathematics & Statistical Foundations', desc: 'Master Linear Algebra (matrix operations, eigenvectors), Multivariable Calculus (gradients, chain rule), and Probability Theory & Hypothesis Testing.' },
+      { step: '02', title: 'Data Science Stack in Python', desc: 'Become proficient in NumPy (vectorized array computing), Pandas (data wrangling & aggregation), and exploratory visual analytics with Matplotlib and Seaborn.' },
+      { step: '03', title: 'Core ML Algorithms (Supervised & Unsupervised)', desc: 'Implement Linear & Logistic Regression, Decision Trees, Random Forests, Support Vector Machines (SVM), K-Means Clustering, and Gradient Boosting.' },
+      { step: '04', title: 'Model Validation & Hyperparameter Optimization', desc: 'Prevent overfitting using K-Fold Cross-Validation, GridSearchCV / RandomizedSearchCV, ROC-AUC, Precision-Recall curves, and Confusion Matrices.' },
+      { step: '05', title: 'Pipeline Architecture & Production Deployment', desc: 'Construct leak-free Scikit-Learn Pipelines, serialize models with Joblib/ONNX, package with FastAPI & Docker, and deploy to cloud runtimes.' }
+    ],
+    resources: [
+      { name: 'Scikit-Learn Official User Guide', url: 'https://scikit-learn.org/stable/user_guide.html', desc: 'The gold-standard reference manual for machine learning estimators, transformers, and pipelines in Python.' },
+      { name: 'Machine Learning Specialization (Coursera)', url: 'https://www.coursera.org/specializations/machine-learning-introduction', desc: 'Andrew Ng\'s world-renowned introductory curriculum covering fundamental ML concepts and practice.' },
+      { name: 'Kaggle Learn Interactive ML Micro-Courses', url: 'https://www.kaggle.com/learn', desc: 'Hands-on browser-based micro-courses covering real datasets, feature engineering, and model tuning.' },
+      { name: 'StatQuest Machine Learning Video Series', url: 'https://www.youtube.com/results?search_query=statquest+machine+learning', desc: 'Visual, intuitive step-by-step mathematical breakdowns of machine learning algorithms by Josh Starmer.' }
+    ],
+    projects: [
+      'Clinical Disease Vulnerability Predictor with calibrated probability scores and Streamlit interface.',
+      'Customer Attrition & Churn Analysis engine evaluating multi-feature business metrics with Random Forest.'
+    ]
+  },
+  'Neural Networks': {
+    icon: '⚡',
+    roadmap: [
+      { step: '01', title: 'Perceptrons & Neural Foundations', desc: 'Understand biological inspiration, artificial neurons, bias & weights, and non-linear activation functions (Sigmoid, Tanh, ReLU, LeakyReLU, Softmax).' },
+      { step: '02', title: 'Forward & Backpropagation Mechanics', desc: 'Master tensor dot products, computational graphs, loss formulations (MSE, Cross-Entropy), and the chain-rule gradient calculus that drives backprop.' },
+      { step: '03', title: 'Optimization & Training Dynamics', desc: 'Implement Stochastic Gradient Descent (SGD), Momentum, RMSprop, and Adam optimizers; tackle vanishing/exploding gradients with Batch Normalization.' },
+      { step: '04', title: 'Regularization & Generalization', desc: 'Prevent deep network overfitting using Dropout layers, L1/L2 Weight Decay, Early Stopping, and Data Augmentation techniques.' },
+      { step: '05', title: 'Deep Architectures & Framework Mastery', desc: 'Construct deep Multi-Layer Perceptrons (MLPs) and residual architectures using PyTorch and TensorFlow / Keras.' }
+    ],
+    resources: [
+      { name: '3Blue1Brown Neural Networks Series', url: 'https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi', desc: 'The most visually stunning and intuitive conceptual introduction to neural networks and backpropagation.' },
+      { name: 'DeepLearning.AI Neural Networks Course', url: 'https://www.deeplearning.ai/courses/deep-learning-specialization/', desc: 'Master deep learning fundamentals, vectorization, and neural network optimization from Andrew Ng.' },
+      { name: 'Neural Networks from Scratch (NNFS)', url: 'https://nnfs.io/', desc: 'Comprehensive textbook and video guides for building neural networks completely from scratch in pure NumPy.' },
+      { name: 'Stanford CS230 Deep Learning', url: 'https://cs230.stanford.edu/', desc: 'Official Stanford lecture slides, syllabi, and practice assignments for building deep learning systems.' }
+    ],
+    projects: [
+      'Pure NumPy Neural Network constructed without frameworks to classify handwritten digits (MNIST).',
+      'Multi-Layer Deep Diagnostic Classifier for medical risk prediction with custom dropout layers.'
+    ]
+  },
+  'TensorFlow': {
+    icon: '📦',
+    roadmap: [
+      { step: '01', title: 'Tensors, Shapes & Graph Execution', desc: 'Master tf.Tensor creation, data types, multidimensional reshaping, slicing, GPU acceleration, and Eager vs Graph execution modes.' },
+      { step: '02', title: 'Keras Sequential & Functional APIs', desc: 'Build feedforward and convolutional networks with Keras layers, specifying inputs, layer stacking, activation functions, and model summaries.' },
+      { step: '03', title: 'Custom Training Loops with tf.GradientTape', desc: 'Take direct control over gradient computation, custom loss formulations, custom training steps, and metric logging.' },
+      { step: '04', title: 'High-Performance tf.data Pipelines', desc: 'Stream massive datasets from disk using tf.data.Dataset with prefetching, batching, parallel mapping, and on-the-fly augmentation.' },
+      { step: '05', title: 'Deployment with TFLite & TF Serving', desc: 'Quantize and optimize neural models for edge/mobile devices using TensorFlow Lite, and serve scalable REST/gRPC endpoints with TF Serving.' }
+    ],
+    resources: [
+      { name: 'TensorFlow Official Tutorials & Guides', url: 'https://www.tensorflow.org/tutorials', desc: 'Authoritative, reproducible Google tutorials covering vision, NLP, and model optimization.' },
+      { name: 'Keras.io Official API Reference', url: 'https://keras.io/', desc: 'Clean, developer-friendly documentation for the high-level neural network API running on top of TensorFlow.' },
+      { name: 'FreeCodeCamp TensorFlow 2.0 Course', url: 'https://www.youtube.com/results?search_query=freecodecamp+tensorflow+2.0+course', desc: 'Comprehensive full-length video course building practical deep learning models in TensorFlow 2.' },
+      { name: 'TensorFlow Developer Certificate Guide', url: 'https://www.tensorflow.org/certificate', desc: 'Official examination criteria and curriculum for verified industry TensorFlow proficiency.' }
+    ],
+    projects: [
+      'Transfer Learning Image Classifier using pre-trained MobileNetV2 with custom dense heads.',
+      'Exported lightweight TFLite model running real-time edge inference in a mobile or web sandbox.'
+    ]
+  },
+  'Large Language Models (LLMs)': {
+    icon: '🤖',
+    roadmap: [
+      { step: '01', title: 'Transformer Architecture & Self-Attention', desc: 'Study the mechanics of multi-head self-attention, positional encodings, feedforward sub-layers, and decoder-only vs encoder-decoder structures.' },
+      { step: '02', title: 'Tokenization & Training Paradigms', desc: 'Understand Byte-Pair Encoding (BPE), vocabulary tokenizers, pre-training objectives (Causal LM), and instruction fine-tuning.' },
+      { step: '03', title: 'Prompt Engineering & System Directives', desc: 'Master zero-shot, few-shot in-context learning, Chain-of-Thought (CoT) prompting, structured JSON output enforcement, and temperature controls.' },
+      { step: '04', title: 'Retrieval-Augmented Generation (RAG)', desc: 'Chunk documents, generate vector embeddings, index into vector databases (ChromaDB, FAISS, Pinecone), and synthesize context-aware answers.' },
+      { step: '05', title: 'Autonomous Agentic Architectures', desc: 'Build tool-calling agents, state machines (LangGraph), multi-agent swarms, and run open-weight models locally with Ollama and vLLM.' }
+    ],
+    resources: [
+      { name: 'Hugging Face NLP & LLM Course', url: 'https://huggingface.co/learn/nlp-course/', desc: 'The industry-standard open curriculum covering transformers, tokenizers, and model fine-tuning.' },
+      { name: 'DeepLearning.AI Prompt Engineering Course', url: 'https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/', desc: 'Created with OpenAI to teach developer-first prompting strategies and programmatic API integration.' },
+      { name: 'The Illustrated Transformer by Jay Alammar', url: 'https://jalammar.github.io/illustrated-transformer/', desc: 'Clear visual guide breaking down the internal mechanics of transformers and attention mechanisms.' },
+      { name: 'Andrej Karpathy: Intro to Large Language Models', url: 'https://www.youtube.com/results?search_query=andrej+karpathy+intro+to+large+language+models', desc: 'Masterclass video lectures detailing LLM pre-training, fine-tuning, and system execution.' }
+    ],
+    projects: [
+      'Production RAG pipeline enabling conversational question-answering over local technical documentation.',
+      'Autonomous multi-step research agent executing API calls and generating verified synthesized reports.'
+    ]
+  },
+  'Computer Vision (OpenCV)': {
+    icon: '👁️',
+    roadmap: [
+      { step: '01', title: 'Digital Image Representation & Color Spaces', desc: 'Understand pixel matrices, color channels (BGR vs RGB), Grayscale, HSV color thresholding, and geometric transformations (resize, rotate).' },
+      { step: '02', title: 'Filtering, Blurring & Edge Detection', desc: 'Apply Gaussian blur, median filters, Sobel operators, and Canny edge detection to clean frames and extract topological boundaries.' },
+      { step: '03', title: 'Contours, Morphological Ops & Bounding Boxes', desc: 'Erosion, dilation, contour discovery, hierarchical filtering, bounding rectangle calculation, and convex hulls.' },
+      { step: '04', title: 'Real-Time Webcam Streaming & Optical Flow', desc: 'Stream video feeds with cv2.VideoCapture, process frames at 60 FPS, calculate dense/sparse optical flow, and track moving targets.' },
+      { step: '05', title: 'Deep Learning Vision Integration', desc: 'Load pre-trained deep learning weights via cv2.dnn (YOLO, SSD, FaceMesh) for real-time facial expression and object classification.' }
+    ],
+    resources: [
+      { name: 'OpenCV Official Python Tutorials', url: 'https://docs.opencv.org/4.x/d6/d00/tutorial_py_root.html', desc: 'Comprehensive step-by-step guides from the core OpenCV foundation developers.' },
+      { name: 'PyImageSearch Computer Vision Guides', url: 'https://pyimagesearch.com/', desc: 'Practical, production-grade computer vision tutorials and Python implementations by Adrian Rosebrock.' },
+      { name: 'FreeCodeCamp OpenCV Python Course', url: 'https://www.youtube.com/results?search_query=freecodecamp+opencv+python+course', desc: 'Full hands-on video workshop covering complete image processing and real-time detection in Python.' },
+      { name: 'LearnOpenCV by Satya Mallick', url: 'https://learnopencv.com/', desc: 'Advanced tutorials covering modern OpenCV, deep learning vision models, and facial landmarking.' }
+    ],
+    projects: [
+      'Real-Time Facial Emotion & Sentiment Recognition System with live webcam camera overlay.',
+      'Automated Document Scanner utilizing edge detection and four-point perspective warp transforms.'
+    ]
+  },
+  'Python 3': {
+    icon: '🐍',
+    roadmap: [
+      { step: '01', title: 'Core Syntax & Control Flow', desc: 'Master primitive data types, control structures (if/elif/else, while/for loops), functions, parameters, and variable scope rules.' },
+      { step: '02', title: 'Idiomatic Data Structures & Comprehensions', desc: 'Deep dive into lists, tuples, sets, dictionaries, slicing, list/dictionary comprehensions, and generator expressions.' },
+      { step: '03', title: 'Object-Oriented Programming (OOP)', desc: 'Design classes, instance/class methods, encapsulation, inheritance, polymorphism, abstract base classes, and dunder methods.' },
+      { step: '04', title: 'Advanced Python Capabilities', desc: 'Master function decorators, context managers (with statement), iterators/generators, type hinting, and asynchronous programming (asyncio).' },
+      { step: '05', title: 'Packaging, Testing & Virtual Environments', desc: 'Isolate environments with venv/uv, write unit tests with pytest, package modules, and establish clean linting with ruff and black.' }
+    ],
+    resources: [
+      { name: 'Python.org Official Tutorial & Reference', url: 'https://docs.python.org/3/tutorial/', desc: 'The definitive, up-to-date manual on Python syntax, standard library, and language features.' },
+      { name: 'Real Python Tutorials & Guides', url: 'https://realpython.com/', desc: 'In-depth, practical Python tutorials written and reviewed by senior industry developers.' },
+      { name: 'Corey Schafer Python YouTube Series', url: 'https://www.youtube.com/results?search_query=corey+schafer+python', desc: 'Legendary playlist breaking down Python fundamentals, OOP, decorators, and virtual environments.' },
+      { name: 'Automate the Boring Stuff with Python', url: 'https://automatetheboringstuff.com/', desc: 'Free online book teaching practical programming for automating repetitive computing tasks.' }
+    ],
+    projects: [
+      'Automated File Sorting & System Telemetry CLI application with modular arguments parser.',
+      'Production-grade RESTful API backend built with FastAPI, Pydantic data schemas, and Pytest.'
+    ]
+  },
+  'Java': {
+    icon: '☕',
+    roadmap: [
+      { step: '01', title: 'JVM Architecture & Fundamental Syntax', desc: 'Understand Java Virtual Machine bytecode execution, memory stack vs heap, primitive data types, and syntax rules.' },
+      { step: '02', title: 'Object-Oriented Design Principles', desc: 'Implement encapsulation with getters/setters, class inheritance, method overriding/overloading, interfaces, and abstract classes.' },
+      { step: '03', title: 'Java Collections Framework', desc: 'Master List (ArrayList, LinkedList), Set (HashSet, TreeSet), and Map (HashMap, TreeMap) operations and time complexities.' },
+      { step: '04', title: 'Generics, Concurrency & Multithreading', desc: 'Thread creation, synchronization primitives, thread pools (ExecutorService), race condition prevention, and generic class typing.' },
+      { step: '05', title: 'Modern Java & Spring Boot Framework', desc: 'Stream API, Lambda expressions, Java Records, dependency injection, and building microservices with Spring Boot.' }
+    ],
+    resources: [
+      { name: 'Oracle Java Official Documentation', url: 'https://docs.oracle.com/en/java/', desc: 'Authoritative JDK specifications, class documentation, and language guides.' },
+      { name: 'University of Helsinki Java MOOC', url: 'https://java-programming.mooc.fi/', desc: 'World-class free university course teaching hands-on Java programming with automated test grading.' },
+      { name: 'Baeldung Java Tutorials', url: 'https://www.baeldung.com/', desc: 'High-quality technical articles on core Java, Spring Framework, and concurrency patterns.' },
+      { name: 'Java Programming Full Course (YouTube)', url: 'https://www.youtube.com/results?search_query=java+programming+full+course', desc: 'Comprehensive video tutorials for mastering Java from fundamentals to enterprise architectures.' }
+    ],
+    projects: [
+      'Multi-threaded Banking Transaction Simulator with thread-safe atomic accounts handling.',
+      'Spring Boot REST API managing library inventory with relational JPA / Hibernate persistence.'
+    ]
+  },
+  'C++': {
+    icon: '⚡',
+    roadmap: [
+      { step: '01', title: 'Compilation Pipeline & Core Syntax', desc: 'Understand preprocessing, compiling, linking, variable types, operators, control flow, and console I/O with iostream.' },
+      { step: '02', title: 'Pointers, References & Memory Layout', desc: 'Direct memory addressing, pointer arithmetic, stack allocation vs dynamic heap allocation (new/delete), and avoiding leaks.' },
+      { step: '03', title: 'RAII & Object-Oriented C++', desc: 'Resource Acquisition Is Initialization (RAII), constructor/destructor lifecycle, copy/move semantics, and virtual polymorphism.' },
+      { step: '04', title: 'Standard Template Library (STL)', desc: 'Master std::vector, std::map, std::unordered_map, std::priority_queue, iterators, and STL algorithms (std::sort, std::find).' },
+      { step: '05', title: 'Modern C++ (C++17/20 Standards)', desc: 'Smart pointers (std::unique_ptr, std::shared_ptr), lambda expressions, structured bindings, auto type deduction, and multithreading.' }
+    ],
+    resources: [
+      { name: 'LearnCpp.com Complete Free Tutorials', url: 'https://www.learncpp.com/', desc: 'The most comprehensive, highly recommended free C++ curriculum available on the web.' },
+      { name: 'CppReference.com Standard Documentation', url: 'https://en.cppreference.com/w/', desc: 'The ultimate standard library and language syntax reference for professional C++ engineers.' },
+      { name: 'The Cherno C++ Series on YouTube', url: 'https://www.youtube.com/results?search_query=the+cherno+c%2B%2B+series', desc: 'Game developer breakdown of how C++ works under the hood at the binary memory level.' },
+      { name: 'Harvard CS50x Computer Science', url: 'https://cs50.harvard.edu/x/', desc: 'Legendary introductory computer science course introducing foundational memory and algorithmic design.' }
+    ],
+    projects: [
+      'Custom Dynamic Array (Vector) container implementing complete memory reallocation and iterators.',
+      'High-performance 2D Physics or Particle Simulation engine utilizing modern C++ and smart pointers.'
+    ]
+  },
+  'JavaScript (ES6+)': {
+    icon: '🟨',
+    roadmap: [
+      { step: '01', title: 'Syntax, Data Types & Scope', desc: 'Variables (let, const), primitives vs references, type coercion, scoping (block vs function), and arrow functions.' },
+      { step: '02', title: 'DOM Manipulation & Event Handling', desc: 'Selecting DOM nodes, modifying attributes, event listeners, bubbling and capturing, and dynamic UI rendering.' },
+      { step: '03', title: 'Asynchronous Architecture & Event Loop', desc: 'Call stack, Task Queue, Microtask Queue, Callbacks, Promises, and modern async/await syntax with error handling.' },
+      { step: '04', title: 'Modern ES6+ Language Features', desc: 'Destructuring assignment, spread/rest operators, template literals, ES modules (import/export), classes, and closures.' },
+      { step: '05', title: 'Browser APIs & Hardware Acceleration', desc: 'Fetch API, LocalStorage/SessionStorage, WebGL context, Canvas 2D, IntersectionObserver, and performance tuning.' }
+    ],
+    resources: [
+      { name: 'MDN Web Docs JavaScript Guide', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript', desc: 'The industry-standard documentation for JavaScript syntax, specifications, and web platform APIs.' },
+      { name: 'JavaScript.info The Modern Tutorial', url: 'https://javascript.info/', desc: 'Masterclass documentation covering everything from JavaScript fundamentals to deep engine internals.' },
+      { name: 'FreeCodeCamp JS Algorithms Certification', url: 'https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures-v8/', desc: 'Hands-on coding challenges to master JavaScript algorithmic problem solving and data structures.' },
+      { name: 'JavaScript Mastery YouTube Channel', url: 'https://www.youtube.com/results?search_query=javascript+mastery+full+course', desc: 'Project-driven video tutorials building modern full-stack JavaScript applications.' }
+    ],
+    projects: [
+      'Interactive 3D Hardware-Accelerated Portfolio Scene using Vanilla JavaScript and WebGL.',
+      'Real-Time Asynchronous Task Management Kanban application with local persistence and drag-and-drop.'
+    ]
+  },
+  'Pandas': {
+    icon: '🐼',
+    roadmap: [
+      { step: '01', title: 'Series & DataFrame Foundations', desc: 'Understand 1D Series and 2D DataFrame anatomy, indices, columns, and data access with .loc[] and .iloc[].' },
+      { step: '02', title: 'Data Ingestion & Inspection', desc: 'Read and write diverse formats (CSV, JSON, Parquet, SQL tables) and inspect shapes with .info(), .describe(), and .head().' },
+      { step: '03', title: 'Data Cleaning & Missing Value Handling', desc: 'Detect and handle nulls with .isna(), .fillna(), .dropna(), remove duplicates, and cast data types with .astype().' },
+      { step: '04', title: 'Grouping, Aggregating & Merging', desc: 'Perform complex data transformations using .groupby(), .agg(), .pivot_table(), and merge/join disparate datasets.' },
+      { step: '05', title: 'Time Series & Vectorized Optimization', desc: 'Parse datetime objects, resample temporal intervals, write vectorized operations, and eliminate slow Python for-loops.' }
+    ],
+    resources: [
+      { name: 'Pandas Official User Guide', url: 'https://pandas.pydata.org/docs/user_guide/index.html', desc: 'Comprehensive guide covering idioms, performance patterns, and official API references.' },
+      { name: 'Kaggle Pandas Micro-Course', url: 'https://www.kaggle.com/learn/pandas', desc: 'Interactive hands-on tutorials for indexing, grouping, and transforming real-world datasets.' },
+      { name: 'Python for Data Analysis (Wes McKinney)', url: 'https://wesmckinney.com/book/', desc: 'The foundational book written by the creator of Pandas, available free online.' },
+      { name: 'Corey Schafer Pandas Series', url: 'https://www.youtube.com/results?search_query=corey+schafer+pandas+tutorial', desc: 'Crystal-clear video breakdowns explaining every major Pandas operation step-by-step.' }
+    ],
+    projects: [
+      'Multi-Year Financial & Sales Performance Aggregator analyzing millions of raw transaction records.',
+      'Automated Data Cleansing & Validation Pipeline preparing raw sensor outputs for ML models.'
+    ]
+  },
+  'NumPy': {
+    icon: '🔢',
+    roadmap: [
+      { step: '01', title: 'The ndarray Object & Array Creation', desc: 'Understand contiguous memory layout, array creation functions (np.zeros, np.ones, np.arange, np.linspace), and dtypes.' },
+      { step: '02', title: 'Indexing, Slicing & Boolean Masking', desc: 'Multi-dimensional indexing, sub-array slicing, fancy integer indexing, and conditional boolean filtering.' },
+      { step: '03', title: 'Broadcasting & Mathematical Operations', desc: 'Master broadcasting rules across mismatched dimensions, vectorized element-wise arithmetic, and universal functions (ufuncs).' },
+      { step: '04', title: 'Reshaping & Matrix Manipulations', desc: 'Array transpositions, flattening, stacking (vstack/hstack), concatenation, and multi-axis reductions (sum, mean, std).' },
+      { step: '05', title: 'Linear Algebra & Random Sampling', desc: 'Dot products, matrix inversion, eigenvalues with np.linalg, reproducible pseudo-random number generation with np.random.' }
+    ],
+    resources: [
+      { name: 'NumPy Official User Guide', url: 'https://numpy.org/doc/stable/user/index.html', desc: 'The authoritative reference for high-performance scientific array computing in Python.' },
+      { name: 'Stanford CS231n NumPy Tutorial', url: 'https://cs231n.github.io/python-numpy-tutorial/', desc: 'Concise, practical crash course on NumPy array operations used in computer vision and machine learning.' },
+      { name: 'FreeCodeCamp NumPy Full Tutorial', url: 'https://www.youtube.com/results?search_query=freecodecamp+numpy+tutorial', desc: 'In-depth hands-on video guide covering arrays, math operations, and linear algebra routines.' },
+      { name: 'Visual Introduction to NumPy (Better Explained)', url: 'https://jalammar.github.io/visual-numpy/', desc: 'Clear diagrams illustrating how arrays, broadcasting, and matrix products work visually.' }
+    ],
+    projects: [
+      'Acoustic Signal Processing & Frequency Analyzer classifying 60-band underwater sonar readings.',
+      'Custom Perceptron & Gradient Descent Optimizer implemented with raw NumPy matrix equations.'
+    ]
+  },
+  'Scikit-Learn': {
+    icon: '🔬',
+    roadmap: [
+      { step: '01', title: 'The Consistent Estimator Interface', desc: 'Learn the unified .fit(), .transform(), and .predict() API conventions that power all Scikit-Learn components.' },
+      { step: '02', title: 'Preprocessing & Feature Engineering', desc: 'Scale numeric features with StandardScaler / RobustScaler, encode categoricals with OneHotEncoder, and impute missing values.' },
+      { step: '03', title: 'Supervised Models (Regression & Classification)', desc: 'Train Linear Regression, Ridge, Lasso, Logistic Regression, Random Forests, and Support Vector Machines.' },
+      { step: '04', title: 'Pipeline & ColumnTransformer Architecture', desc: 'Encapsulate feature transformations and estimators into unified Pipelines to strictly prevent data leakage.' },
+      { step: '05', title: 'Model Selection & Metric Evaluation', desc: 'Run StratifiedKFold cross-validation, hyperparameter grid search, analyze classification reports, and plot precision-recall curves.' }
+    ],
+    resources: [
+      { name: 'Scikit-Learn Official Getting Started', url: 'https://scikit-learn.org/stable/getting_started.html', desc: 'Official tutorials detailing core model fitting, prediction pipelines, and evaluation metrics.' },
+      { name: 'Inria Scikit-Learn MOOC', url: 'https://inria.github.io/scikit-learn-mooc/', desc: 'World-class online course authored by the core Scikit-Learn core development team in France.' },
+      { name: 'Hands-On Machine Learning (Aurélien Géron)', url: 'https://github.com/ageron/handson-ml3', desc: 'Interactive Jupyter notebooks covering Scikit-Learn pipelines from the bestselling O\'Reilly textbook.' },
+      { name: 'Scikit-Learn YouTube Masterclass', url: 'https://www.youtube.com/results?search_query=scikit+learn+tutorial+python', desc: 'Structured video courses teaching practical machine learning modeling with Scikit-Learn.' }
+    ],
+    projects: [
+      'Comprehensive Patient Diabetes Risk Assessment Pipeline with hyperparameter-tuned classifiers.',
+      'Sonar Frequency Object Classification System predicting rock vs metal cylinder reflections.'
+    ]
+  },
+  'Data Cleaning & EDA': {
+    icon: '🧹',
+    roadmap: [
+      { step: '01', title: 'Exploratory Data Inspection', desc: 'Understand data distributions, central tendencies (mean, median, mode), variance, and data types across raw columns.' },
+      { step: '02', title: 'Systematic Missing Value Handling', desc: 'Identify Missing Completely at Random (MCAR) vs MAR, apply median/mean/mode imputation, or train KNN/iterative imputers.' },
+      { step: '03', title: 'Outlier Detection & Treatment', desc: 'Identify extreme anomalies using Interquartile Range (IQR) bounds, Z-scores, and Isolation Forests; decide on trimming vs winsorizing.' },
+      { step: '04', title: 'Visual Statistical Exploration', desc: 'Plot histograms, KDE curves, boxplots, correlation heatmaps, and pairplots using Seaborn to unearth hidden patterns.' },
+      { step: '05', title: 'Feature Transformation & Engineering', desc: 'Apply log/box-cox transformations for skewed features, create interaction terms, bin continuous variables, and select top features.' }
+    ],
+    resources: [
+      { name: 'Kaggle Data Cleaning Micro-Course', url: 'https://www.kaggle.com/learn/data-cleaning', desc: 'Interactive tutorials covering missing values, scaling, normalization, parsing dates, and character encodings.' },
+      { name: 'Seaborn Official Data Visualization Gallery', url: 'https://seaborn.pydata.org/', desc: 'High-level Python statistical data visualization library reference and code recipes.' },
+      { name: 'Towards Data Science EDA Guides', url: 'https://towardsdatascience.com/', desc: 'Top industry articles sharing best practices for exploratory data analysis on messy business datasets.' },
+      { name: 'Exploratory Data Analysis Python Tutorial', url: 'https://www.youtube.com/results?search_query=exploratory+data+analysis+python', desc: 'End-to-end video walkthroughs cleaning and visualizing raw messy datasets from scratch.' }
+    ],
+    projects: [
+      'Comprehensive Healthcare Diagnostics EDA uncovering clinical correlation patterns and risk distributions.',
+      'Automated Data Profiler and Quality Audit Tool generating HTML statistical summaries from any CSV.'
+    ]
+  },
+  'React.js': {
+    icon: '⚛️',
+    roadmap: [
+      { step: '01', title: 'JSX & Component-Driven Architecture', desc: 'Understand declarative UI syntax, functional components, props passing, and conditional rendering patterns.' },
+      { step: '02', title: 'State Management & Effects', desc: 'Manage reactive state with useState, handle side effects & lifecycle events with useEffect, and avoid infinite render loops.' },
+      { step: '03', title: 'Forms & Controlled Components', desc: 'Build controlled form inputs, manage complex nested form state, and validate user submissions before API dispatch.' },
+      { step: '04', title: 'Custom Hooks & Performance Tuning', desc: 'Extract reusable logic into Custom Hooks, optimize re-renders using useMemo, useCallback, and React.memo.' },
+      { step: '05', title: 'Modern React Frameworks & 3D Integration', desc: 'Integrate React with React Three Fiber / Three.js, React Router, Context API, and deploy with Vercel.' }
+    ],
+    resources: [
+      { name: 'React.dev Official Documentation', url: 'https://react.dev/', desc: 'The modern, interactive official React documentation with live sandboxes and tutorials.' },
+      { name: 'Scrimba Learn React Free Interactive Course', url: 'https://scrimba.com/learn/learnreact', desc: 'Hands-on interactive screencasts where you can edit code directly inside the browser.' },
+      { name: 'FreeCodeCamp React 18 Full Course', url: 'https://www.youtube.com/results?search_query=freecodecamp+react+course', desc: 'Full-length video masterclass teaching React components, hooks, state, and real-world project builds.' },
+      { name: 'React Three Fiber Documentation', url: 'https://r3f.docs.pmnd.rs/', desc: 'Declarative, reactive 3D graphics in React utilizing Three.js and WebGL.' }
+    ],
+    projects: [
+      'Interactive 3D Hardware-Accelerated Portfolio and AI Launchpad dashboard.',
+      'Dynamic NGO Digital Campaign Portal featuring real-time donation modules and responsive routing.'
+    ]
+  },
+  'HTML5': {
+    icon: '🌐',
+    roadmap: [
+      { step: '01', title: 'Semantic Document Structure', desc: 'Master semantic layout tags (header, nav, main, article, section, aside, footer) for accessible, SEO-friendly DOMs.' },
+      { step: '02', title: 'Forms, Validations & Input Types', desc: 'Modern input types (email, tel, date, range), form constraints (required, pattern), and client-side form validation.' },
+      { step: '03', title: 'Embedded Media & Canvas 2D', desc: 'Responsive images (picture, srcset), audio/video tags, SVG vector graphics, and drawing via the Canvas 2D API.' },
+      { step: '04', title: 'Web Storage & DOM APIs', desc: 'Persist state with LocalStorage and SessionStorage, read data attributes (dataset), and query elements with querySelector.' },
+      { step: '05', title: 'Accessibility (a11y) & WCAG Compliance', desc: 'Implement ARIA roles, live regions, accessible names, keyboard focus rings, and screen-reader optimizations.' }
+    ],
+    resources: [
+      { name: 'MDN Web Docs HTML Reference', url: 'https://developer.mozilla.org/en-US/docs/Web/HTML', desc: 'Authoritative guide to HTML elements, attributes, accessibility guidelines, and browser compatibility.' },
+      { name: 'FreeCodeCamp Responsive Web Design', url: 'https://www.freecodecamp.org/learn/2022/responsive-web-design/', desc: 'Verified certification course teaching semantic HTML and modern CSS through interactive projects.' },
+      { name: 'W3C Web Accessibility Initiative (WAI)', url: 'https://www.w3.org/WAI/', desc: 'Essential standards and guidelines for building universally accessible, compliant web interfaces.' },
+      { name: 'HTML5 Semantic Layouts Video Guide', url: 'https://www.youtube.com/results?search_query=html5+semantic+elements+tutorial', desc: 'Clear video tutorials explaining proper semantic structuring and accessibility practices.' }
+    ],
+    projects: [
+      'Fully Accessible, WCAG-Compliant Inamigos NGO Web Platform with accessible donation forms.',
+      'Interactive HTML5 Canvas 2D Drawing Board with image export and touch support.'
+    ]
+  },
+  'CSS3': {
+    icon: '🎨',
+    roadmap: [
+      { step: '01', title: 'Box Model, Specificity & Cascade', desc: 'Master margin, border, padding, content boxes (box-sizing), CSS specificity hierarchy, and inheritance.' },
+      { step: '02', title: 'Modern Layouts: Flexbox & CSS Grid', desc: 'Flexbox alignment, flex-grow/shrink, multi-dimensional CSS Grid (grid-template-columns, minmax, gap, areas).' },
+      { step: '03', title: 'Responsive Design & Fluid Typography', desc: 'Mobile-first media queries, container queries, clamp() fluid typography, and viewport relative units (vh, vw, rem).' },
+      { step: '04', title: 'Hardware-Accelerated Animations & 3D Transforms', desc: 'Keyframe animations, transitions, 3D perspective transforms (rotateX/Y/Z, translate3d), and will-change optimizations.' },
+      { step: '05', title: 'Glassmorphism, Tokens & Custom Properties', desc: 'Design tokens with CSS Variables, backdrop-filter blur, radiant gradients, and ultra-crisp dark-mode styling.' }
+    ],
+    resources: [
+      { name: 'MDN Web Docs CSS Guide', url: 'https://developer.mozilla.org/en-US/docs/Web/CSS', desc: 'Comprehensive specifications and guides for modern CSS properties, selectors, and layout engines.' },
+      { name: 'CSS-Tricks Complete Guide to Flexbox & Grid', url: 'https://css-tricks.com/snippets/css/a-guide-to-flexbox/', desc: 'The most popular visual reference posters for mastering Flexbox and Grid layouts.' },
+      { name: 'Kevin Powell CSS YouTube Channel', url: 'https://www.youtube.com/results?search_query=kevin+powell+css', desc: 'Masterclass video tutorials demystifying modern CSS layouts, animations, and responsive architecture.' },
+      { name: 'Web.dev Learn CSS Course (Google)', url: 'https://web.dev/learn/css/', desc: 'Structured, modern curriculum developed by Google engineers covering all aspects of modern styling.' }
+    ],
+    projects: [
+      'High-Tech Glassmorphic 3D Card Hover & Tilt system with hardware-accelerated transforms.',
+      'Fully Responsive Modern Web Interface optimized for seamless mobile and desktop browsing.'
+    ]
+  },
+  'RESTful APIs': {
+    icon: '🔌',
+    roadmap: [
+      { step: '01', title: 'HTTP Protocol & Architectural Principles', desc: 'Client-server separation, statelessness, HTTP methods (GET, POST, PUT, PATCH, DELETE), and HTTP status codes (2xx, 4xx, 5xx).' },
+      { step: '02', title: 'Resource-Oriented URI Design', desc: 'Design clean, plural, intuitive endpoint paths (/api/v1/projects/:id), query parameters (?filter=ml&page=1), and JSON payloads.' },
+      { step: '03', title: 'Authentication, Authorization & Security', desc: 'Secure endpoints using Bearer Tokens, JWT (JSON Web Tokens), API keys, CORS policies, and rate-limiting headers.' },
+      { step: '04', title: 'API Documentation & OpenAPI / Swagger', desc: 'Document endpoints with OpenAPI 3.0 / Swagger specifications for automated client generation and interactive testing.' },
+      { step: '05', title: 'Client Integration & Resilience', desc: 'Consume APIs using fetch / Axios, handle network retries, timeout management, pagination, and error degradation.' }
+    ],
+    resources: [
+      { name: 'RESTful API Design Best Practices', url: 'https://restfulapi.net/', desc: 'Clear guidelines detailing resource modeling, status codes, and HTTP method idempotency.' },
+      { name: 'Postman Learning Center & Tutorials', url: 'https://learning.postman.com/', desc: 'Learn how to inspect, test, mock, and automate REST API requests and automated collections.' },
+      { name: 'MDN HTTP Overview & Headers', url: 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview', desc: 'Essential knowledge on HTTP requests, response headers, caching, and CORS configuration.' },
+      { name: 'REST API Tutorial (YouTube)', url: 'https://www.youtube.com/results?search_query=rest+api+tutorial+for+beginners', desc: 'Comprehensive video tutorials teaching RESTful architecture and backend endpoint implementation.' }
+    ],
+    projects: [
+      'Secure User Authentication & Resource Management API with JWT tokens and role-based permissions.',
+      'Autonomous Job Aggregator API Gateway polling remote platforms and delivering parsed JSON feeds.'
+    ]
+  },
+  'MySQL Relational DB': {
+    icon: '🗄️',
+    roadmap: [
+      { step: '01', title: 'Relational Theory & Schema Normalization', desc: 'Understand relational algebra, entity-relationship diagrams, primary/foreign keys, and 1NF, 2NF, 3NF normalization.' },
+      { step: '02', title: 'Data Definition (DDL) & Manipulation (DML)', desc: 'CREATE, ALTER, DROP tables with constraints (NOT NULL, UNIQUE, CHECK), and INSERT, UPDATE, DELETE records.' },
+      { step: '03', title: 'Advanced Querying & Joins', desc: 'Query data with INNER JOIN, LEFT JOIN, RIGHT JOIN, subqueries, GROUP BY, HAVING, and aggregate functions (COUNT, SUM, AVG).' },
+      { step: '04', title: 'Indexing & Performance Optimization', desc: 'Create B-Tree and Composite indexes, optimize slow queries using EXPLAIN execution plans, and reduce table scans.' },
+      { step: '05', title: 'Transactions (ACID) & Programmatic Connectors', desc: 'Enforce Atomicity, Consistency, Isolation, and Durability (ACID) with COMMIT/ROLLBACK, and connect via Python (mysql-connector).' }
+    ],
+    resources: [
+      { name: 'MySQL Official Reference Manual', url: 'https://dev.mysql.com/doc/', desc: 'The comprehensive official manual covering MySQL architecture, SQL syntax, and optimization engines.' },
+      { name: 'Mode Analytics SQL Tutorial', url: 'https://mode.com/sql-tutorial/', desc: 'Interactive, beginner-to-advanced SQL course with real business analytics scenarios.' },
+      { name: 'SQLZoo Interactive SQL Platform', url: 'https://sqlzoo.net/', desc: 'Free interactive browser playground with instant automated feedback on SQL queries and joins.' },
+      { name: 'MySQL Full Course for Beginners (YouTube)', url: 'https://www.youtube.com/results?search_query=mysql+full+course', desc: 'End-to-end video tutorial building relational databases, tables, and complex queries from scratch.' }
+    ],
+    projects: [
+      'Comprehensive Library Management Database managing book catalogs, students, loans, and fines.',
+      'Scalable E-Commerce Inventory & Order Processing relational database schema with ACID transactions.'
+    ]
+  },
+  'Linux Environment': {
+    icon: '🐧',
+    roadmap: [
+      { step: '01', title: 'File System Hierarchy & Core Navigation', desc: 'Navigate directories (cd, ls, pwd), understand root hierarchy (/etc, /var, /home, /bin), and manipulate files (cp, mv, rm, mkdir).' },
+      { step: '02', title: 'File Permissions & User Management', desc: 'Understand read, write, execute permissions for user, group, and others; manage access with chmod, chown, and sudo.' },
+      { step: '03', title: 'Stream Redirection & Text Processing', desc: 'Harness stdin/stdout/stderr pipes (|), redirection (>, >>), and command-line text filters (grep, awk, sed, cut, sort, uniq).' },
+      { step: '04', title: 'Process Monitoring & System Telemetry', desc: 'Inspect active workloads with ps, top, htop, terminate processes with kill/killall, and manage systemd services (systemctl).' },
+      { step: '05', title: 'Bash Scripting & Remote SSH Administration', desc: 'Write automated bash scripts with loops and arguments, schedule tasks via cron, and administer remote servers with SSH keys.' }
+    ],
+    resources: [
+      { name: 'Linux Journey Interactive Guide', url: 'https://linuxjourney.com/', desc: 'A beautiful, free interactive platform teaching Linux from fundamentals to kernel configuration.' },
+      { name: 'The Linux Command Line by William Shotts', url: 'https://linuxcommand.org/', desc: 'The quintessential free book for mastering terminal navigation, utilities, and shell scripting.' },
+      { name: 'OverTheWire: Bandit Security Wargame', url: 'https://overthewire.org/wargames/bandit/', desc: 'Gamified challenge series where you practice essential Linux commands to solve security levels.' },
+      { name: 'Linux for Beginners Full Course (YouTube)', url: 'https://www.youtube.com/results?search_query=linux+for+beginners+course', desc: 'Full video walkthrough covering the terminal, file systems, permissions, and bash automation.' }
+    ],
+    projects: [
+      'Automated Server Health Monitor & Backup Bash script logging system telemetry and archiving logs.',
+      'Hardened Production Remote Server setup with automated firewall (ufw), SSH keys, and systemd services.'
+    ]
+  },
+  'Git & GitHub': {
+    icon: '🐙',
+    roadmap: [
+      { step: '01', title: 'Version Control Fundamentals', desc: 'Understand working directory, staging area, commit history, and essential commands (git init, status, add, commit, log).' },
+      { step: '02', title: 'Branching & Collaborative Merging', desc: 'Create feature branches (git branch, checkout, switch), merge branches (git merge), and resolve merge conflicts cleanly.' },
+      { step: '03', title: 'Remote Repositories & Collaboration', desc: 'Connect to remotes (git remote), sync code (git push, pull, fetch, clone), and manage GitHub Pull Requests and code reviews.' },
+      { step: '04', title: 'History Manipulation & Recovery', desc: 'Stash dirty working states (git stash), cherry-pick commits, rebase interactive (git rebase -i), and recover lost commits with git reflog.' },
+      { step: '05', title: 'Automated CI/CD with GitHub Actions', desc: 'Configure YAML workflow pipelines to automate test suites, linting, build checks, and continuous deployment to GitHub Pages.' }
+    ],
+    resources: [
+      { name: 'Pro Git Book (Free by Scott Chacon)', url: 'https://git-scm.com/book/en/v2', desc: 'The definitive, officially recommended reference manual detailing all Git internals and commands.' },
+      { name: 'GitHub Skills Interactive Courses', url: 'https://skills.github.com/', desc: 'Interactive hands-on repositories on GitHub that teach Git workflows through pull requests.' },
+      { name: 'Learn Git Branching Interactive Visualizer', url: 'https://learngitbranching.js.org/', desc: 'The most popular visual interactive game for mastering Git branches, rebasing, and HEAD pointers.' },
+      { name: 'Git & GitHub Tutorial for Beginners (YouTube)', url: 'https://www.youtube.com/results?search_query=git+and+github+tutorial+for+beginners', desc: 'Step-by-step video guide mastering Git commits, branches, pull requests, and GitHub collaboration.' }
+    ],
+    projects: [
+      'Production Multi-Branch Repository with automated GitHub Actions CI/CD deploying static sites on push.',
+      'Open Source Pull Request contribution following industry branch etiquette and commit conventions.'
+    ]
+  },
+  'Analytical Thinking': {
+    icon: '🔍',
+    roadmap: [
+      { step: '01', title: 'First Principles Deconstruction', desc: 'Break down complex engineering systems into foundational truths rather than relying on analogies or surface assumptions.' },
+      { step: '02', title: 'Hypothesis-Driven Problem Framing', desc: 'Formulate quantifiable hypotheses, isolate confounding variables, and design empirical tests to validate design choices.' },
+      { step: '03', title: 'Algorithmic Complexity & Trade-Off Analysis', desc: 'Analyze computational Big-O time and space complexity, evaluating trade-offs between latency, memory, and scalability.' },
+      { step: '04', title: 'Root Cause Analysis (5 Whys & Ishikawa)', desc: 'Conduct systematic post-mortems for software failures by drilling down to foundational root causes rather than symptoms.' },
+      { step: '05', title: 'Data-Driven Architectural Decision Making', desc: 'Utilize empirical benchmarks and telemetry metrics to make defensible engineering and infrastructure decisions.' }
+    ],
+    resources: [
+      { name: 'Farnam Street: First Principles Thinking', url: 'https://fs.blog/first-principles/', desc: 'Frameworks and mental models for deconstructing problems to fundamental truths.' },
+      { name: 'Khan Academy Logic & Critical Reasoning', url: 'https://www.khanacademy.org/', desc: 'Foundational coursework in deductive logic, statistical reasoning, and structured problem solving.' },
+      { name: 'Harvard Business Review on Analytical Thinking', url: 'https://hbr.org/', desc: 'Case studies and frameworks on strategic evaluation, cognitive biases, and systematic analysis.' },
+      { name: 'Analytical Thinking for Software Engineers (YouTube)', url: 'https://www.youtube.com/results?search_query=analytical+thinking+skills+software+engineer', desc: 'Video lectures on sharpening technical deduction, problem decomposition, and critical thinking.' }
+    ],
+    projects: [
+      'Algorithmic Complexity Comparison benchmark comparing 3 classification models under varying data sizes.',
+      'System Architecture Trade-off Analysis document balancing scraping latency vs server memory.'
+    ]
+  },
+  'Problem Solving': {
+    icon: '🧩',
+    roadmap: [
+      { step: '01', title: 'Problem Definition & Constraint Identification', desc: 'Clarify input/output formats, boundary conditions, edge cases, and time/space constraints before writing any code.' },
+      { step: '02', title: 'Modular Decomposition & Sub-Tasking', desc: 'Deconstruct complex multi-faceted systems into independent, testable sub-problems with clear interface contracts.' },
+      { step: '03', title: 'Pattern Recognition & Data Structure Mapping', desc: 'Recognize underlying problem structures and map them to appropriate data structures (HashMaps, Graphs, Heaps, Trees).' },
+      { step: '04', title: 'Iterative Prototyping & Incremental Refinement', desc: 'Build a minimal viable working solution first, verify its correctness, and then iteratively optimize performance.' },
+      { step: '05', title: 'Defensive Engineering & Stress Testing', desc: 'Design comprehensive test suites covering malformed inputs, edge values, race conditions, and graceful degradation.' }
+    ],
+    resources: [
+      { name: 'LeetCode Problem Solving Platform', url: 'https://leetcode.com/', desc: 'The industry-standard coding platform for practicing data structures and algorithmic challenge patterns.' },
+      { name: 'NeetCode Structured Roadmap', url: 'https://neetcode.io/roadmap', desc: 'Curated visual roadmap organizing core algorithmic patterns into structured problem sets.' },
+      { name: 'How to Solve It by George Pólya (Summary)', url: 'https://en.wikipedia.org/wiki/How_to_Solve_It', desc: 'The legendary four-stage problem-solving heuristic framework: Understand, Plan, Carry Out, Look Back.' },
+      { name: 'How to Think Like a Programmer (YouTube)', url: 'https://www.youtube.com/results?search_query=how+to+think+like+a+programmer', desc: 'Inspiring lectures on breaking down difficult programming problems into conquerable pieces.' }
+    ],
+    projects: [
+      'Solving 50+ Core Algorithmic Challenges covering Arrays, Binary Trees, and Dynamic Programming on LeetCode.',
+      'Diagnosing and resolving a subtle concurrency race condition in a multi-threaded Python script.'
+    ]
+  },
+  'Communication': {
+    icon: '🗣️',
+    roadmap: [
+      { step: '01', title: 'Technical Precision & Conciseness', desc: 'Articulate intricate architecture clearly without unnecessary fluff; choose precise technical terminology.' },
+      { step: '02', title: 'Active Listening & Requirement Alignment', desc: 'Confirm understanding before replying, ask clarifying questions, and ensure alignment with project goals.' },
+      { step: '03', title: 'Structured Written Documentation', desc: 'Write comprehensive READMEs, clear pull request descriptions, actionable bug reports, and API documentation.' },
+      { step: '04', title: 'Visual Architecture Presentation', desc: 'Use architectural diagrams (Mermaid, flowcharts, data schemas) to convey system relationships at a glance.' },
+      { step: '05', title: 'Cross-Functional Stakeholder Alignment', desc: 'Translate complex technical trade-offs into plain business impacts for non-technical stakeholders and clients.' }
+    ],
+    resources: [
+      { name: 'Google Technical Writing Courses', url: 'https://developers.google.com/tech-writing', desc: 'Free online courses by Google engineers on communicating complex software concepts with clarity.' },
+      { name: 'Write the Docs Community Resources', url: 'https://www.writethedocs.org/', desc: 'Global community focused on best practices for software documentation and technical communication.' },
+      { name: 'Toastmasters Public Speaking Resources', url: 'https://www.toastmasters.org/', desc: 'Time-tested techniques for clear oral presentation, speech structuring, and impromptu speaking.' },
+      { name: 'Technical Communication for Engineers (YouTube)', url: 'https://www.youtube.com/results?search_query=technical+communication+for+engineers', desc: 'Video masterclasses on presenting engineering projects confidently to team members and leaders.' }
+    ],
+    projects: [
+      'Complete Technical System Architecture Whitepaper documenting portfolio 3D & AI subsystems.',
+      'Recorded 5-minute video presentation and screen demo walking through an AI project architecture.'
+    ]
+  },
+  'Pressure Handling': {
+    icon: '🛡️',
+    roadmap: [
+      { step: '01', title: 'Cognitive Prioritization & Triage', desc: 'Triage incoming demands under strict deadlines using the Eisenhower matrix; address blocking fires first.' },
+      { step: '02', title: 'Emotional Regulation & Composure', desc: 'Maintain objective clarity during production outages, avoiding panic and focusing on methodical diagnostic logs.' },
+      { step: '03', title: 'Blameless Incident Management', desc: 'Follow structured incident recovery protocols, isolate fault boundaries, and conduct constructive post-mortems.' },
+      { step: '04', title: 'Deep Work & Timebox Discipline', desc: 'Eliminate contextual interruptions through timeboxed focus sessions (Pomodoro) to deliver critical code.' },
+      { step: '05', title: 'Stress Inoculation via Mock Outages', desc: 'Simulate high-stakes production breaks and timed competitive hackathons to build calm resilience.' }
+    ],
+    resources: [
+      { name: 'Google SRE Book: Managing Incidents', url: 'https://sre.google/sre-book/managing-incidents/', desc: 'Official Google Site Reliability Engineering guide on handling critical production emergencies.' },
+      { name: 'Deep Work by Cal Newport (Concepts)', url: 'https://calnewport.com/books/deep-work/', desc: 'Actionable frameworks for intense focus and peak productivity in distracting environments.' },
+      { name: 'MindTools Stress Management Frameworks', url: 'https://www.mindtools.com/', desc: 'Proven strategies for cognitive resilience, cognitive reframing, and peak pressure performance.' },
+      { name: 'Handling Pressure in Tech (YouTube)', url: 'https://www.youtube.com/results?search_query=handling+pressure+as+a+software+engineer', desc: 'Experienced tech leads discussing how to navigate tight release dates and production outages calmly.' }
+    ],
+    projects: [
+      '24-Hour Hackathon delivery building a working MVP under tight time and scope constraints.',
+      'Disaster Recovery Runbook documenting step-by-step restoration procedures for cloud services.'
+    ]
+  },
+  'Adaptive Nature': {
+    icon: '🌊',
+    roadmap: [
+      { step: '01', title: 'Rapid Technology Onboarding', desc: 'Read official documentation and API references quickly to grasp core mental models of unfamiliar libraries.' },
+      { step: '02', title: 'Continuous Learning Mindset', desc: 'Stay hungry for emerging advances in AI, large language models, autonomous agents, and web technologies.' },
+      { step: '03', title: 'Graceful Architectural Pivoting', desc: 'Refactor codebases without frustration when project specifications or client requirements shift unexpectedly.' },
+      { step: '04', title: 'Cross-Disciplinary Bridge Building', desc: 'Connect disparate fields — machine learning modeling, frontend hardware-accelerated 3D, and cloud pipelines.' },
+      { step: '05', title: 'Unlearning Obsolete Paradigms', desc: 'Willingness to retire deprecated patterns in favor of modern, robust, and performant industry best practices.' }
+    ],
+    resources: [
+      { name: 'MIT OpenCourseWare Computer Science', url: 'https://ocw.mit.edu/', desc: 'Free access to cutting-edge university curriculum across modern computing disciplines.' },
+      { name: 'Hacker News & GitHub Trending Feeds', url: 'https://news.ycombinator.com/', desc: 'Daily pulses of developer breakthroughs, new tools, and architectural paradigm shifts.' },
+      { name: 'ArXiv Machine Learning Preprints', url: 'https://arxiv.org/list/cs.LG/recent', desc: 'The frontline of scientific and AI research papers published daily by global researchers.' },
+      { name: 'How to Learn New Tech Fast (YouTube)', url: 'https://www.youtube.com/results?search_query=how+to+learn+new+technologies+fast', desc: 'Proven study systems used by senior engineers to pick up new frameworks in record time.' }
+    ],
+    projects: [
+      'Self-directed integration of Three.js 3D WebGL physics engine into an existing web codebase.',
+      'Rapid migration from classical Scikit-Learn workflows to autonomous n8n agentic pipelines.'
+    ]
+  },
+  'Collaboration': {
+    icon: '🤝',
+    roadmap: [
+      { step: '01', title: 'Git & Version Control Etiquette', desc: 'Write clean atomic commits, maintain branch hygiene, write descriptive commit messages, and rebase cleanly.' },
+      { step: '02', title: 'Empathetic & Rigorous Code Reviews', desc: 'Review peer pull requests thoroughly, provide actionable and respectful feedback, and welcome constructive critiques.' },
+      { step: '03', title: 'Agile Ceremonies & Transparent Status', desc: 'Participate actively in sprint standups, backlog refinement, retrospectives, and communicate blockers early.' },
+      { step: '04', title: 'Shared Knowledge & Documentation', desc: 'Build shared team wikis and setup scripts to eradicate knowledge silos and empower smooth teammate onboarding.' },
+      { step: '05', title: 'Pair Programming & Synchronous Problem Solving', desc: 'Collaborate live with peers to navigate complex algorithmic bottlenecks and architectural refactors.' }
+    ],
+    resources: [
+      { name: 'Atlassian Git Team Workflows Guide', url: 'https://www.atlassian.com/git/tutorials/comparing-workflows', desc: 'Industry-standard guidelines on Gitflow, feature branching, and collaborative development.' },
+      { name: 'Thoughtbot Code Review Guides', url: 'https://github.com/thoughtbot/guides/tree/main/code-review', desc: 'Exemplary principles for conducting constructive, humble, and thorough code reviews.' },
+      { name: 'FreeCodeCamp Open Source Guide', url: 'https://www.freecodecamp.org/news/how-to-contribute-to-open-source/', desc: 'Detailed walkthrough on how to collaborate and contribute effectively to open source repositories.' },
+      { name: 'How to Collaborate on GitHub (YouTube)', url: 'https://www.youtube.com/results?search_query=how+to+collaborate+on+github', desc: 'Video masterclass explaining team forks, pull requests, branch protection, and collaborative review.' }
+    ],
+    projects: [
+      'Multi-Contributor Open Source contribution via tested, reviewed pull request with CI pass.',
+      'Paired collaboration on a multi-module NGO portal with shared git branches and issue tracking.'
+    ]
+  }
+};
+
 function renderSkills() {
   const container = document.getElementById('skillsGrid');
   if (!container) return;
@@ -1230,73 +1754,256 @@ function renderSkills() {
       </div>
       <div class="skill-badge-cloud">
         ${cat.skills.map(s => `
-          <span class="skill-badge-pill">
+          <button class="skill-badge-pill" data-skill="${s}" data-category="${cat.title}" data-icon="${cat.icon}" aria-label="Explore learning pathway for ${s}" title="Click to view step-by-step roadmap and free resources">
             <span class="badge-dot"></span>
-            <span>${s}</span>
-          </span>
+            <span class="skill-pill-name">${s}</span>
+            <span class="skill-learn-hint">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              <span>Learn ↗</span>
+            </span>
+          </button>
         `).join('')}
       </div>
     </div>
   `).join('');
 
+  // Wire up click event handlers for skill pills
+  const skillPills = container.querySelectorAll('.skill-badge-pill');
+  skillPills.forEach(pill => {
+    pill.addEventListener('click', (e) => {
+      e.preventDefault();
+      const skillName = pill.getAttribute('data-skill');
+      const category = pill.getAttribute('data-category');
+      const icon = pill.getAttribute('data-icon');
+      openSkillModal(skillName, category, icon);
+    });
+  });
+
   initDynamic3DCardTilt();
 }
 
 /* ----------------------------------------------------------------
-   12. RENDER FEATURED PROJECTS (100% REAL FROM RESUME, NO FAKE STARS)
+   SKILL LEARNING MODAL CONTROLLER
+   ---------------------------------------------------------------- */
+function openSkillModal(skillName, category, defaultIcon) {
+  const overlay = document.getElementById('skillModalOverlay');
+  const iconEl = document.getElementById('modalSkillIcon');
+  const titleEl = document.getElementById('modalSkillTitle');
+  const catEl = document.getElementById('modalSkillCategory');
+  const timelineEl = document.getElementById('modalRoadmapTimeline');
+  const resourcesEl = document.getElementById('modalResourcesGrid');
+  const projectsEl = document.getElementById('modalProjectsList');
+
+  if (!overlay || !timelineEl || !resourcesEl || !projectsEl) return;
+
+  const data = SKILL_ROADMAP_DATABASE[skillName] || {
+    icon: defaultIcon || '💡',
+    roadmap: [
+      { step: '01', title: 'Core Principles & Foundational Theory', desc: `Master the essential syntax, architecture, and theoretical foundations of ${skillName}.` },
+      { step: '02', title: 'Tools & Standard Practices', desc: `Configure modern development environments, learn idiomatic paradigms, and study official references.` },
+      { step: '03', title: 'Practical Hands-on Implementation', desc: `Build isolated algorithmic solutions and integrate ${skillName} into modular workflows.` },
+      { step: '04', title: 'Optimization & Testing Architecture', desc: `Refactor for peak performance, profile memory and execution speed, and implement unit tests.` },
+      { step: '05', title: 'Production Engineering & Deployment', desc: `Deploy robust solutions to production with monitoring, telemetry, and automated CI/CD.` }
+    ],
+    resources: [
+      { name: `${skillName} Official Documentation`, url: `https://google.com/search?q=${encodeURIComponent(skillName + ' official documentation')}`, desc: `Authoritative specifications and developer reference manual.` },
+      { name: 'FreeCodeCamp Interactive Curriculum', url: 'https://www.freecodecamp.org/', desc: 'Free verified certifications and interactive developer coursework.' },
+      { name: 'Coursera & University MOOCs', url: `https://www.coursera.org/search?query=${encodeURIComponent(skillName)}`, desc: 'Academic and industry courses taught by top global professors.' },
+      { name: `${skillName} Tutorials on YouTube`, url: `https://www.youtube.com/results?search_query=${encodeURIComponent(skillName + ' tutorial course')}`, desc: 'Top curated visual video walkthroughs and programming guides.' }
+    ],
+    projects: [
+      `End-to-end practical application utilizing ${skillName} deployed with a responsive interface.`,
+      `Performance-benchmarked solution testing algorithmic boundary conditions in ${skillName}.`
+    ]
+  };
+
+  iconEl.textContent = data.icon || defaultIcon || '💡';
+  titleEl.textContent = skillName;
+  catEl.textContent = category || 'Verified Competency';
+
+  // Render 5-Step Roadmap
+  timelineEl.innerHTML = data.roadmap.map(item => `
+    <div class="roadmap-step-item">
+      <div class="step-num-badge">${item.step}</div>
+      <div class="step-info">
+        <div class="step-title">${item.title}</div>
+        <p class="step-desc">${item.desc}</p>
+      </div>
+    </div>
+  `).join('');
+
+  // Render Curated Free Resources
+  resourcesEl.innerHTML = data.resources.map(res => `
+    <a href="${res.url}" target="_blank" rel="noopener noreferrer" class="resource-card-link">
+      <div class="resource-card-title-row">
+        <span class="resource-card-name">${res.name}</span>
+        <span class="resource-card-icon">↗</span>
+      </div>
+      <p class="resource-card-desc">${res.desc}</p>
+    </a>
+  `).join('');
+
+  // Render Hands-on Project Ideas
+  projectsEl.innerHTML = data.projects.map(idea => `
+    <li>
+      <span class="idea-marker">✓</span>
+      <span>${idea}</span>
+    </li>
+  `).join('');
+
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function initSkillModal() {
+  const overlay = document.getElementById('skillModalOverlay');
+  const closeBtn = document.getElementById('skillModalClose');
+  const footerCloseBtn = document.getElementById('skillModalCloseFooter');
+
+  if (!overlay) return;
+
+  const closeModal = () => {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  };
+
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (footerCloseBtn) footerCloseBtn.addEventListener('click', closeModal);
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('active')) {
+      closeModal();
+    }
+  });
+}
+
+/* ----------------------------------------------------------------
+   12. RENDER FEATURED PROJECTS (PORTFOLIO #1 WITH LIVE DEMO + ALL VERIFIED PROJECTS)
    ---------------------------------------------------------------- */
 function renderProjects() {
   const filtersContainer = document.getElementById('projectFilters');
   const gridContainer = document.getElementById('projectsGrid');
   if (!gridContainer) return;
 
-  // Exactly the 6 authentic projects from Harshit's resume
+  // Complete roster of 11 authentic projects with Personal Portfolio #1 at top
   const resumeProjects = [
     {
-      name: 'Human Emotion Recognition System',
-      description: 'Designed a real-time facial expression and sentiment detection system using computer vision techniques and trained machine learning models.',
-      category: 'Machine Learning',
-      tags: ['Python', 'AI/ML', 'OpenCV', 'CNN'],
-      url: 'https://github.com/harshit-001-it'
+      name: 'Personal Portfolio Website',
+      description: 'Hardware-accelerated 3D portfolio powered by Three.js WebGL cosmos, realistic dual-layer titanium & acrylic ID badge with lanyard physics, interactive skill learning pathways, and autonomous AI workstations. Deployed live with GitHub Pages & Vercel.',
+      category: 'Web & 3D',
+      tags: ['Three.js', 'WebGL', 'JavaScript', 'Physics Engine', 'Vercel'],
+      url: 'https://github.com/har-001/Personal-Portfolio-Website',
+      liveUrl: 'https://har-001.github.io/Personal-Portfolio-Website/',
+      featured: true,
+      icon: '🌐'
     },
     {
-      name: 'Diabetes Prediction',
-      description: 'Built a predictive web application where users input clinical diagnostic metrics to calculate diabetes vulnerability powered by an optimized machine learning classifier.',
+      name: 'Human Emotion Recognition System',
+      description: 'Real-time facial expression and emotional sentiment detection engine utilizing Deep Learning Convolutional Neural Networks (CNN) and OpenCV for live webcam stream inference.',
+      category: 'Machine Learning',
+      tags: ['Python', 'AI/ML', 'OpenCV', 'CNN', 'Deep Learning'],
+      url: 'https://github.com/harshit-001-it',
+      liveUrl: null,
+      featured: false,
+      icon: '🧠'
+    },
+    {
+      name: 'Diabetes Prediction System',
+      description: 'Predictive clinical diagnostic engine where users input clinical diagnostic metrics to calculate diabetes risk vulnerability powered by an optimized Scikit-Learn classifier.',
       category: 'Machine Learning',
       tags: ['Python', 'Scikit-Learn', 'Classification', 'Healthcare'],
-      url: 'https://github.com/harshit-001-it'
+      url: 'https://github.com/harshit-001-it',
+      liveUrl: null,
+      featured: false,
+      icon: '🩺'
     },
     {
-      name: 'Fake News Prediction',
-      description: 'Developed a natural language processing classifier that evaluates article contents and linguistic patterns to classify news reports as authentic or fabricated.',
+      name: 'Fake News Prediction Pipeline',
+      description: 'Natural language processing classifier that evaluates article contents and linguistic patterns using TF-IDF vectorization and Logistic Regression to classify news as authentic or fabricated.',
       category: 'Machine Learning',
       tags: ['Python', 'NLP', 'TF-IDF', 'Machine Learning'],
-      url: 'https://github.com/harshit-001-it'
+      url: 'https://github.com/harshit-001-it',
+      liveUrl: null,
+      featured: false,
+      icon: '📰'
     },
     {
       name: 'Rock and Stone Prediction with Sonar',
-      description: 'Built a machine learning system that collects and analyzes sonar frequency signals to accurately classify underwater objects as rock or stone.',
+      description: 'Acoustic signal classification system analyzing 60-band underwater sonar frequency reflections to accurately discriminate between submerged metal cylinders and seabed rock formations.',
       category: 'Machine Learning',
-      tags: ['Python', 'NumPy', 'Signal Classification', 'ML'],
-      url: 'https://github.com/harshit-001-it'
+      tags: ['Python', 'NumPy', 'Signal Processing', 'ML Classifier'],
+      url: 'https://github.com/harshit-001-it',
+      liveUrl: null,
+      featured: false,
+      icon: '🌊'
+    },
+    {
+      name: 'Crop Disease Predictor & Plant Pathology',
+      description: 'Computer vision deep learning pipeline using Convolutional Neural Networks (CNN) to detect agricultural diseases and foliage infections from leaf photographs to support crop health.',
+      category: 'Machine Learning',
+      tags: ['Python', 'CNN', 'OpenCV', 'TensorFlow', 'AgriTech'],
+      url: 'https://github.com/harshit-001-it',
+      liveUrl: null,
+      featured: false,
+      icon: '🌿'
+    },
+    {
+      name: 'Autonomous n8n Multi-Portal Job Agent',
+      description: 'Multi-channel autonomous job search automation built with n8n workflow nodes, polling career portals, matching resume criteria, and delivering real-time candidate notifications via webhooks.',
+      category: 'Autonomous Workflows',
+      tags: ['n8n', 'Webhooks', 'API Automation', 'Python'],
+      url: 'https://github.com/har-001/Personal-Portfolio-Website',
+      liveUrl: 'ai-hub.html',
+      featured: false,
+      icon: '⚡'
+    },
+    {
+      name: 'Autonomous n8n Freelance Gig Radar',
+      description: 'Autonomous freelance opportunities aggregator polling remote freelance platforms, evaluating project budget matches, and automatically drafting tailored client proposals.',
+      category: 'Autonomous Workflows',
+      tags: ['n8n', 'Freelance APIs', 'Proposal Bot', 'Automation'],
+      url: 'https://github.com/har-001/Personal-Portfolio-Website',
+      liveUrl: 'ai-hub.html',
+      featured: false,
+      icon: '💼'
+    },
+    {
+      name: 'Inamigos Foundation NGO Donation Portal & Web Modules',
+      description: 'Engineered responsive donation collection interfaces, campaign landing pages, and interactive UI modules for Inamigos Foundation during AI Web Development internship.',
+      category: 'Web & 3D',
+      tags: ['HTML5', 'CSS3', 'JavaScript', 'Responsive UI', 'NGO Portal'],
+      url: 'https://github.com/har-001/Personal-Portfolio-Website',
+      liveUrl: null,
+      featured: false,
+      icon: '🤝'
+    },
+    {
+      name: 'InternPe Modular Python Algorithmic Solutions',
+      description: 'Engineered optimized algorithmic modules, automated file processors, and core data structure workflows during Python Programming internship at InternPe.',
+      category: 'Systems & DB',
+      tags: ['Python 3', 'Data Structures', 'File I/O', 'Automation'],
+      url: 'https://github.com/har-001/Personal-Portfolio-Website',
+      liveUrl: null,
+      featured: false,
+      icon: '⚙️'
     },
     {
       name: 'Library Management System',
-      description: 'Engineered an administrative relational database application to manage complete library operations — adding books, issuing to students, and tracking circulation records.',
-      category: 'Systems',
+      description: 'Administrative relational database application to manage complete library operations — adding books, issuing to students, and tracking borrowing and return records.',
+      category: 'Systems & DB',
       tags: ['Python', 'MySQL', 'Relational DB', 'CRUD'],
-      url: 'https://github.com/har-001/Personal-Portfolio-Website'
-    },
-    {
-      name: 'Personal Portfolio Website',
-      description: 'Built and deployed this personal portfolio to showcase verified skills, machine learning projects, and contact credentials with 3D hardware-accelerated graphics.',
-      category: 'Web Dev',
-      tags: ['React.js', 'Python', 'Three.js', 'WebGL'],
-      url: 'https://github.com/har-001/Personal-Portfolio-Website'
+      url: 'https://github.com/har-001/Personal-Portfolio-Website',
+      liveUrl: null,
+      featured: false,
+      icon: '📚'
     }
   ];
 
-  const categories = ['All', 'Machine Learning', 'Systems', 'Web Dev'];
+  const categories = ['All', 'Machine Learning', 'Autonomous Workflows', 'Web & 3D', 'Systems & DB'];
   if (filtersContainer) {
     filtersContainer.innerHTML = categories.map((c, i) => `
       <button class="filter-btn ${i === 0 ? 'active' : ''}" data-cat="${c}">${c}</button>
@@ -1319,11 +2026,19 @@ function renderProjects() {
       : resumeProjects.filter(p => p.category === filterCat || p.tags.includes(filterCat));
 
     gridContainer.innerHTML = filtered.map(p => `
-      <div class="project-card glass tilt-card reveal">
+      <div class="project-card glass tilt-card reveal ${p.featured ? 'featured-project' : ''}">
+        ${p.featured ? '<div class="project-featured-badge">⭐ #1 Featured Project • Live Demo</div>' : ''}
         <div class="project-card-header">
-          <div class="project-icon-box">🚀</div>
+          <div class="project-icon-box">${p.icon || '🚀'}</div>
           <div class="project-links-row">
-            <a href="${p.url}" target="_blank" rel="noopener" class="icon-link" title="View Source Code on GitHub" aria-label="GitHub Repository">
+            ${p.liveUrl ? `
+              <a href="${p.liveUrl}" target="_blank" rel="noopener noreferrer" class="btn-live-preview" title="Open Live Site">
+                <span class="live-pulse-dot"></span>
+                <span>Live Demo</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            ` : ''}
+            <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="icon-link" title="View Source Code on GitHub" aria-label="GitHub Repository">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
             </a>
           </div>
