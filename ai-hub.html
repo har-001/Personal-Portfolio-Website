@@ -118,14 +118,14 @@
           </div>
 
           <div class="workstation-action">
-            <button class="btn btn-primary hub-launch-btn" data-system="niva">
-              <span>Launch NIVA Assistant</span>
+            <button class="btn btn-primary hub-launch-btn" id="launchNivaBtn" data-system="niva">
+              <span>⚡ Launch NIVA AI Assistant</span>
               <span class="btn-arrow">↗</span>
             </button>
           </div>
         </div>
 
-        <!-- WORKSTATION 2: n8n JOB SEARCH AGENT -->
+        <!-- WORKSTATION 2: n8n JOB SEARCH AGENT (DIRECT OPEN) -->
         <div class="hub-workstation-card glass tilt-card" id="jobAgentCard">
           <div class="card-glow-bg"></div>
           <div class="workstation-top">
@@ -134,7 +134,7 @@
             </div>
             <div class="workstation-status">
               <span class="status-dot cyan"></span>
-              <span>READY FOR LAUNCH</span>
+              <span>DIRECT PIPELINE READY</span>
             </div>
           </div>
 
@@ -147,20 +147,20 @@
           </div>
 
           <div class="workstation-features">
-            <span class="feat-pill">Multi-Portal API</span>
-            <span class="feat-pill">Keyword Matcher</span>
-            <span class="feat-pill">Alert Webhook</span>
+            <span class="feat-pill">Multi-Portal Ingest</span>
+            <span class="feat-pill">AI Match Scorer</span>
+            <span class="feat-pill">Direct Apply ↗</span>
           </div>
 
           <div class="workstation-action">
-            <button class="btn btn-primary hub-launch-btn" data-system="n8n-jobs">
-              <span>Launch Job Search Agent</span>
+            <button class="btn btn-primary hub-launch-btn" id="launchJobAgentBtn" data-system="n8n-jobs">
+              <span>⚡ Open Job Search Agent</span>
               <span class="btn-arrow">↗</span>
             </button>
           </div>
         </div>
 
-        <!-- WORKSTATION 3: n8n FREELANCE GIG FINDER -->
+        <!-- WORKSTATION 3: n8n FREELANCE GIG FINDER (DIRECT OPEN) -->
         <div class="hub-workstation-card glass tilt-card" id="freelanceCard">
           <div class="card-glow-bg"></div>
           <div class="workstation-top">
@@ -169,7 +169,7 @@
             </div>
             <div class="workstation-status">
               <span class="status-dot violet"></span>
-              <span>READY FOR LAUNCH</span>
+              <span>DIRECT RADAR READY</span>
             </div>
           </div>
 
@@ -182,14 +182,14 @@
           </div>
 
           <div class="workstation-features">
-            <span class="feat-pill">Contract Radar</span>
-            <span class="feat-pill">Proposal Drafter</span>
+            <span class="feat-pill">Market Radar</span>
+            <span class="feat-pill">AI Proposal Bot</span>
             <span class="feat-pill">Bid Management</span>
           </div>
 
           <div class="workstation-action">
-            <button class="btn btn-primary hub-launch-btn" data-system="n8n-freelance">
-              <span>Launch Freelance Radar</span>
+            <button class="btn btn-primary hub-launch-btn" id="launchFreelanceBtn" data-system="n8n-freelance">
+              <span>⚡ Open Freelance Radar</span>
               <span class="btn-arrow">↗</span>
             </button>
           </div>
@@ -200,48 +200,132 @@
 
   </main>
 
-  <!-- ===== DEPLOYMENT / LAUNCH CONFIGURATION MODAL ===== -->
-  <div class="hub-modal-overlay" id="launchConfigModal">
-    <div class="hub-modal-window glass launch-config-window">
+  <!-- ===== MODAL 1: n8n JOB SEARCH AGENT CONSOLE (DIRECT OPEN) ===== -->
+  <div class="hub-modal-overlay" id="jobAgentModal">
+    <div class="hub-modal-window glass wide-window">
       <div class="hub-modal-header">
         <div class="modal-header-left">
-          <div class="modal-header-icon" id="launchModalIcon">🚀</div>
+          <div class="modal-header-icon job-color">⚡</div>
           <div>
-            <h3 class="modal-header-title" id="launchModalTitle">System Launch Console</h3>
-            <span class="modal-header-sub" id="launchModalSub">Configure or launch live service endpoint</span>
+            <h3 class="modal-header-title">n8n Remote Job Search Agent</h3>
+            <span class="modal-header-sub">Continuous Opportunity Radar &bull; Multi-Portal Aggregator</span>
           </div>
         </div>
         <div class="modal-header-right">
-          <span class="modal-live-pill"><span class="status-dot green"></span> Ready</span>
-          <button class="hub-modal-close" id="closeLaunchModalBtn" aria-label="Close Launch Modal">&times;</button>
+          <button class="btn btn-secondary trigger-sync-btn" id="syncJobsBtn">
+            <span>Sync n8n Webhook</span> 🔄
+          </button>
+          <button class="hub-modal-close" id="closeJobAgentBtn" aria-label="Close Job Agent">&times;</button>
         </div>
       </div>
 
-      <div class="launch-modal-body">
-        <div class="launch-info-banner">
-          <p id="launchModalDesc">
-            This autonomous workstation is pre-configured and ready for deployment.
-          </p>
-        </div>
-
-        <div class="launch-url-group">
-          <label for="launchUrlInput" class="launch-label">Target Service / Webhook URL</label>
-          <div class="launch-input-wrapper">
-            <input type="url" id="launchUrlInput" class="launch-url-field" placeholder="https://..." />
-            <button class="btn btn-secondary btn-sm" id="saveUrlBtn">Save Endpoint</button>
+      <div class="job-console-body">
+        <!-- Controls & Filters Bar -->
+        <div class="job-filter-bar">
+          <div class="search-input-wrapper">
+            <input type="text" id="jobSearchInput" class="hub-search-field" placeholder="Search title or technology (e.g. Python, Machine Learning)..." />
           </div>
-          <span class="launch-hint">You can add your live link here, or leave it blank to update later. It will be saved automatically.</span>
+          <div class="filter-dropdowns">
+            <select id="jobTypeFilter" class="hub-select-field">
+              <option value="all">All Role Types</option>
+              <option value="Machine Learning">Machine Learning / AI</option>
+              <option value="Python">Python Developer</option>
+              <option value="Data">Data Analytics</option>
+              <option value="Full-Stack">Full-Stack / Web</option>
+            </select>
+            <div class="job-counter-pill">
+              <span id="jobsCount">0</span> Roles Loaded
+            </div>
+          </div>
         </div>
 
-        <div class="launch-actions-footer">
-          <button class="btn btn-primary launch-proceed-btn" id="launchProceedBtn">
-            <span>Open Service In New Tab</span>
-            <span class="btn-arrow">↗</span>
-          </button>
-          <button class="btn btn-secondary" id="cancelLaunchBtn">Dismiss</button>
+        <!-- Workflow Execution Status Strip -->
+        <div class="n8n-workflow-strip">
+          <div class="workflow-node complete"><span class="node-icon">⏱</span> Cron Trigger</div>
+          <div class="workflow-arrow">→</div>
+          <div class="workflow-node complete"><span class="node-icon">🌐</span> Multi-Portal API</div>
+          <div class="workflow-arrow">→</div>
+          <div class="workflow-node complete"><span class="node-icon">🔍</span> Resume Matcher (85%+)</div>
+          <div class="workflow-arrow">→</div>
+          <div class="workflow-node active"><span class="node-icon">📬</span> Dispatch &amp; Alerts</div>
+        </div>
+
+        <!-- Jobs Grid Container -->
+        <div class="jobs-list-container" id="jobsList">
+          <!-- Dynamic Job Cards injected here -->
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- ===== MODAL 2: n8n FREELANCE GIG FINDER CONSOLE (DIRECT OPEN) ===== -->
+  <div class="hub-modal-overlay" id="freelanceModal">
+    <div class="hub-modal-window glass wide-window">
+      <div class="hub-modal-header">
+        <div class="modal-header-left">
+          <div class="modal-header-icon freelance-color">💼</div>
+          <div>
+            <h3 class="modal-header-title">n8n Freelance Gig Finder &amp; Proposal Bot</h3>
+            <span class="modal-header-sub">Global Contract Radar &bull; Automated Tailored Proposals</span>
+          </div>
+        </div>
+        <div class="modal-header-right">
+          <div class="bids-tracker-badge">
+            Bids Sent: <strong id="activeBidsCount">0</strong>
+          </div>
+          <button class="hub-modal-close" id="closeFreelanceBtn" aria-label="Close Freelance Finder">&times;</button>
+        </div>
+      </div>
+
+      <div class="freelance-console-body">
+        <div class="freelance-layout-grid">
+          <!-- Left: Available Gigs Feed -->
+          <div class="gigs-feed-column">
+            <div class="column-header-row">
+              <h4>Active Contract Opportunities</h4>
+              <span class="pulse-tag">Live Feed</span>
+            </div>
+            <div class="gigs-list" id="gigsList">
+              <!-- Dynamically populated gigs -->
+            </div>
+          </div>
+
+          <!-- Right: Intelligent Proposal Generator -->
+          <div class="proposal-generator-column">
+            <div class="proposal-box glass">
+              <div class="proposal-header">
+                <div>
+                  <h4>Automated Proposal Generator</h4>
+                  <p class="subtext">Customized with Harshit's verified competencies</p>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="copyProposalBtn" title="Copy proposal to clipboard">
+                  📋 Copy Text
+                </button>
+              </div>
+
+              <div class="selected-gig-banner" id="selectedGigBanner">
+                <span>Selected Contract:</span> <strong id="selectedGigTitle">Select any contract on the left</strong>
+              </div>
+
+              <textarea class="proposal-textarea" id="proposalText" readonly placeholder="Click 'Generate Proposal' on any gig to draft an authentic bid pitch..."></textarea>
+
+              <div class="proposal-footer-actions">
+                <button class="btn btn-primary" id="submitBidBtn" disabled>
+                  <span>Submit &amp; Track Bid</span> 🚀
+                </button>
+                <span class="bid-status-feedback" id="bidStatusFeedback"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NIVA AI Direct Link Toast Notification -->
+  <div class="ai-hub-toast" id="nivaToast">
+    <span class="toast-icon">⚡</span>
+    <span id="nivaToastMsg">NIVA AI Live Link: Harshit will attach the direct live link here!</span>
   </div>
 
   <!-- Floating Companion Character Selector Dock (Same as Main Page) -->

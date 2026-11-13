@@ -1241,3 +1241,42 @@
   }
 }
 
+/* NIVA AI Direct Link Toast Notification */
+.ai-hub-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: rgba(11, 18, 42, 0.96);
+  backdrop-filter: blur(18px);
+  border: 1.5px solid #00f0ff;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 240, 255, 0.35);
+  padding: 0.95rem 1.6rem;
+  border-radius: var(--radius-full, 9999px);
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.84rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 100000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 90vw;
+  text-align: center;
+}
+
+.ai-hub-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ai-hub-toast .toast-icon {
+  font-size: 1.15rem;
+  color: #00f0ff;
+  filter: drop-shadow(0 0 6px #00f0ff);
+}
+
