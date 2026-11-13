@@ -619,25 +619,55 @@ function initPhysicalTitaniumIDCard() {
     const h = 1500;
     fCtx.save();
 
+    // Premium Luminous Midnight Cyberpunk Gradient (Rich, vibrant & high-contrast)
     const bgGrad = fCtx.createLinearGradient(0, 0, w, h);
-    bgGrad.addColorStop(0, '#0c101d');
-    bgGrad.addColorStop(0.5, '#070a14');
-    bgGrad.addColorStop(1, '#0e1526');
+    bgGrad.addColorStop(0, '#09122c');
+    bgGrad.addColorStop(0.35, '#0d183f');
+    bgGrad.addColorStop(0.7, '#070f26');
+    bgGrad.addColorStop(1, '#14123c');
     fCtx.fillStyle = bgGrad;
     fCtx.fillRect(0, 0, w, h);
 
-    // Circuit grid lines
-    fCtx.strokeStyle = 'rgba(0, 212, 255, 0.15)';
-    fCtx.lineWidth = 2.5;
+    // Glowing Holographic Card Perimeter Rim
+    fCtx.strokeStyle = 'rgba(0, 240, 255, 0.45)';
+    fCtx.lineWidth = 3.5;
     fCtx.beginPath();
-    fCtx.moveTo(60, 200); fCtx.lineTo(964, 200);
-    fCtx.moveTo(60, 740); fCtx.lineTo(964, 740);
-    fCtx.moveTo(60, 1260); fCtx.lineTo(964, 1260);
+    fCtx.roundRect(30, 30, w - 60, h - 60, 26);
     fCtx.stroke();
+
+    // Corner Precision Cyber Tech Brackets
+    fCtx.strokeStyle = '#00f0ff';
+    fCtx.lineWidth = 5;
+    fCtx.beginPath();
+    fCtx.moveTo(25, 75); fCtx.lineTo(25, 25); fCtx.lineTo(75, 25);
+    fCtx.moveTo(w - 75, 25); fCtx.lineTo(w - 25, 25); fCtx.lineTo(w - 25, 75);
+    fCtx.moveTo(25, h - 75); fCtx.lineTo(25, h - 25); fCtx.lineTo(75, h - 25);
+    fCtx.moveTo(w - 75, h - 25); fCtx.lineTo(w - 25, h - 25); fCtx.lineTo(w - 25, h - 75);
+    fCtx.stroke();
+
+    // Subtle Illuminated Cyber Circuit Grid
+    fCtx.strokeStyle = 'rgba(0, 212, 255, 0.18)';
+    fCtx.lineWidth = 2;
+    fCtx.beginPath();
+    fCtx.moveTo(60, 195); fCtx.lineTo(964, 195);
+    fCtx.moveTo(60, 735); fCtx.lineTo(964, 735);
+    fCtx.moveTo(60, 1045); fCtx.lineTo(964, 1045);
+    fCtx.stroke();
+
+    // Circuit solder nodes
+    fCtx.fillStyle = '#00f0ff';
+    [120, 512, 904].forEach(nx => {
+      fCtx.beginPath();
+      fCtx.arc(nx, 195, 4.5, 0, Math.PI * 2);
+      fCtx.fill();
+      fCtx.beginPath();
+      fCtx.arc(nx, 735, 4.5, 0, Math.PI * 2);
+      fCtx.fill();
+    });
 
     // Top Header: College & AKTU
     fCtx.textAlign = 'left';
-    fCtx.fillStyle = '#00d4ff';
+    fCtx.fillStyle = '#00f0ff';
     fCtx.font = 'bold 32px "Space Grotesk", sans-serif';
     fCtx.fillText('IIMT COLLEGE OF ENGINEERING', 80, 115);
 
@@ -765,22 +795,44 @@ function initPhysicalTitaniumIDCard() {
     fCtx.font = '600 19px "JetBrains Mono", monospace';
     fCtx.fillText('ID: HM-2026-IT // BATCH: 2022-2026', 240, 1138);
 
-    // Code 128 Barcode at bottom
-    fCtx.fillStyle = '#ffffff';
-    fCtx.fillRect(80, 1290, 864, 75);
-    fCtx.fillStyle = '#0f172a';
-    const barPattern = [3, 2, 4, 1, 2, 4, 3, 1, 2, 3, 4, 2, 1, 3, 2, 4, 1, 3, 2, 4, 3, 1, 2, 4, 1, 3, 2, 4, 3, 2, 1, 4, 2, 3, 1, 4, 3, 2, 4, 1, 2, 3, 4, 1, 3, 2, 4, 2, 1, 3, 4, 2, 3, 1, 2, 4, 3, 1, 2, 4];
-    let barX = 110;
-    for (let i = 0; i < barPattern.length; i++) {
-      const bW = barPattern[i] * 3.2;
-      if (i % 2 === 0) fCtx.fillRect(barX, 1300, bW, 55);
-      barX += bW + 2;
-    }
+    // Holographic Quantum Security Verification Console (Zero Barcode)
+    const footX = 80;
+    const footY = 1260;
+    const footW = 864;
+    const footH = 120;
+
+    fCtx.fillStyle = 'rgba(0, 212, 255, 0.07)';
+    fCtx.beginPath();
+    fCtx.roundRect(footX, footY, footW, footH, 16);
+    fCtx.fill();
+    fCtx.strokeStyle = 'rgba(0, 212, 255, 0.38)';
+    fCtx.lineWidth = 2;
+    fCtx.stroke();
+
+    // Left Seal: Shield Icon & Clearance Text
+    fCtx.textAlign = 'left';
+    fCtx.fillStyle = '#00f0ff';
+    fCtx.font = 'bold 26px "Space Grotesk", sans-serif';
+    fCtx.fillText('🛡️ SECURE QUANTUM ID', footX + 32, footY + 48);
+
+    fCtx.fillStyle = '#34d399';
+    fCtx.font = 'bold 20px "JetBrains Mono", monospace';
+    fCtx.fillText('● BIOMETRIC-AUTHENTICATED // LEVEL-5', footX + 32, footY + 86);
+
+    // Right Seal: Cryptographic Signature & Validity
+    fCtx.textAlign = 'right';
+    fCtx.fillStyle = '#cbd5e1';
+    fCtx.font = '600 20px "JetBrains Mono", monospace';
+    fCtx.fillText('SHA-256: 7F8E-HM26-AKTU', footX + footW - 32, footY + 48);
+
+    fCtx.fillStyle = '#38bdf8';
+    fCtx.font = '600 18px "JetBrains Mono", monospace';
+    fCtx.fillText('VALIDITY: 2022 – 2026 ACTIVE', footX + footW - 32, footY + 86);
 
     fCtx.fillStyle = '#64748b';
-    fCtx.font = '18px "JetBrains Mono", monospace';
+    fCtx.font = '16px "JetBrains Mono", monospace';
     fCtx.textAlign = 'center';
-    fCtx.fillText('VERIFIED AUTHENTIC CREDENTIAL // CODE-128 AUTH: HM-AKTU-2026', 512, 1400);
+    fCtx.fillText('ENCRYPTED HOLOGRAPHIC CREDENTIAL MATRIX // OFFICIAL AKTU ISSUANCE', 512, 1425);
 
     fCtx.restore();
     frontTexture.needsUpdate = true;
@@ -792,12 +844,31 @@ function initPhysicalTitaniumIDCard() {
     const h = 1500;
     bCtx.save();
 
+    // Matching Premium Luminous Midnight Cyberpunk Gradient
     const bgGrad = bCtx.createLinearGradient(0, 0, w, h);
-    bgGrad.addColorStop(0, '#0c101d');
-    bgGrad.addColorStop(0.5, '#070a14');
-    bgGrad.addColorStop(1, '#0e1526');
+    bgGrad.addColorStop(0, '#09122c');
+    bgGrad.addColorStop(0.35, '#0d183f');
+    bgGrad.addColorStop(0.7, '#070f26');
+    bgGrad.addColorStop(1, '#14123c');
     bCtx.fillStyle = bgGrad;
     bCtx.fillRect(0, 0, w, h);
+
+    // Glowing Holographic Card Perimeter Rim
+    bCtx.strokeStyle = 'rgba(0, 240, 255, 0.45)';
+    bCtx.lineWidth = 3.5;
+    bCtx.beginPath();
+    bCtx.roundRect(30, 30, w - 60, h - 60, 26);
+    bCtx.stroke();
+
+    // Corner Precision Cyber Tech Brackets
+    bCtx.strokeStyle = '#00f0ff';
+    bCtx.lineWidth = 5;
+    bCtx.beginPath();
+    bCtx.moveTo(25, 75); bCtx.lineTo(25, 25); bCtx.lineTo(75, 25);
+    bCtx.moveTo(w - 75, 25); bCtx.lineTo(w - 25, 25); bCtx.lineTo(w - 25, 75);
+    bCtx.moveTo(25, h - 75); bCtx.lineTo(25, h - 25); bCtx.lineTo(75, h - 25);
+    bCtx.moveTo(w - 75, h - 25); bCtx.lineTo(w - 25, h - 25); bCtx.lineTo(w - 25, h - 75);
+    bCtx.stroke();
 
     // Magnetic Stripe
     bCtx.fillStyle = '#020617';
@@ -871,10 +942,16 @@ function initPhysicalTitaniumIDCard() {
     bCtx.fillText('• Diabetes & Heart Disease Prediction Models (Scikit-Learn ML)', 105, 1024);
     bCtx.fillText('• VedoraAI Trading Market Prediction Bot & Platform (Python)', 105, 1062);
 
-    // Signature Strip
-    bCtx.fillStyle = '#f8fafc';
-    bCtx.fillRect(100, 1145, 460, 60);
-    bCtx.fillStyle = '#1e293b';
+    // Frosted Translucent Cyber Signature Panel
+    bCtx.fillStyle = 'rgba(0, 212, 255, 0.08)';
+    bCtx.beginPath();
+    bCtx.roundRect(100, 1145, 460, 60, 10);
+    bCtx.fill();
+    bCtx.strokeStyle = 'rgba(0, 212, 255, 0.35)';
+    bCtx.lineWidth = 1.5;
+    bCtx.stroke();
+
+    bCtx.fillStyle = '#00f0ff';
     bCtx.font = 'italic bold 28px "Space Grotesk", cursive';
     bCtx.fillText('Harshit Mishra', 140, 1188);
 
