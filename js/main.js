@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTypewriter();
   initFullPageSpace3D();
   initPhysicalTitaniumIDCard();
+  initCardBreakoutModal();
   initDynamic3DCardTilt();
   initRevealAnimations();
   initCounters();
@@ -307,24 +308,24 @@ function initPhysicalTitaniumIDCard() {
     return;
   }
 
-  // Realistic Studio Lighting
-  const ambient = new THREE.AmbientLight(0xffffff, 1.4);
+  // Brilliant High-Definition Studio Lighting for Crystal-Clear ID Card
+  const ambient = new THREE.AmbientLight(0xffffff, 2.6);
   scene.add(ambient);
 
-  const keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
-  keyLight.position.set(3, 5, 4);
+  const keyLight = new THREE.DirectionalLight(0xffffff, 3.2);
+  keyLight.position.set(0, 2, 5);
   scene.add(keyLight);
 
-  const cyanBaseLight = new THREE.PointLight(0x00f0ff, 3.5, 8);
-  cyanBaseLight.position.set(0, -1.4, 0.8);
+  const cyanBaseLight = new THREE.PointLight(0x00f0ff, 4.2, 10);
+  cyanBaseLight.position.set(0, -1.4, 1.2);
   scene.add(cyanBaseLight);
 
-  const violetRim = new THREE.DirectionalLight(0xa855f7, 2.0);
-  violetRim.position.set(-3, 3, -3);
+  const violetRim = new THREE.DirectionalLight(0xa855f7, 2.8);
+  violetRim.position.set(-3, 3, -2);
   scene.add(violetRim);
 
-  const frontAccent = new THREE.PointLight(0x00d4ff, 1.8, 6);
-  frontAccent.position.set(0, 0, 2.2);
+  const frontAccent = new THREE.PointLight(0x38bdf8, 3.0, 8);
+  frontAccent.position.set(0, 0, 3.2);
   scene.add(frontAccent);
 
   // Dynamic Floor Shadow Texture
@@ -489,17 +490,27 @@ function initPhysicalTitaniumIDCard() {
     chamberGroup.add(strut);
   }
 
-  // Cylindrical Cyber-Glass Shield
+  // Glowing Hologram Containment Rings (Unobstructed Visibility)
+  const containmentRingGeo = new THREE.TorusGeometry(1.05, 0.016, 12, 48);
+  const containmentRingMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.85 });
+
+  const midRing1 = new THREE.Mesh(containmentRingGeo, containmentRingMat);
+  midRing1.rotation.x = Math.PI / 2;
+  midRing1.position.y = 0.72;
+  chamberGroup.add(midRing1);
+
+  const midRing2 = new THREE.Mesh(containmentRingGeo, containmentRingMat);
+  midRing2.rotation.x = Math.PI / 2;
+  midRing2.position.y = -0.72;
+  chamberGroup.add(midRing2);
+
+  // Sheer Holographic Field (Zero Darkening Transmission)
   const glassGeo = new THREE.CylinderGeometry(1.05, 1.05, 2.50, 32, 1, true);
-  const glassMat = new THREE.MeshPhysicalMaterial({
-    color: 0xffffff,
+  const glassMat = new THREE.MeshBasicMaterial({
+    color: 0x00f0ff,
     transparent: true,
-    opacity: 0.22,
-    roughness: 0.05,
-    metalness: 0.1,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.05,
-    transmission: 0.9,
+    opacity: 0.035,
+    side: THREE.DoubleSide,
     depthWrite: false
   });
   const glassShield = new THREE.Mesh(glassGeo, glassMat);
@@ -561,7 +572,7 @@ function initPhysicalTitaniumIDCard() {
   const passCoreMesh = new THREE.Mesh(passGeo, titaniumMat);
   holoPassGroup.add(passCoreMesh);
 
-  // Canvas Textures for Front & Back
+  // Canvas Textures for Front & Back (High-Anisotropy & Super Crisp)
   const frontCanvas = document.createElement('canvas');
   frontCanvas.width = 1024;
   frontCanvas.height = 1500;
@@ -578,27 +589,25 @@ function initPhysicalTitaniumIDCard() {
 
   const facePlaneGeo = new THREE.PlaneGeometry(cardW - 0.03, cardH - 0.03);
 
-  const frontMat = new THREE.MeshPhysicalMaterial({
+  const frontMat = new THREE.MeshStandardMaterial({
     map: frontTexture,
     transparent: true,
-    roughness: 0.18,
-    metalness: 0.15,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.06,
-    reflectivity: 0.85
+    roughness: 0.15,
+    metalness: 0.05,
+    emissive: 0x0a1632,
+    emissiveIntensity: 0.38
   });
   const frontMesh = new THREE.Mesh(facePlaneGeo, frontMat);
   frontMesh.position.z = cardThick / 2 + 0.018;
   holoPassGroup.add(frontMesh);
 
-  const backMat = new THREE.MeshPhysicalMaterial({
+  const backMat = new THREE.MeshStandardMaterial({
     map: backTexture,
     transparent: true,
-    roughness: 0.18,
-    metalness: 0.15,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.06,
-    reflectivity: 0.85
+    roughness: 0.15,
+    metalness: 0.05,
+    emissive: 0x0a1632,
+    emissiveIntensity: 0.38
   });
   const backMesh = new THREE.Mesh(facePlaneGeo, backMat);
   backMesh.position.z = -(cardThick / 2 + 0.018);
@@ -619,79 +628,86 @@ function initPhysicalTitaniumIDCard() {
     const h = 1500;
     fCtx.save();
 
-    // Premium Luminous Midnight Cyberpunk Gradient (Rich, vibrant & high-contrast)
+    // Vibrant High-Contrast Midnight Cyber Gradient
     const bgGrad = fCtx.createLinearGradient(0, 0, w, h);
-    bgGrad.addColorStop(0, '#09122c');
-    bgGrad.addColorStop(0.35, '#0d183f');
-    bgGrad.addColorStop(0.7, '#070f26');
-    bgGrad.addColorStop(1, '#14123c');
+    bgGrad.addColorStop(0, '#0f2458');
+    bgGrad.addColorStop(0.35, '#132d6e');
+    bgGrad.addColorStop(0.7, '#0b1a42');
+    bgGrad.addColorStop(1, '#1b1c5a');
     fCtx.fillStyle = bgGrad;
     fCtx.fillRect(0, 0, w, h);
 
-    // Glowing Holographic Card Perimeter Rim
-    fCtx.strokeStyle = 'rgba(0, 240, 255, 0.45)';
-    fCtx.lineWidth = 3.5;
+    // Glowing Neon Cyan Perimeter Rim
+    fCtx.strokeStyle = '#00f0ff';
+    fCtx.lineWidth = 4.5;
     fCtx.beginPath();
-    fCtx.roundRect(30, 30, w - 60, h - 60, 26);
+    fCtx.roundRect(28, 28, w - 56, h - 56, 26);
+    fCtx.stroke();
+
+    // Inner bright secondary stroke
+    fCtx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+    fCtx.lineWidth = 2;
+    fCtx.beginPath();
+    fCtx.roundRect(40, 40, w - 80, h - 80, 20);
     fCtx.stroke();
 
     // Corner Precision Cyber Tech Brackets
     fCtx.strokeStyle = '#00f0ff';
-    fCtx.lineWidth = 5;
+    fCtx.lineWidth = 6;
     fCtx.beginPath();
-    fCtx.moveTo(25, 75); fCtx.lineTo(25, 25); fCtx.lineTo(75, 25);
-    fCtx.moveTo(w - 75, 25); fCtx.lineTo(w - 25, 25); fCtx.lineTo(w - 25, 75);
-    fCtx.moveTo(25, h - 75); fCtx.lineTo(25, h - 25); fCtx.lineTo(75, h - 25);
-    fCtx.moveTo(w - 75, h - 25); fCtx.lineTo(w - 25, h - 25); fCtx.lineTo(w - 25, h - 75);
+    fCtx.moveTo(25, 80); fCtx.lineTo(25, 25); fCtx.lineTo(80, 25);
+    fCtx.moveTo(w - 80, 25); fCtx.lineTo(w - 25, 25); fCtx.lineTo(w - 25, 80);
+    fCtx.moveTo(25, h - 80); fCtx.lineTo(25, h - 25); fCtx.lineTo(80, h - 25);
+    fCtx.moveTo(w - 80, h - 25); fCtx.lineTo(w - 25, h - 25); fCtx.lineTo(w - 25, h - 80);
     fCtx.stroke();
 
     // Subtle Illuminated Cyber Circuit Grid
-    fCtx.strokeStyle = 'rgba(0, 212, 255, 0.18)';
+    fCtx.strokeStyle = 'rgba(0, 240, 255, 0.25)';
     fCtx.lineWidth = 2;
     fCtx.beginPath();
-    fCtx.moveTo(60, 195); fCtx.lineTo(964, 195);
-    fCtx.moveTo(60, 735); fCtx.lineTo(964, 735);
-    fCtx.moveTo(60, 1045); fCtx.lineTo(964, 1045);
+    fCtx.moveTo(50, 195); fCtx.lineTo(974, 195);
+    fCtx.moveTo(50, 735); fCtx.lineTo(974, 735);
+    fCtx.moveTo(50, 1045); fCtx.lineTo(974, 1045);
     fCtx.stroke();
 
     // Circuit solder nodes
     fCtx.fillStyle = '#00f0ff';
     [120, 512, 904].forEach(nx => {
       fCtx.beginPath();
-      fCtx.arc(nx, 195, 4.5, 0, Math.PI * 2);
+      fCtx.arc(nx, 195, 5, 0, Math.PI * 2);
       fCtx.fill();
       fCtx.beginPath();
-      fCtx.arc(nx, 735, 4.5, 0, Math.PI * 2);
+      fCtx.arc(nx, 735, 5, 0, Math.PI * 2);
       fCtx.fill();
     });
 
     // Top Header: College & AKTU
     fCtx.textAlign = 'left';
     fCtx.fillStyle = '#00f0ff';
-    fCtx.font = 'bold 32px "Space Grotesk", sans-serif';
+    fCtx.font = 'bold 36px "Space Grotesk", sans-serif';
     fCtx.fillText('IIMT COLLEGE OF ENGINEERING', 80, 115);
 
-    fCtx.fillStyle = '#94a3b8';
-    fCtx.font = '600 21px "JetBrains Mono", monospace';
-    fCtx.fillText('AKTU // DEPT. OF INFORMATION TECHNOLOGY', 80, 150);
+    fCtx.fillStyle = '#e2e8f0';
+    fCtx.font = '700 22px "JetBrains Mono", monospace';
+    fCtx.fillText('AKTU // DEPT. OF INFORMATION TECHNOLOGY', 80, 152);
 
     // Online Status Pill
-    fCtx.fillStyle = 'rgba(16, 185, 129, 0.15)';
+    fCtx.fillStyle = 'rgba(16, 185, 129, 0.22)';
     fCtx.beginPath();
-    fCtx.roundRect(690, 88, 250, 46, 23);
+    fCtx.roundRect(690, 88, 250, 48, 24);
     fCtx.fill();
-    fCtx.strokeStyle = 'rgba(16, 185, 129, 0.45)';
+    fCtx.strokeStyle = '#10b981';
     fCtx.lineWidth = 2;
     fCtx.stroke();
 
     fCtx.fillStyle = '#10b981';
     fCtx.beginPath();
-    fCtx.arc(716, 111, 7, 0, Math.PI * 2);
+    fCtx.arc(716, 112, 8, 0, Math.PI * 2);
     fCtx.fill();
 
     fCtx.fillStyle = '#34d399';
-    fCtx.font = 'bold 19px "JetBrains Mono", monospace';
-    fCtx.fillText('ONLINE // ACTIVE', 736, 118);
+    fCtx.font = 'bold 20px "JetBrains Mono", monospace';
+    fCtx.fillText('ONLINE // ACTIVE', 736, 119);
 
     // Official Portrait Frame
     const cx = 512;
@@ -701,10 +717,10 @@ function initPhysicalTitaniumIDCard() {
     fCtx.save();
     fCtx.beginPath();
     fCtx.arc(cx, cy, r + 8, 0, Math.PI * 2);
-    fCtx.strokeStyle = '#00d4ff';
-    fCtx.lineWidth = 5;
-    fCtx.shadowColor = '#00d4ff';
-    fCtx.shadowBlur = 20;
+    fCtx.strokeStyle = '#00f0ff';
+    fCtx.lineWidth = 6;
+    fCtx.shadowColor = '#00f0ff';
+    fCtx.shadowBlur = 24;
     fCtx.stroke();
     fCtx.restore();
 
@@ -727,35 +743,39 @@ function initPhysicalTitaniumIDCard() {
       fCtx.textAlign = 'left';
     }
 
-    // Name & Title
+    // Name & Title (Pure White & Bright Cyan, razor-sharp)
     fCtx.textAlign = 'center';
+    fCtx.save();
     fCtx.fillStyle = '#ffffff';
-    fCtx.font = '900 58px "Space Grotesk", sans-serif';
+    fCtx.font = '900 66px "Space Grotesk", sans-serif';
+    fCtx.shadowColor = 'rgba(0, 240, 255, 0.8)';
+    fCtx.shadowBlur = 18;
     fCtx.fillText('HARSHIT MISHRA', cx, 815);
+    fCtx.restore();
 
-    fCtx.fillStyle = '#00d4ff';
-    fCtx.font = 'bold 28px "JetBrains Mono", monospace';
-    fCtx.fillText('AI / ML ENGINEER & FULL-STACK DEV', cx, 865);
+    fCtx.fillStyle = '#00f0ff';
+    fCtx.font = 'bold 30px "JetBrains Mono", monospace';
+    fCtx.fillText('AI / ML ENGINEER & FULL-STACK DEV', cx, 866);
 
-    fCtx.fillStyle = '#94a3b8';
-    fCtx.font = '600 23px "Inter", sans-serif';
-    fCtx.fillText('B.Tech CSE (IT) • IIMT College • CGPA: 6.64', cx, 912);
+    fCtx.fillStyle = '#f8fafc';
+    fCtx.font = '700 24px "Inter", sans-serif';
+    fCtx.fillText('B.Tech CSE (IT) • IIMT College • CGPA: 6.64', cx, 914);
 
     // Verified Skills Badges Row
     const badges = ['PYTHON 3', 'MACHINE LEARNING', 'TENSORFLOW', 'REACT.JS'];
     let bx = 90;
     badges.forEach((b) => {
-      fCtx.fillStyle = 'rgba(0, 212, 255, 0.08)';
+      fCtx.fillStyle = 'rgba(0, 240, 255, 0.16)';
       fCtx.beginPath();
-      fCtx.roundRect(bx, 970, 195, 46, 10);
+      fCtx.roundRect(bx, 970, 195, 48, 12);
       fCtx.fill();
-      fCtx.strokeStyle = 'rgba(0, 212, 255, 0.28)';
-      fCtx.lineWidth = 1.5;
+      fCtx.strokeStyle = '#00f0ff';
+      fCtx.lineWidth = 1.8;
       fCtx.stroke();
 
-      fCtx.fillStyle = '#e2e8f0';
-      fCtx.font = 'bold 19px "JetBrains Mono", monospace';
-      fCtx.fillText(b, bx + 97, 1000);
+      fCtx.fillStyle = '#ffffff';
+      fCtx.font = 'bold 20px "JetBrains Mono", monospace';
+      fCtx.fillText(b, bx + 97, 1001);
       bx += 215;
     });
 
@@ -780,7 +800,7 @@ function initPhysicalTitaniumIDCard() {
     fCtx.lineWidth = 2;
     fCtx.stroke();
 
-    fCtx.strokeStyle = 'rgba(120, 53, 15, 0.75)';
+    fCtx.strokeStyle = 'rgba(120, 53, 15, 0.85)';
     fCtx.lineWidth = 2;
     fCtx.beginPath();
     fCtx.moveTo(chipX + 8, chipY + chipH / 2);
@@ -788,51 +808,52 @@ function initPhysicalTitaniumIDCard() {
     fCtx.stroke();
 
     // Security Clearance Text
-    fCtx.fillStyle = '#64748b';
-    fCtx.font = 'bold 20px "JetBrains Mono", monospace';
-    fCtx.fillText('CLEARANCE: LEVEL-5 ACTIVE', 240, 1105);
     fCtx.fillStyle = '#38bdf8';
-    fCtx.font = '600 19px "JetBrains Mono", monospace';
-    fCtx.fillText('ID: HM-2026-IT // BATCH: 2022-2026', 240, 1138);
+    fCtx.font = 'bold 22px "JetBrains Mono", monospace';
+    fCtx.fillText('CLEARANCE: LEVEL-5 ACTIVE', 240, 1105);
+    fCtx.fillStyle = '#f8fafc';
+    fCtx.font = '700 21px "JetBrains Mono", monospace';
+    fCtx.fillText('ID: HM-2026-IT // BATCH: 2022-2026', 240, 1140);
 
     // Holographic Quantum Security Verification Console (Zero Barcode)
     const footX = 80;
-    const footY = 1260;
+    const footY = 1250;
     const footW = 864;
-    const footH = 120;
+    const footH = 125;
 
-    fCtx.fillStyle = 'rgba(0, 212, 255, 0.07)';
+    fCtx.fillStyle = 'rgba(0, 240, 255, 0.1)';
     fCtx.beginPath();
     fCtx.roundRect(footX, footY, footW, footH, 16);
     fCtx.fill();
-    fCtx.strokeStyle = 'rgba(0, 212, 255, 0.38)';
-    fCtx.lineWidth = 2;
+    fCtx.strokeStyle = 'rgba(0, 240, 255, 0.55)';
+    fCtx.lineWidth = 2.2;
     fCtx.stroke();
 
     // Left Seal: Shield Icon & Clearance Text
     fCtx.textAlign = 'left';
     fCtx.fillStyle = '#00f0ff';
-    fCtx.font = 'bold 26px "Space Grotesk", sans-serif';
+    fCtx.font = 'bold 28px "Space Grotesk", sans-serif';
     fCtx.fillText('🛡️ SECURE QUANTUM ID', footX + 32, footY + 48);
 
     fCtx.fillStyle = '#34d399';
-    fCtx.font = 'bold 20px "JetBrains Mono", monospace';
-    fCtx.fillText('● BIOMETRIC-AUTHENTICATED // LEVEL-5', footX + 32, footY + 86);
+    fCtx.font = 'bold 21px "JetBrains Mono", monospace';
+    fCtx.fillText('● BIOMETRIC-AUTHENTICATED // LEVEL-5', footX + 32, footY + 88);
 
     // Right Seal: Cryptographic Signature & Validity
     fCtx.textAlign = 'right';
-    fCtx.fillStyle = '#cbd5e1';
-    fCtx.font = '600 20px "JetBrains Mono", monospace';
+    fCtx.fillStyle = '#f1f5f9';
+    fCtx.font = '700 21px "JetBrains Mono", monospace';
     fCtx.fillText('SHA-256: 7F8E-HM26-AKTU', footX + footW - 32, footY + 48);
 
     fCtx.fillStyle = '#38bdf8';
-    fCtx.font = '600 18px "JetBrains Mono", monospace';
-    fCtx.fillText('VALIDITY: 2022 – 2026 ACTIVE', footX + footW - 32, footY + 86);
+    fCtx.font = '700 19px "JetBrains Mono", monospace';
+    fCtx.fillText('VALIDITY: 2022 – 2026 ACTIVE', footX + footW - 32, footY + 88);
 
-    fCtx.fillStyle = '#64748b';
-    fCtx.font = '16px "JetBrains Mono", monospace';
+    // Dynamic Pop-out Prompt
+    fCtx.fillStyle = '#00f0ff';
+    fCtx.font = 'bold 22px "JetBrains Mono", monospace';
     fCtx.textAlign = 'center';
-    fCtx.fillText('ENCRYPTED HOLOGRAPHIC CREDENTIAL MATRIX // OFFICIAL AKTU ISSUANCE', 512, 1425);
+    fCtx.fillText('⚡ CLICK CARD TO BREAK OUT & INSPECT IN HD ⚡', 512, 1425);
 
     fCtx.restore();
     frontTexture.needsUpdate = true;
@@ -844,30 +865,30 @@ function initPhysicalTitaniumIDCard() {
     const h = 1500;
     bCtx.save();
 
-    // Matching Premium Luminous Midnight Cyberpunk Gradient
+    // Matching Vibrant Midnight Gradient
     const bgGrad = bCtx.createLinearGradient(0, 0, w, h);
-    bgGrad.addColorStop(0, '#09122c');
-    bgGrad.addColorStop(0.35, '#0d183f');
-    bgGrad.addColorStop(0.7, '#070f26');
-    bgGrad.addColorStop(1, '#14123c');
+    bgGrad.addColorStop(0, '#0f2458');
+    bgGrad.addColorStop(0.35, '#132d6e');
+    bgGrad.addColorStop(0.7, '#0b1a42');
+    bgGrad.addColorStop(1, '#1b1c5a');
     bCtx.fillStyle = bgGrad;
     bCtx.fillRect(0, 0, w, h);
 
     // Glowing Holographic Card Perimeter Rim
-    bCtx.strokeStyle = 'rgba(0, 240, 255, 0.45)';
-    bCtx.lineWidth = 3.5;
+    bCtx.strokeStyle = '#a855f7';
+    bCtx.lineWidth = 4.5;
     bCtx.beginPath();
-    bCtx.roundRect(30, 30, w - 60, h - 60, 26);
+    bCtx.roundRect(28, 28, w - 56, h - 56, 26);
     bCtx.stroke();
 
-    // Corner Precision Cyber Tech Brackets
-    bCtx.strokeStyle = '#00f0ff';
-    bCtx.lineWidth = 5;
+    // Corner Tech Brackets
+    bCtx.strokeStyle = '#a855f7';
+    bCtx.lineWidth = 6;
     bCtx.beginPath();
-    bCtx.moveTo(25, 75); bCtx.lineTo(25, 25); bCtx.lineTo(75, 25);
-    bCtx.moveTo(w - 75, 25); bCtx.lineTo(w - 25, 25); bCtx.lineTo(w - 25, 75);
-    bCtx.moveTo(25, h - 75); bCtx.lineTo(25, h - 25); bCtx.lineTo(75, h - 25);
-    bCtx.moveTo(w - 75, h - 25); bCtx.lineTo(w - 25, h - 25); bCtx.lineTo(w - 25, h - 75);
+    bCtx.moveTo(25, 80); bCtx.lineTo(25, 25); bCtx.lineTo(80, 25);
+    bCtx.moveTo(w - 80, 25); bCtx.lineTo(w - 25, 25); bCtx.lineTo(w - 25, 80);
+    bCtx.moveTo(25, h - 80); bCtx.lineTo(25, h - 25); bCtx.lineTo(80, h - 25);
+    bCtx.moveTo(w - 80, h - 25); bCtx.lineTo(w - 25, h - 25); bCtx.lineTo(w - 25, h - 80);
     bCtx.stroke();
 
     // Magnetic Stripe
@@ -876,66 +897,73 @@ function initPhysicalTitaniumIDCard() {
     bCtx.fillStyle = '#334155';
     bCtx.fillRect(0, 75, w, 40);
 
-    bCtx.fillStyle = '#00d4ff';
-    bCtx.font = 'bold 32px "Space Grotesk", sans-serif';
+    bCtx.fillStyle = '#00f0ff';
+    bCtx.font = 'bold 34px "Space Grotesk", sans-serif';
     bCtx.fillText('ACADEMIC & PROFESSIONAL CREDENTIALS', 80, 195);
 
-    bCtx.fillStyle = '#94a3b8';
-    bCtx.font = '600 21px "JetBrains Mono", monospace';
+    bCtx.fillStyle = '#e2e8f0';
+    bCtx.font = '700 22px "JetBrains Mono", monospace';
     bCtx.fillText('VERIFIED RECORD // HARSHIT MISHRA', 80, 230);
 
     // Academic Section
-    bCtx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+    bCtx.fillStyle = 'rgba(255, 255, 255, 0.04)';
     bCtx.beginPath();
     bCtx.roundRect(70, 265, 884, 250, 14);
     bCtx.fill();
-    bCtx.strokeStyle = 'rgba(0, 212, 255, 0.2)';
-    bCtx.lineWidth = 1.5;
+    bCtx.strokeStyle = 'rgba(0, 240, 255, 0.35)';
+    bCtx.lineWidth = 1.8;
     bCtx.stroke();
 
-    bCtx.fillStyle = '#00d4ff';
-    bCtx.font = 'bold 26px "Space Grotesk", sans-serif';
+    bCtx.fillStyle = '#00f0ff';
+    bCtx.font = 'bold 28px "Space Grotesk", sans-serif';
     bCtx.fillText('🎓 Verified Academic Milestones', 105, 315);
 
-    bCtx.fillStyle = '#cbd5e1';
-    bCtx.font = '500 22px "Inter", sans-serif';
+    bCtx.fillStyle = '#ffffff';
+    bCtx.font = '600 23px "Inter", sans-serif';
     bCtx.fillText('• B.Tech in CSE (IT) — IIMT College of Engineering (CGPA: 6.64)', 105, 365);
     bCtx.fillText('• Class XII CBSE — Army Public School, Lucknow (71.6% • 2023)', 105, 415);
     bCtx.fillText('• Class X CBSE — Army Public School, Lucknow (91.4% • 2021)', 105, 465);
 
     // Internships Section
-    bCtx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+    bCtx.fillStyle = 'rgba(255, 255, 255, 0.04)';
     bCtx.beginPath();
     bCtx.roundRect(70, 540, 884, 250, 14);
     bCtx.fill();
-    bCtx.strokeStyle = 'rgba(168, 85, 247, 0.2)';
+    bCtx.strokeStyle = 'rgba(168, 85, 247, 0.35)';
     bCtx.stroke();
 
-    bCtx.fillStyle = '#a855f7';
-    bCtx.font = 'bold 26px "Space Grotesk", sans-serif';
+    bCtx.fillStyle = '#c084fc';
+    bCtx.font = 'bold 28px "Space Grotesk", sans-serif';
     bCtx.fillText('💼 Verified Industrial Internships', 105, 590);
 
-    bCtx.fillStyle = '#cbd5e1';
-    bCtx.font = '500 22px "Inter", sans-serif';
+    bCtx.fillStyle = '#ffffff';
+    bCtx.font = '600 23px "Inter", sans-serif';
     bCtx.fillText('• AI Web Developer — Inamigos Foundation (Jul 2026 – Aug 2026)', 105, 640);
+    bCtx.fillStyle = '#cbd5e1';
+    bCtx.font = '500 20px "Inter", sans-serif';
     bCtx.fillText('  Engineered NGO donation portal and responsive web modules.', 105, 678);
+
+    bCtx.fillStyle = '#ffffff';
+    bCtx.font = '600 23px "Inter", sans-serif';
     bCtx.fillText('• Python Programming Intern — InternPe (May 2025 – Jun 2025)', 105, 725);
+    bCtx.fillStyle = '#cbd5e1';
+    bCtx.font = '500 20px "Inter", sans-serif';
     bCtx.fillText('  Built modular Python scripts, algorithms, and data structures.', 105, 763);
 
     // GitHub Repositories Section
-    bCtx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+    bCtx.fillStyle = 'rgba(255, 255, 255, 0.04)';
     bCtx.beginPath();
     bCtx.roundRect(70, 815, 884, 300, 14);
     bCtx.fill();
-    bCtx.strokeStyle = 'rgba(16, 185, 129, 0.25)';
+    bCtx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
     bCtx.stroke();
 
     bCtx.fillStyle = '#34d399';
-    bCtx.font = 'bold 26px "Space Grotesk", sans-serif';
+    bCtx.font = 'bold 28px "Space Grotesk", sans-serif';
     bCtx.fillText('🚀 Verified GitHub Repositories (@har-001 & @harshit-001-it)', 105, 865);
 
-    bCtx.fillStyle = '#cbd5e1';
-    bCtx.font = '500 20px "Inter", sans-serif';
+    bCtx.fillStyle = '#ffffff';
+    bCtx.font = '600 21px "Inter", sans-serif';
     bCtx.fillText('• Personal Portfolio Website (3D WebGL, Physics) [LIVE DEMO]', 105, 910);
     bCtx.fillText('• NIVA AI Task & Conversational Assistant (Python, LLM)', 105, 948);
     bCtx.fillText('• Human Emotion Recognition System (CNN, OpenCV, Deep Learning)', 105, 986);
@@ -943,27 +971,27 @@ function initPhysicalTitaniumIDCard() {
     bCtx.fillText('• VedoraAI Trading Market Prediction Bot & Platform (Python)', 105, 1062);
 
     // Frosted Translucent Cyber Signature Panel
-    bCtx.fillStyle = 'rgba(0, 212, 255, 0.08)';
+    bCtx.fillStyle = 'rgba(0, 240, 255, 0.12)';
     bCtx.beginPath();
-    bCtx.roundRect(100, 1145, 460, 60, 10);
+    bCtx.roundRect(100, 1145, 460, 62, 10);
     bCtx.fill();
-    bCtx.strokeStyle = 'rgba(0, 212, 255, 0.35)';
-    bCtx.lineWidth = 1.5;
+    bCtx.strokeStyle = 'rgba(0, 240, 255, 0.5)';
+    bCtx.lineWidth = 1.8;
     bCtx.stroke();
 
     bCtx.fillStyle = '#00f0ff';
-    bCtx.font = 'italic bold 28px "Space Grotesk", cursive';
+    bCtx.font = 'italic bold 30px "Space Grotesk", cursive';
     bCtx.fillText('Harshit Mishra', 140, 1188);
 
-    bCtx.fillStyle = '#64748b';
-    bCtx.font = '19px "JetBrains Mono", monospace';
+    bCtx.fillStyle = '#38bdf8';
+    bCtx.font = 'bold 20px "JetBrains Mono", monospace';
     bCtx.fillText('OFFICIAL GITHUB: github.com/har-001', 100, 1235);
     bCtx.fillText('SECONDARY REPO: github.com/harshit-001-it', 100, 1265);
 
-    bCtx.fillStyle = '#94a3b8';
+    bCtx.fillStyle = '#00f0ff';
     bCtx.textAlign = 'center';
-    bCtx.font = 'bold 23px "Space Grotesk", sans-serif';
-    bCtx.fillText('Click to flip back to front face ↺', 512, 1370);
+    bCtx.font = 'bold 24px "Space Grotesk", sans-serif';
+    bCtx.fillText('⚡ CLICK CARD TO BREAK OUT & INSPECT IN HD ⚡', 512, 1370);
 
     bCtx.restore();
     backTexture.needsUpdate = true;
@@ -1198,27 +1226,21 @@ function initPhysicalTitaniumIDCard() {
     isDragging = false;
   }
 
-  // Guaranteed Click Handler
+  // Guaranteed Click Handler - Fires Shockwave & Breaks Out into Full 3D Inspection ("tut ke bahar aaye")
   stage.addEventListener('click', (e) => {
     if (e.target && e.target.closest('#cardResetBtn')) return;
+    if (e.target && e.target.closest('#cardBreakoutTriggerBtn')) return;
     if (totalDragDist > 18) return;
 
-    // Trigger Energy Pulse
+    // Trigger Visual Energy Pulse & Pod Shockwave Recoil
     pulseActive = true;
     pulseScale = 0.1;
-    pulseOpacity = 0.95;
-    pulseRecoil = 0.08;
+    pulseOpacity = 1.0;
+    pulseRecoil = 0.14;
 
-    // In Holo-ID mode, also flip front/back
-    if (currentMode === 'holo-pass') {
-      isFlipped = !isFlipped;
-      targetRotY = isFlipped ? Math.PI : 0;
-      targetRotX = 0;
-      if (hintText) {
-        hintText.textContent = isFlipped
-          ? 'Back Face: Verified Credentials • Click to flip front ↺'
-          : 'Front Face: Verified Pass • Click to flip back ↻';
-      }
+    // Trigger Breakout into Full High-Definition 3D Inspection Modal
+    if (typeof openCardBreakoutModal === 'function') {
+      openCardBreakoutModal();
     }
   });
 
@@ -1329,6 +1351,135 @@ function initPhysicalTitaniumIDCard() {
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
+  });
+}
+
+/* ----------------------------------------------------------------
+   6B. 3D CYBER BREAKOUT INSPECTION MODAL CONTROLLER ("TUT KE BAHAR AAYE")
+   ---------------------------------------------------------------- */
+let openCardBreakoutModal = () => {};
+let closeCardBreakoutModal = () => {};
+
+function initCardBreakoutModal() {
+  const breakoutModal = document.getElementById('cardBreakoutModal');
+  const breakoutBackdrop = document.getElementById('cardBreakoutBackdrop');
+  const breakoutCloseBtn = document.getElementById('breakoutCloseTriggerBtn');
+  const breakoutFlipBtn = document.getElementById('breakoutFlipTriggerBtn');
+  const breakoutCard3D = document.getElementById('breakoutCard3D');
+  const breakoutCardStage = document.getElementById('breakoutCardStage');
+  const breakoutTriggerBtn = document.getElementById('cardBreakoutTriggerBtn');
+  const glareFront = document.getElementById('breakoutGlareFront');
+  const glareBack = document.getElementById('breakoutGlareBack');
+
+  if (!breakoutModal) return;
+
+  let breakoutFlipped = false;
+
+  openCardBreakoutModal = function() {
+    breakoutModal.classList.add('active');
+    breakoutModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    // Reset card state to front face with crisp upright perspective
+    breakoutFlipped = false;
+    if (breakoutCard3D) {
+      breakoutCard3D.classList.remove('is-flipped');
+      breakoutCard3D.style.transform = 'perspective(1400px) rotateX(0deg) rotateY(0deg)';
+    }
+  };
+
+  closeCardBreakoutModal = function() {
+    breakoutModal.classList.remove('active');
+    breakoutModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  };
+
+  function toggleBreakoutFlip() {
+    if (!breakoutCard3D) return;
+    breakoutFlipped = !breakoutFlipped;
+    breakoutCard3D.classList.toggle('is-flipped', breakoutFlipped);
+  }
+
+  if (breakoutTriggerBtn) {
+    breakoutTriggerBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openCardBreakoutModal();
+    });
+  }
+
+  if (breakoutCloseBtn) {
+    breakoutCloseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeCardBreakoutModal();
+    });
+  }
+
+  if (breakoutBackdrop) {
+    breakoutBackdrop.addEventListener('click', () => {
+      closeCardBreakoutModal();
+    });
+  }
+
+  if (breakoutFlipBtn) {
+    breakoutFlipBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleBreakoutFlip();
+    });
+  }
+
+  if (breakoutCardStage) {
+    // 3D Parallax Tilt with Mouse
+    breakoutCardStage.addEventListener('mousemove', (e) => {
+      if (!breakoutCard3D) return;
+      const rect = breakoutCardStage.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+
+      const rotX = ((y - cy) / cy) * -12;
+      const rotY = ((x - cx) / cx) * 12;
+
+      const baseRotY = breakoutFlipped ? 180 : 0;
+      breakoutCard3D.style.transform = `perspective(1400px) rotateX(${rotX.toFixed(2)}deg) rotateY(${(baseRotY + rotY).toFixed(2)}deg)`;
+
+      // Dynamic Holographic Glare
+      const glareX = `${(x / rect.width) * 100}%`;
+      const glareY = `${(y / rect.height) * 100}%`;
+      if (glareFront) {
+        glareFront.style.setProperty('--glare-x', glareX);
+        glareFront.style.setProperty('--glare-y', glareY);
+      }
+      if (glareBack) {
+        glareBack.style.setProperty('--glare-x', glareX);
+        glareBack.style.setProperty('--glare-y', glareY);
+      }
+    });
+
+    breakoutCardStage.addEventListener('mouseleave', () => {
+      if (!breakoutCard3D) return;
+      const baseRotY = breakoutFlipped ? 180 : 0;
+      breakoutCard3D.style.transform = `perspective(1400px) rotateX(0deg) rotateY(${baseRotY}deg)`;
+    });
+
+    // Click anywhere on card stage to flip front/back
+    breakoutCardStage.addEventListener('click', (e) => {
+      toggleBreakoutFlip();
+    });
+  }
+
+  // Keyboard accessibility: Escape closes modal, Space/Enter flips
+  window.addEventListener('keydown', (e) => {
+    if (breakoutModal && breakoutModal.classList.contains('active')) {
+      if (e.key === 'Escape') {
+        closeCardBreakoutModal();
+      } else if (e.key === ' ' || e.key === 'Enter') {
+        if (!e.target || !e.target.closest('button')) {
+          e.preventDefault();
+          toggleBreakoutFlip();
+        }
+      }
+    }
   });
 }
 

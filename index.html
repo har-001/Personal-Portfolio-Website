@@ -141,6 +141,9 @@
       <div class="hero-col-right">
         <div class="hero-stage-wrapper">
           <div class="cyber-pod-stage" id="idCardStage">
+            <button class="card-breakout-trigger-btn" id="cardBreakoutTriggerBtn" title="Click to Pop-Out &amp; Inspect Card in HD 3D" aria-label="Pop Out Card">
+              <span class="btn-sparkle">⚡</span> Pop-Out &amp; Inspect
+            </button>
             <button class="card-reset-btn" id="cardResetBtn" title="Reset Pod Orientation" aria-label="Reset Pod Orientation">
               ↺ Reset
             </button>
@@ -172,7 +175,7 @@
 
           <div class="card-hint-badge" id="cardHintBadge">
             <span class="hint-icon" id="cardHintIcon">⚡</span>
-            <span id="cardHintText">Drag 360° to inspect • Click pod to fire pulse • Switch modes above ▴</span>
+            <span id="cardHintText">Click Card to Break Out &amp; Inspect in HD • Drag 360° • Switch modes ▴</span>
           </div>
         </div>
       </div>
@@ -603,6 +606,187 @@
             Inspect Original Document 📄 ↗
           </a>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 3D CYBER BREAKOUT INSPECTION MODAL ("TUT KE BAHAR AAYE") ===== -->
+  <div class="card-breakout-modal" id="cardBreakoutModal" aria-hidden="true" role="dialog" aria-label="3D Holographic Identity Pass Quantum Inspection">
+    <div class="card-breakout-backdrop" id="cardBreakoutBackdrop"></div>
+    <div class="card-breakout-container">
+      <!-- Top Cyber HUD Header -->
+      <div class="card-breakout-hud">
+        <div class="breakout-hud-left">
+          <span class="breakout-pulse-dot"></span>
+          <span class="breakout-hud-title">QUANTUM POD BREAKOUT // FULL-DEFINITION 3D INSPECTION</span>
+        </div>
+        <div class="breakout-hud-actions">
+          <button class="breakout-hud-btn breakout-flip-trigger" id="breakoutFlipTriggerBtn" title="Flip Card (Front / Back)" aria-label="Flip Card">
+            <span class="btn-icon">🔄</span>
+            <span>Flip Card</span>
+          </button>
+          <button class="breakout-hud-btn breakout-close-trigger" id="breakoutCloseTriggerBtn" title="Return to Hero Pod" aria-label="Close Inspection">
+            <span class="btn-icon">✕</span>
+            <span>Return to Pod</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3D Perspective Stage -->
+      <div class="breakout-card-stage" id="breakoutCardStage" title="Click anywhere on card to flip front / back • Move mouse to tilt in 3D">
+        <!-- 3D Card Object -->
+        <div class="breakout-card-3d" id="breakoutCard3D">
+          
+          <!-- ================= FRONT FACE ================= -->
+          <div class="breakout-face breakout-face-front">
+            <div class="holographic-glare" id="breakoutGlareFront"></div>
+            
+            <!-- Tech Corner Brackets -->
+            <div class="card-corner-bracket top-left"></div>
+            <div class="card-corner-bracket top-right"></div>
+            <div class="card-corner-bracket bottom-left"></div>
+            <div class="card-corner-bracket bottom-right"></div>
+
+            <!-- Card Header -->
+            <div class="breakout-card-header">
+              <div class="breakout-header-text">
+                <div class="college-title">IIMT COLLEGE OF ENGINEERING</div>
+                <div class="college-sub">AKTU // DEPT. OF INFORMATION TECHNOLOGY</div>
+              </div>
+              <div class="breakout-status-pill">
+                <span class="status-live-beacon"></span>
+                <span>ONLINE // ACTIVE</span>
+              </div>
+            </div>
+
+            <!-- Avatar & Identity Core -->
+            <div class="breakout-avatar-section">
+              <div class="breakout-avatar-frame">
+                <img src="image.png" alt="Harshit Mishra - AI/ML Engineer" class="breakout-avatar-img" />
+                <div class="avatar-holo-ring ring-1"></div>
+                <div class="avatar-holo-ring ring-2"></div>
+              </div>
+              <h2 class="breakout-name">HARSHIT MISHRA</h2>
+              <div class="breakout-role">AI / ML ENGINEER &amp; FULL-STACK DEVELOPER</div>
+              <div class="breakout-degree">B.Tech CSE (IT) • IIMT College of Engineering • CGPA: 6.64</div>
+            </div>
+
+            <!-- Verified Skills Badges Grid -->
+            <div class="breakout-skills-chips">
+              <span class="breakout-chip">PYTHON 3</span>
+              <span class="breakout-chip">MACHINE LEARNING</span>
+              <span class="breakout-chip">TENSORFLOW</span>
+              <span class="breakout-chip">REACT.JS</span>
+              <span class="breakout-chip">DEEP LEARNING</span>
+              <span class="breakout-chip">OPENCV</span>
+            </div>
+
+            <!-- Hardware Security Chip & Clearance -->
+            <div class="breakout-chip-row">
+              <div class="breakout-emv-chip" title="Hardware Security Smart Chip">
+                <div class="chip-line line-h"></div>
+                <div class="chip-line line-v"></div>
+                <div class="chip-core"></div>
+              </div>
+              <div class="breakout-clearance-meta">
+                <div class="clearance-level">CLEARANCE: LEVEL-5 ACTIVE</div>
+                <div class="clearance-batch">ID: HM-2026-IT // BATCH: 2022-2026</div>
+              </div>
+            </div>
+
+            <!-- Quantum Security Verification Console (Zero Barcode) -->
+            <div class="breakout-quantum-console">
+              <div class="quantum-console-left">
+                <div class="console-badge-title">🛡️ SECURE QUANTUM ID</div>
+                <div class="console-badge-sub">● BIOMETRIC-AUTHENTICATED // LEVEL-5</div>
+              </div>
+              <div class="quantum-console-right">
+                <div class="console-sig">SHA-256: 7F8E-HM26-AKTU</div>
+                <div class="console-validity">VALIDITY: 2022 – 2026 ACTIVE</div>
+              </div>
+            </div>
+
+            <!-- Interactive Hint Prompt -->
+            <div class="breakout-card-prompt">
+              <span>🔄 Click anywhere to flip credentials back face &bull; Tilt mouse in 3D</span>
+            </div>
+          </div>
+
+          <!-- ================= BACK FACE ================= -->
+          <div class="breakout-face breakout-face-back">
+            <div class="holographic-glare" id="breakoutGlareBack"></div>
+
+            <!-- Tech Corner Brackets -->
+            <div class="card-corner-bracket top-left"></div>
+            <div class="card-corner-bracket top-right"></div>
+            <div class="card-corner-bracket bottom-left"></div>
+            <div class="card-corner-bracket bottom-right"></div>
+
+            <!-- Magnetic Encrypted Stripe -->
+            <div class="breakout-magnetic-stripe">
+              <div class="mag-holo-track"></div>
+            </div>
+
+            <div class="breakout-back-header">
+              <div class="back-title">ACADEMIC &amp; PROFESSIONAL CREDENTIALS</div>
+              <div class="back-subtitle">OFFICIAL VERIFIED RECORD // HARSHIT MISHRA</div>
+            </div>
+
+            <!-- Academic Milestones -->
+            <div class="breakout-section-box">
+              <div class="box-heading">🎓 Verified Academic Milestones</div>
+              <ul class="breakout-list">
+                <li><strong>B.Tech in CSE (IT)</strong> — IIMT College of Engineering (CGPA: 6.64)</li>
+                <li><strong>Class XII CBSE</strong> — Army Public School, Lucknow (71.6% • 2023)</li>
+                <li><strong>Class X CBSE</strong> — Army Public School, Lucknow (91.4% • 2021)</li>
+              </ul>
+            </div>
+
+            <!-- Industrial Internships -->
+            <div class="breakout-section-box purple">
+              <div class="box-heading">💼 Verified Industrial Internships</div>
+              <ul class="breakout-list">
+                <li><strong>AI Web Developer</strong> — Inamigos Foundation (Jul 2026 – Aug 2026)<br /><span class="list-sub">Engineered NGO donation portal and responsive web modules.</span></li>
+                <li><strong>Python Programming Intern</strong> — InternPe (May 2025 – Jun 2025)<br /><span class="list-sub">Built modular Python scripts, algorithms, and data structures.</span></li>
+              </ul>
+            </div>
+
+            <!-- GitHub Repositories -->
+            <div class="breakout-section-box green">
+              <div class="box-heading">🚀 Verified GitHub Repositories (@har-001 &amp; @harshit-001-it)</div>
+              <ul class="breakout-list compact">
+                <li>• Personal Portfolio Website (3D WebGL, Physics) <span class="tag-live">[LIVE DEMO]</span></li>
+                <li>• NIVA AI Task &amp; Conversational Assistant (Python, LLM)</li>
+                <li>• Human Emotion Recognition System (CNN, OpenCV, Deep Learning)</li>
+                <li>• Diabetes &amp; Heart Disease Prediction Models (Scikit-Learn ML)</li>
+                <li>• VedoraAI Trading Market Prediction Bot &amp; Platform (Python)</li>
+              </ul>
+            </div>
+
+            <!-- Digital Holographic Signature & Verification -->
+            <div class="breakout-sig-row">
+              <div class="breakout-sig-box">
+                <span class="sig-cursive">Harshit Mishra</span>
+                <span class="sig-label">AUTHORIZED CRYPTOGRAPHIC SIGNATURE</span>
+              </div>
+              <div class="breakout-links-box">
+                <div class="link-item">github.com/har-001</div>
+                <div class="link-item">github.com/harshit-001-it</div>
+              </div>
+            </div>
+
+            <!-- Interactive Hint Prompt -->
+            <div class="breakout-card-prompt">
+              <span>↺ Click anywhere to flip front face &bull; [Esc] to return to pod</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Bottom Hint Bar -->
+      <div class="breakout-footer-hud">
+        <span>⚡ 3D Real-Time Physics Active • Mouse-tilt parallax • Click card or button to rotate 180°</span>
       </div>
     </div>
   </div>
