@@ -1,7 +1,7 @@
 /* ================================================================
-   HARSHIT MISHRA — MAIN APPLICATION SCRIPT
-   Hardware-Accelerated Three.js Universe • Physical Titanium Badge
-   Interactive Lanyard & Physics • 3D Card Tilt • Real Portfolio Data
+   HARSHIT MISHRA — MAIN APPLICATION SCRIPT (VERIFIED REAL DATA)
+   Hardware-Accelerated Three.js Universe • Physical Acrylic & Titanium Badge
+   Tactile Lanyard Physics • 3D Card Tilt • 100% Authentic Resume Data
    ================================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initDynamic3DCardTilt();
   initRevealAnimations();
   initCounters();
+  renderEducation();
   renderSkills();
   renderProjects();
   renderCertificates();
@@ -101,183 +102,139 @@ function initTypewriter() {
   const el = document.getElementById('typewriter');
   if (!el) return;
 
-  const words = [
+  // Authentic specializations strictly from Harshit's resume
+  const phrases = [
     'Machine Learning',
+    'Python Architecture',
     'Neural Networks',
-    'Python Engineering',
-    'Data Analytics',
+    'TensorFlow Modeling',
+    'Computer Vision',
     'Full-Stack Systems'
   ];
 
-  let wordIdx = 0;
+  let phraseIdx = 0;
   let charIdx = 0;
   let isDeleting = false;
-  let delay = 140;
+  let typeSpeed = 90;
 
   function type() {
-    const currentWord = words[wordIdx];
+    const current = phrases[phraseIdx];
 
     if (isDeleting) {
-      el.textContent = currentWord.substring(0, charIdx - 1);
+      el.textContent = current.substring(0, charIdx - 1);
       charIdx--;
-      delay = 60;
+      typeSpeed = 45;
     } else {
-      el.textContent = currentWord.substring(0, charIdx + 1);
+      el.textContent = current.substring(0, charIdx + 1);
       charIdx++;
-      delay = 120;
+      typeSpeed = 100;
     }
 
-    if (!isDeleting && charIdx === currentWord.length) {
-      delay = 2000;
+    if (!isDeleting && charIdx === current.length) {
       isDeleting = true;
+      typeSpeed = 1800; // Pause at end of word
     } else if (isDeleting && charIdx === 0) {
       isDeleting = false;
-      wordIdx = (wordIdx + 1) % words.length;
-      delay = 400;
+      phraseIdx = (phraseIdx + 1) % phrases.length;
+      typeSpeed = 350;
     }
 
-    setTimeout(type, delay);
+    setTimeout(type, typeSpeed);
   }
 
   type();
 }
 
 /* ----------------------------------------------------------------
-   5. FULL-PAGE CONTINUOUS 3D SPACE CANVAS (THREE.JS)
-   Volumetric deep-space starfield with floating low-poly crystals
-   and smooth continuous scroll fly-through camera travel
+   5. FULL-PAGE THREE.JS BACKGROUND (DYNAMIC PARTICLE UNIVERSE)
    ---------------------------------------------------------------- */
 function initFullPageSpace3D() {
   const canvas = document.getElementById('webglCanvas');
   if (!canvas || typeof THREE === 'undefined') return;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
-  camera.position.set(0, 0, 500);
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 100;
 
-  const renderer = new THREE.WebGLRenderer({
-    canvas: canvas,
-    alpha: true,
-    antialias: true,
-    powerPreference: 'high-performance'
-  });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  } catch (e) {
+    console.warn('WebGL initialization failed for background:', e);
+    return;
+  }
 
-  // Volumetric Starfield Particles
-  const starCount = 2000;
+  // Multi-tier Starfield & Quantum Nodes
+  const starCount = 950;
   const starGeo = new THREE.BufferGeometry();
   const starPositions = new Float32Array(starCount * 3);
   const starColors = new Float32Array(starCount * 3);
 
-  const colorPalette = [
-    new THREE.Color(0x00d4ff),
-    new THREE.Color(0x8b5cf6),
-    new THREE.Color(0x38bdf8),
-    new THREE.Color(0xffffff)
-  ];
+  const cyan = new THREE.Color(0x00d4ff);
+  const violet = new THREE.Color(0x8b5cf6);
+  const white = new THREE.Color(0xffffff);
 
-  for (let i = 0; i < starCount; i++) {
-    const i3 = i * 3;
-    starPositions[i3] = (Math.random() - 0.5) * 2600;
-    starPositions[i3 + 1] = (Math.random() - 0.5) * 3200;
-    starPositions[i3 + 2] = (Math.random() - 0.5) * 2600;
+  for (let i = 0; i < starCount * 3; i += 3) {
+    starPositions[i] = (Math.random() - 0.5) * 450;
+    starPositions[i + 1] = (Math.random() - 0.5) * 450;
+    starPositions[i + 2] = (Math.random() - 0.5) * 300;
 
-    const col = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-    starColors[i3] = col.r;
-    starColors[i3 + 1] = col.g;
-    starColors[i3 + 2] = col.b;
+    const rnd = Math.random();
+    const c = rnd > 0.6 ? cyan : (rnd > 0.3 ? violet : white);
+    starColors[i] = c.r;
+    starColors[i + 1] = c.g;
+    starColors[i + 2] = c.b;
   }
 
   starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
   starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
-  function createParticleTexture() {
-    const pCanvas = document.createElement('canvas');
-    pCanvas.width = 32;
-    pCanvas.height = 32;
-    const pCtx = pCanvas.getContext('2d');
-    const grad = pCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
-    grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    grad.addColorStop(0.35, 'rgba(0, 212, 255, 0.8)');
-    grad.addColorStop(0.7, 'rgba(139, 92, 246, 0.3)');
-    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    pCtx.fillStyle = grad;
-    pCtx.beginPath();
-    pCtx.arc(16, 16, 16, 0, Math.PI * 2);
-    pCtx.fill();
-    return new THREE.CanvasTexture(pCanvas);
-  }
-
   const starMat = new THREE.PointsMaterial({
-    size: 4.5,
+    size: 1.4,
     vertexColors: true,
-    map: createParticleTexture(),
     transparent: true,
-    opacity: 0.85,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
+    opacity: 0.65
   });
 
   const starField = new THREE.Points(starGeo, starMat);
   scene.add(starField);
 
-  // Floating Low-Poly Crystals
-  const crystals = [];
-  const crystalCount = 14;
-  const crystalGeos = [
-    new THREE.IcosahedronGeometry(14, 0),
-    new THREE.OctahedronGeometry(12, 0),
-    new THREE.TetrahedronGeometry(13, 0),
-    new THREE.TorusGeometry(12, 3.5, 8, 16)
-  ];
+  // Floating Cyber Geometric Rings
+  const ringGeo = new THREE.TorusGeometry(32, 0.4, 8, 48);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0x00d4ff,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.12
+  });
+  const floatingRing1 = new THREE.Mesh(ringGeo, ringMat);
+  floatingRing1.position.set(-60, 20, -50);
+  scene.add(floatingRing1);
 
-  for (let i = 0; i < crystalCount; i++) {
-    const geo = crystalGeos[i % crystalGeos.length];
-    const isWire = i % 2 === 0;
-    const crystalMat = new THREE.MeshBasicMaterial({
-      color: i % 3 === 0 ? 0x00d4ff : (i % 3 === 1 ? 0x8b5cf6 : 0x38bdf8),
-      wireframe: isWire,
-      transparent: true,
-      opacity: isWire ? 0.45 : 0.25
-    });
+  const floatingRing2 = floatingRing1.clone();
+  floatingRing2.material = new THREE.MeshBasicMaterial({
+    color: 0x8b5cf6,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.1
+  });
+  floatingRing2.position.set(70, -40, -60);
+  scene.add(floatingRing2);
 
-    const mesh = new THREE.Mesh(geo, crystalMat);
-    mesh.position.set(
-      (Math.random() - 0.5) * 1600,
-      (Math.random() - 0.5) * 2200,
-      (Math.random() - 0.5) * 1400
-    );
-
-    mesh.userData = {
-      rotX: (Math.random() - 0.5) * 0.015,
-      rotY: (Math.random() - 0.5) * 0.015,
-      rotZ: (Math.random() - 0.5) * 0.015,
-      driftSpeed: 0.2 + Math.random() * 0.3,
-      baseY: mesh.position.y
-    };
-
-    crystals.push(mesh);
-    scene.add(mesh);
-  }
-
+  // Mouse Parallax
   let mouseX = 0;
   let mouseY = 0;
   let targetCamX = 0;
   let targetCamY = 0;
-  let targetCamZ = 500;
-  let currentCamZ = 500;
 
   window.addEventListener('mousemove', (e) => {
     mouseX = (e.clientX / window.innerWidth) * 2 - 1;
     mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+    targetCamX = mouseX * 8;
+    targetCamY = mouseY * 8;
   }, { passive: true });
-
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
 
   const clock = new THREE.Clock();
 
@@ -285,36 +242,30 @@ function initFullPageSpace3D() {
     requestAnimationFrame(animate);
     const elapsed = clock.getElapsedTime();
 
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const scrollFraction = docHeight > 0 ? (window.scrollY / docHeight) : 0;
-
-    targetCamZ = 500 - (scrollFraction * 900);
-    currentCamZ += (targetCamZ - currentCamZ) * 0.06;
-    camera.position.z = currentCamZ;
-
-    targetCamX = mouseX * 80;
-    targetCamY = mouseY * 50 - (scrollFraction * 200);
     camera.position.x += (targetCamX - camera.position.x) * 0.05;
     camera.position.y += (targetCamY - camera.position.y) * 0.05;
 
     starField.rotation.y = elapsed * 0.015;
     starField.rotation.x = elapsed * 0.008;
 
-    crystals.forEach((c) => {
-      c.rotation.x += c.userData.rotX;
-      c.rotation.y += c.userData.rotY;
-      c.rotation.z += c.userData.rotZ;
-      c.position.y = c.userData.baseY + Math.sin(elapsed * c.userData.driftSpeed) * 25;
-    });
+    floatingRing1.rotation.x = elapsed * 0.15;
+    floatingRing1.rotation.y = elapsed * 0.2;
+    floatingRing2.rotation.y = -elapsed * 0.18;
+    floatingRing2.rotation.z = elapsed * 0.12;
 
     renderer.render(scene, camera);
   }
-
   animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
 }
 
 /* ----------------------------------------------------------------
-   6. ULTRA-REALISTIC PHYSICAL ID CARD WITH LANYARD & WEIGHT
+   6. ULTRA-REALISTIC PHYSICAL ID CARD WITH ACRYLIC CASE & LANYARD
    ---------------------------------------------------------------- */
 function initPhysicalTitaniumIDCard() {
   const stage = document.getElementById('idCardStage');
@@ -335,36 +286,45 @@ function initPhysicalTitaniumIDCard() {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
-  camera.position.set(0, 0, 4.7);
+  camera.position.set(0, 0, 5.0);
 
-  const renderer = new THREE.WebGLRenderer({
-    alpha: true,
-    antialias: true,
-    powerPreference: 'high-performance'
-  });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.setSize(width, height);
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  stage.appendChild(renderer.domElement);
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(width, height);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    stage.appendChild(renderer.domElement);
+  } catch (e) {
+    if (fallback) fallback.style.display = 'flex';
+    return;
+  }
 
-  // Studio Lighting
-  const ambient = new THREE.AmbientLight(0xffffff, 1.3);
+  // Realistic Studio Lighting Setup
+  const ambient = new THREE.AmbientLight(0xffffff, 1.35);
   scene.add(ambient);
 
-  const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
-  keyLight.position.set(2, 4, 6);
+  // Key directional light creating specular sheen on card clearcoat
+  const keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
+  keyLight.position.set(3, 5, 5);
   scene.add(keyLight);
 
-  const cyanFill = new THREE.DirectionalLight(0x00d4ff, 0.9);
+  // Cyan fill from left
+  const cyanFill = new THREE.DirectionalLight(0x00d4ff, 1.2);
   cyanFill.position.set(-4, -1, 3);
   scene.add(cyanFill);
 
-  const violetRim = new THREE.DirectionalLight(0x8b5cf6, 1.0);
-  violetRim.position.set(0, -4, -4);
+  // Violet rim from back/right
+  const violetRim = new THREE.DirectionalLight(0x8b5cf6, 1.2);
+  violetRim.position.set(2, -4, -3);
   scene.add(violetRim);
 
-  // Dynamic Drop Shadow
+  // Dynamic Drop Shadow onto wall plane
   function createShadowTexture() {
     const sCanvas = document.createElement('canvas');
     sCanvas.width = 256;
@@ -379,15 +339,16 @@ function initPhysicalTitaniumIDCard() {
     return new THREE.CanvasTexture(sCanvas);
   }
 
-  const shadowGeo = new THREE.PlaneGeometry(3.0, 4.0);
-  const shadowMat = new THREE.MeshBasicMaterial({
-    map: createShadowTexture(),
-    transparent: true,
-    opacity: 0.65,
-    depthWrite: false
-  });
-  const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
-  shadowMesh.position.set(0, 0, -0.35);
+  const shadowMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(3.2, 4.2),
+    new THREE.MeshBasicMaterial({
+      map: createShadowTexture(),
+      transparent: true,
+      opacity: 0.6,
+      depthWrite: false
+    })
+  );
+  shadowMesh.position.set(0, 0, -0.4);
   scene.add(shadowMesh);
 
   // Lanyard Anchor at Top
@@ -395,10 +356,46 @@ function initPhysicalTitaniumIDCard() {
   lanyardMaster.position.set(0, 1.48, 0);
   scene.add(lanyardMaster);
 
+  // Braided Fabric Strap Texture (Procedural Canvas)
+  function createStrapTexture() {
+    const strapCanvas = document.createElement('canvas');
+    strapCanvas.width = 64;
+    strapCanvas.height = 256;
+    const sCtx = strapCanvas.getContext('2d');
+
+    sCtx.fillStyle = '#101626';
+    sCtx.fillRect(0, 0, 64, 256);
+
+    // Diagonal herringbone weave pattern
+    sCtx.strokeStyle = 'rgba(0, 212, 255, 0.25)';
+    sCtx.lineWidth = 2;
+    for (let y = -64; y < 320; y += 8) {
+      sCtx.beginPath();
+      sCtx.moveTo(0, y);
+      sCtx.lineTo(32, y + 16);
+      sCtx.lineTo(64, y);
+      sCtx.stroke();
+    }
+
+    // Edge seams
+    sCtx.strokeStyle = '#00d4ff';
+    sCtx.lineWidth = 3;
+    sCtx.beginPath();
+    sCtx.moveTo(2, 0); sCtx.lineTo(2, 256);
+    sCtx.moveTo(62, 0); sCtx.lineTo(62, 256);
+    sCtx.stroke();
+
+    const tex = new THREE.CanvasTexture(strapCanvas);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(1, 2);
+    return tex;
+  }
+
   const strapMat = new THREE.MeshStandardMaterial({
-    color: 0x181e2e,
-    roughness: 0.85,
-    metalness: 0.1
+    map: createStrapTexture(),
+    roughness: 0.8,
+    metalness: 0.15
   });
 
   const strapGeo = new THREE.BoxGeometry(0.14, 1.6, 0.02);
@@ -412,23 +409,33 @@ function initPhysicalTitaniumIDCard() {
   strapR.rotation.z = 0.16;
   lanyardMaster.add(strapR);
 
-  // Chrome Swivel Hook
+  // Metallic Hardware (Chrome Finish)
   const chromeMat = new THREE.MeshStandardMaterial({
-    color: 0xf1f5f9,
+    color: 0xf8fafc,
     metalness: 0.98,
-    roughness: 0.15
+    roughness: 0.1
   });
 
-  const swivelBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.2, 16), chromeMat);
+  // Crimp clamp sleeve
+  const crimpSleeve = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.14, 0.08), chromeMat);
+  crimpSleeve.position.set(0, 0.15, 0);
+  lanyardMaster.add(crimpSleeve);
+
+  // Swivel barrel
+  const swivelBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.22, 16), chromeMat);
   swivelBarrel.position.set(0, 0.02, 0);
   lanyardMaster.add(swivelBarrel);
 
-  const carabinerHook = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.035, 12, 24, Math.PI * 1.5), chromeMat);
-  carabinerHook.position.set(0, -0.15, 0);
+  // Carabiner Swivel Hook
+  const carabinerHook = new THREE.Mesh(
+    new THREE.TorusGeometry(0.13, 0.038, 12, 24, Math.PI * 1.55),
+    chromeMat
+  );
+  carabinerHook.position.set(0, -0.16, 0);
   carabinerHook.rotation.z = Math.PI / 4;
   lanyardMaster.add(carabinerHook);
 
-  // Card Pendulum Group
+  // Card Pendulum Group (Centered vertically at world y = 0.0)
   const cardGroup = new THREE.Group();
   cardGroup.position.set(0, -1.48, 0);
   lanyardMaster.add(cardGroup);
@@ -436,8 +443,9 @@ function initPhysicalTitaniumIDCard() {
   const cardW = 1.95;
   const cardH = 2.95;
   const cardR = 0.14;
-  const thickness = 0.042;
+  const thickness = 0.045;
 
+  // Beveled Titanium / Composite Card Body
   const cardShape = new THREE.Shape();
   cardShape.moveTo(-cardW / 2 + cardR, cardH / 2);
   cardShape.lineTo(cardW / 2 - cardR, cardH / 2);
@@ -449,8 +457,9 @@ function initPhysicalTitaniumIDCard() {
   cardShape.lineTo(-cardW / 2, cardH / 2 - cardR);
   cardShape.quadraticCurveTo(-cardW / 2, cardH / 2, -cardW / 2 + cardR, cardH / 2);
 
+  // Slot Punch Hole
   const slotW = 0.42;
-  const slotH = 0.08;
+  const slotH = 0.085;
   const slotY = cardH / 2 - 0.16;
   const slotHole = new THREE.Path();
   slotHole.moveTo(-slotW / 2, slotY - slotH / 2);
@@ -473,18 +482,59 @@ function initPhysicalTitaniumIDCard() {
   const bodyGeo = new THREE.ExtrudeGeometry(cardShape, extrudeSettings);
   bodyGeo.center();
 
+  // Dark Titanium Core Material with Specular Sheen
   const titaniumMat = new THREE.MeshPhysicalMaterial({
-    color: 0x151b29,
+    color: 0x111625,
     metalness: 0.92,
-    roughness: 0.25,
-    clearcoat: 0.4,
-    clearcoatRoughness: 0.2
+    roughness: 0.22,
+    clearcoat: 0.6,
+    clearcoatRoughness: 0.15
   });
   const bodyMesh = new THREE.Mesh(bodyGeo, titaniumMat);
   cardGroup.add(bodyMesh);
 
-  // Chrome Corner Rivets
-  const rivetGeo = new THREE.CylinderGeometry(0.04, 0.04, thickness + 0.035, 12);
+  // Clear Acrylic Protective Sleeve (Adds true physical glass/plastic casing)
+  const casingShape = new THREE.Shape();
+  const cW = cardW + 0.06;
+  const cH = cardH + 0.08;
+  const cR = 0.16;
+  casingShape.moveTo(-cW / 2 + cR, cH / 2);
+  casingShape.lineTo(cW / 2 - cR, cH / 2);
+  casingShape.quadraticCurveTo(cW / 2, cH / 2, cW / 2, cH / 2 - cR);
+  casingShape.lineTo(cW / 2, -cH / 2 + cR);
+  casingShape.quadraticCurveTo(cW / 2, -cH / 2, cW / 2 - cR, -cH / 2);
+  casingShape.lineTo(-cW / 2 + cR, -cH / 2);
+  casingShape.quadraticCurveTo(-cW / 2, -cH / 2, -cW / 2, -cH / 2 + cR);
+  casingShape.lineTo(-cW / 2, cH / 2 - cR);
+  casingShape.quadraticCurveTo(-cW / 2, cH / 2, -cW / 2 + cR, cH / 2);
+  casingShape.holes.push(slotHole);
+
+  const casingGeo = new THREE.ExtrudeGeometry(casingShape, {
+    depth: thickness + 0.025,
+    bevelEnabled: true,
+    bevelSegments: 3,
+    bevelSize: 0.012,
+    bevelThickness: 0.012,
+    curveSegments: 16
+  });
+  casingGeo.center();
+
+  const acrylicMat = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.28,
+    roughness: 0.08,
+    metalness: 0.1,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.05,
+    transmission: 0.85,
+    depthWrite: false
+  });
+  const casingMesh = new THREE.Mesh(casingGeo, acrylicMat);
+  cardGroup.add(casingMesh);
+
+  // Corner Chrome Rivets
+  const rivetGeo = new THREE.CylinderGeometry(0.04, 0.04, thickness + 0.045, 12);
   const cornerOffsets = [
     [-cardW / 2 + 0.1, cardH / 2 - 0.1],
     [cardW / 2 - 0.1, cardH / 2 - 0.1],
@@ -498,7 +548,7 @@ function initPhysicalTitaniumIDCard() {
     cardGroup.add(rivet);
   });
 
-  // FRONT FACE CANVAS TEXTURE (1024 x 1600 High-DPI)
+  // FRONT & BACK HIGH-DPI CANVAS TEXTURES (1024 x 1600)
   const frontCanvas = document.createElement('canvas');
   frontCanvas.width = 1024;
   frontCanvas.height = 1600;
@@ -506,16 +556,24 @@ function initPhysicalTitaniumIDCard() {
   const frontTexture = new THREE.CanvasTexture(frontCanvas);
   frontTexture.anisotropy = 8;
 
-  const faceW = cardW - 0.08;
-  const faceH = cardH - 0.08;
+  const faceW = cardW - 0.06;
+  const faceH = cardH - 0.06;
   const facePlaneGeo = new THREE.PlaneGeometry(faceW, faceH);
 
-  const frontMat = new THREE.MeshBasicMaterial({ map: frontTexture, transparent: true });
+  // MeshPhysicalMaterial with clearcoat for glossy laminated card look!
+  const frontMat = new THREE.MeshPhysicalMaterial({
+    map: frontTexture,
+    transparent: true,
+    roughness: 0.2,
+    metalness: 0.15,
+    clearcoat: 0.95,
+    clearcoatRoughness: 0.08
+  });
   const frontMesh = new THREE.Mesh(facePlaneGeo, frontMat);
-  frontMesh.position.z = thickness / 2 + 0.026;
+  frontMesh.position.z = thickness / 2 + 0.028;
   cardGroup.add(frontMesh);
 
-  // BACK FACE CANVAS TEXTURE
+  // Back Face
   const backCanvas = document.createElement('canvas');
   backCanvas.width = 1024;
   backCanvas.height = 1600;
@@ -523,12 +581,20 @@ function initPhysicalTitaniumIDCard() {
   const backTexture = new THREE.CanvasTexture(backCanvas);
   backTexture.anisotropy = 8;
 
-  const backMat = new THREE.MeshBasicMaterial({ map: backTexture, transparent: true });
+  const backMat = new THREE.MeshPhysicalMaterial({
+    map: backTexture,
+    transparent: true,
+    roughness: 0.2,
+    metalness: 0.15,
+    clearcoat: 0.95,
+    clearcoatRoughness: 0.08
+  });
   const backMesh = new THREE.Mesh(facePlaneGeo, backMat);
-  backMesh.position.z = -(thickness / 2 + 0.026);
+  backMesh.position.z = -(thickness / 2 + 0.028);
   backMesh.rotation.y = Math.PI;
   cardGroup.add(backMesh);
 
+  // RENDER FRONT FACE (100% VERIFIED AUTHENTIC RESUME CREDENTIALS)
   function drawFrontFace(avatarImg) {
     const w = 1024;
     const h = 1600;
@@ -537,32 +603,33 @@ function initPhysicalTitaniumIDCard() {
     fCtx.textAlign = 'left';
     fCtx.textBaseline = 'alphabetic';
 
+    // Premium Cyber Dark Card Stock
     const bgGrad = fCtx.createLinearGradient(0, 0, w, h);
-    bgGrad.addColorStop(0, '#0d111e');
-    bgGrad.addColorStop(0.5, '#070912');
-    bgGrad.addColorStop(1, '#0e1424');
+    bgGrad.addColorStop(0, '#0c101d');
+    bgGrad.addColorStop(0.4, '#070a14');
+    bgGrad.addColorStop(1, '#0e1526');
     fCtx.fillStyle = bgGrad;
     fCtx.fillRect(0, 0, w, h);
 
-    // Subtle Metallic Grid Lines
-    fCtx.strokeStyle = 'rgba(0, 212, 255, 0.12)';
-    fCtx.lineWidth = 3;
+    // Subtle Metallic Grid Circuit Lines
+    fCtx.strokeStyle = 'rgba(0, 212, 255, 0.14)';
+    fCtx.lineWidth = 2.5;
     fCtx.beginPath();
-    fCtx.moveTo(70, 200); fCtx.lineTo(954, 200);
-    fCtx.moveTo(70, 780); fCtx.lineTo(954, 780);
-    fCtx.moveTo(70, 1340); fCtx.lineTo(954, 1340);
+    fCtx.moveTo(60, 210); fCtx.lineTo(964, 210);
+    fCtx.moveTo(60, 780); fCtx.lineTo(964, 780);
+    fCtx.moveTo(60, 1340); fCtx.lineTo(964, 1340);
     fCtx.stroke();
 
-    // Top Header: Organization & Clearance
+    // Top Header: Official College & Affiliation
     fCtx.fillStyle = '#00d4ff';
-    fCtx.font = 'bold 32px "Space Grotesk", sans-serif';
+    fCtx.font = 'bold 34px "Space Grotesk", sans-serif';
     fCtx.fillText('IIMT COLLEGE OF ENGINEERING', 80, 120);
 
     fCtx.fillStyle = '#94a3b8';
     fCtx.font = '600 22px "JetBrains Mono", monospace';
-    fCtx.fillText('IDENTITY CREDENTIAL // AKTU', 80, 155);
+    fCtx.fillText('AKTU // DEPT. OF INFORMATION TECHNOLOGY', 80, 155);
 
-    // Live Status Pill
+    // Active Clearance Status Pill
     fCtx.fillStyle = 'rgba(16, 185, 129, 0.15)';
     fCtx.beginPath();
     fCtx.roundRect(690, 92, 250, 48, 24);
@@ -578,12 +645,12 @@ function initPhysicalTitaniumIDCard() {
 
     fCtx.fillStyle = '#34d399';
     fCtx.font = 'bold 20px "JetBrains Mono", monospace';
-    fCtx.fillText('ONLINE // SECURE', 738, 123);
+    fCtx.fillText('ONLINE // ACTIVE', 738, 123);
 
-    // Avatar Photo (Circular cyber-frame)
+    // Circular Portrait Cyber Frame (Centered at 512, 485)
     const cx = 512;
-    const cy = 490;
-    const r = 220;
+    const cy = 485;
+    const r = 210;
 
     fCtx.save();
     fCtx.beginPath();
@@ -591,10 +658,11 @@ function initPhysicalTitaniumIDCard() {
     fCtx.strokeStyle = '#00d4ff';
     fCtx.lineWidth = 6;
     fCtx.shadowColor = '#00d4ff';
-    fCtx.shadowBlur = 25;
+    fCtx.shadowBlur = 24;
     fCtx.stroke();
     fCtx.restore();
 
+    // Draw Harshit's Authentic Photo
     if (avatarImg && avatarImg.complete && avatarImg.naturalWidth > 0) {
       fCtx.save();
       fCtx.beginPath();
@@ -614,42 +682,43 @@ function initPhysicalTitaniumIDCard() {
       fCtx.textAlign = 'left';
     }
 
-    // Name & Title
+    // Name & Official Designation
     fCtx.textAlign = 'center';
     fCtx.fillStyle = '#ffffff';
-    fCtx.font = '900 64px "Space Grotesk", sans-serif';
-    fCtx.fillText('HARSHIT MISHRA', cx, 880);
+    fCtx.font = '900 60px "Space Grotesk", sans-serif';
+    fCtx.fillText('HARSHIT MISHRA', cx, 865);
 
     fCtx.fillStyle = '#00d4ff';
-    fCtx.font = 'bold 34px "JetBrains Mono", monospace';
-    fCtx.fillText('DATA ANALYTICS & AI ENTHUSIAST', cx, 940);
+    fCtx.font = 'bold 30px "JetBrains Mono", monospace';
+    fCtx.fillText('AI / ML ENGINEER & FULL-STACK DEV', cx, 920);
 
     fCtx.fillStyle = '#94a3b8';
-    fCtx.font = '500 28px "Inter", sans-serif';
-    fCtx.fillText('B.Tech in Information Technology • AKTU', cx, 990);
+    fCtx.font = '600 24px "Inter", sans-serif';
+    fCtx.fillText('B.Tech CSE (IT) • IIMT College • CGPA: 6.64', cx, 968);
 
-    // Badges Row
-    const badges = ['PYTHON 3', 'MACHINE LEARNING', 'CNN / CV', 'SQL PIPELINES'];
+    // Verified Skills Badges Row (Strictly from resume)
+    const badges = ['PYTHON 3', 'MACHINE LEARNING', 'TENSORFLOW', 'REACT.JS'];
     let bx = 90;
     badges.forEach((b) => {
       fCtx.fillStyle = 'rgba(0, 212, 255, 0.08)';
       fCtx.beginPath();
-      fCtx.roundRect(bx, 1060, 195, 50, 10);
+      fCtx.roundRect(bx, 1030, 195, 48, 10);
       fCtx.fill();
-      fCtx.strokeStyle = 'rgba(0, 212, 255, 0.25)';
+      fCtx.strokeStyle = 'rgba(0, 212, 255, 0.28)';
       fCtx.lineWidth = 1.5;
       fCtx.stroke();
 
       fCtx.fillStyle = '#e2e8f0';
       fCtx.font = 'bold 20px "JetBrains Mono", monospace';
-      fCtx.fillText(b, bx + 97, 1092);
+      fCtx.fillText(b, bx + 97, 1061);
       bx += 215;
     });
 
-    // Holographic Micro-Chip
+    // Security Holographic Chip
+    fCtx.textAlign = 'left';
     fCtx.fillStyle = '#d97706';
     fCtx.beginPath();
-    fCtx.roundRect(80, 1170, 140, 100, 14);
+    fCtx.roundRect(80, 1135, 140, 95, 14);
     fCtx.fill();
     fCtx.strokeStyle = '#fef3c7';
     fCtx.lineWidth = 2;
@@ -657,36 +726,36 @@ function initPhysicalTitaniumIDCard() {
 
     fCtx.fillStyle = '#1e293b';
     fCtx.font = 'bold 18px "JetBrains Mono", monospace';
-    fCtx.fillText('SECURITY CHIP', 150, 1228);
+    fCtx.fillText('SECURITY CHIP', 150, 1190);
 
-    // Security ID Details
-    fCtx.textAlign = 'left';
+    // Clearance and Credentials Matrix Details
     fCtx.fillStyle = '#64748b';
     fCtx.font = '600 22px "JetBrains Mono", monospace';
-    fCtx.fillText('ACCESS CLEARANCE // LEVEL 4', 250, 1205);
-    fCtx.fillText('ISSUED TO: HARSHIT MISHRA', 250, 1240);
+    fCtx.fillText('STUDENT ID: #HM-2026-IIMT-IT', 250, 1165);
+    fCtx.fillText('AFFILIATION: DR. A.P.J. ABDUL KALAM TECH UNIV', 250, 1200);
     fCtx.fillStyle = '#00d4ff';
-    fCtx.fillText('SERIAL: #HM-2026-X9B', 250, 1275);
+    fCtx.fillText('STATUS: AUTHENTIC VERIFIED PASS', 250, 1235);
 
-    // Barcode Pattern
+    // High-Density Code-128 Barcode Pattern
     const barStartX = 80;
-    const barY = 1380;
+    const barY = 1310;
     const barH = 75;
     fCtx.fillStyle = '#f8fafc';
-    for (let x = barStartX; x < 940; x += 10) {
-      const wBar = (x % 30 === 0 || x % 70 === 0) ? 6 : 2.5;
+    for (let x = barStartX; x < 944; x += 9) {
+      const wBar = (x % 27 === 0 || x % 63 === 0) ? 6 : 2.5;
       fCtx.fillRect(x, barY, wBar, barH);
     }
 
     fCtx.fillStyle = '#64748b';
     fCtx.font = '20px "JetBrains Mono", monospace';
     fCtx.textAlign = 'center';
-    fCtx.fillText('AUTHENTIC CREDENTIAL MATRIX • AUTHORIZED HOLDER', cx, 1500);
+    fCtx.fillText('OFFICIAL IDENTITY CREDENTIAL • IIMT COLLEGE OF ENGINEERING', cx, 1440);
 
     fCtx.restore();
     frontTexture.needsUpdate = true;
   }
 
+  // RENDER BACK FACE (VERIFIED EDUCATION, INTERNSHIPS, PROJECTS)
   function drawBackFace() {
     const w = 1024;
     const h = 1600;
@@ -696,90 +765,107 @@ function initPhysicalTitaniumIDCard() {
     bCtx.textBaseline = 'alphabetic';
 
     const bgGrad = bCtx.createLinearGradient(0, 0, w, h);
-    bgGrad.addColorStop(0, '#0d111e');
-    bgGrad.addColorStop(0.5, '#070912');
-    bgGrad.addColorStop(1, '#0e1424');
+    bgGrad.addColorStop(0, '#0c101d');
+    bgGrad.addColorStop(0.5, '#070a14');
+    bgGrad.addColorStop(1, '#0e1526');
     bCtx.fillStyle = bgGrad;
     bCtx.fillRect(0, 0, w, h);
 
-    bCtx.fillStyle = '#8b5cf6';
-    bCtx.font = 'bold 36px "Space Grotesk", sans-serif';
-    bCtx.fillText('TECHNICAL SPECIFICATIONS', 80, 120);
+    // Top Magnetic Stripe
+    bCtx.fillStyle = '#020617';
+    bCtx.fillRect(0, 40, w, 110);
+    bCtx.fillStyle = '#334155';
+    bCtx.fillRect(0, 75, w, 40);
+
+    // Header
+    bCtx.fillStyle = '#00d4ff';
+    bCtx.font = 'bold 34px "Space Grotesk", sans-serif';
+    bCtx.fillText('ACADEMIC & PROFESSIONAL CREDENTIALS', 80, 200);
 
     bCtx.fillStyle = '#94a3b8';
-    bCtx.font = '600 24px "JetBrains Mono", monospace';
-    bCtx.fillText('ENGINEERING COMPETENCIES', 80, 160);
+    bCtx.font = '600 22px "JetBrains Mono", monospace';
+    bCtx.fillText('VERIFIED RESUME RECORD // HARSHIT MISHRA', 80, 235);
 
-    // Matrix Card 1: Core Languages & ML
+    // Section 1: Academic Milestones
     bCtx.fillStyle = 'rgba(255, 255, 255, 0.03)';
     bCtx.beginPath();
-    bCtx.roundRect(70, 220, 884, 340, 16);
+    bCtx.roundRect(70, 280, 884, 270, 16);
     bCtx.fill();
     bCtx.strokeStyle = 'rgba(0, 212, 255, 0.2)';
-    bCtx.lineWidth = 2;
+    bCtx.lineWidth = 1.5;
     bCtx.stroke();
 
     bCtx.fillStyle = '#00d4ff';
-    bCtx.font = 'bold 30px "Space Grotesk", sans-serif';
-    bCtx.fillText('🧠 Core Machine Learning & Data', 110, 280);
+    bCtx.font = 'bold 28px "Space Grotesk", sans-serif';
+    bCtx.fillText('🎓 Verified Academic Milestones', 105, 335);
 
     bCtx.fillStyle = '#cbd5e1';
-    bCtx.font = '500 24px "Inter", sans-serif';
-    bCtx.fillText('• Supervised & Unsupervised Learning (Scikit-Learn, Pandas)', 110, 340);
-    bCtx.fillText('• Deep Learning & Computer Vision (CNN, OpenCV, TensorFlow)', 110, 395);
-    bCtx.fillText('• Exploratory Data Analysis & Statistical Modeling', 110, 450);
-    bCtx.fillText('• Crop Disease Classification & Leaf Pathology Models', 110, 505);
+    bCtx.font = '500 23px "Inter", sans-serif';
+    bCtx.fillText('• B.Tech in CSE (IT) — IIMT College of Engineering (CGPA: 6.64)', 105, 385);
+    bCtx.fillText('• Class XII CBSE — Army Public School, Lucknow (71.6% • 2023)', 105, 435);
+    bCtx.fillText('• Class X CBSE — Army Public School, Lucknow (91.4% • 2021)', 105, 485);
 
-    // Matrix Card 2: Development & Automation
+    // Section 2: Industrial Internships
     bCtx.fillStyle = 'rgba(255, 255, 255, 0.03)';
     bCtx.beginPath();
-    bCtx.roundRect(70, 600, 884, 340, 16);
+    bCtx.roundRect(70, 580, 884, 270, 16);
     bCtx.fill();
     bCtx.strokeStyle = 'rgba(139, 92, 246, 0.2)';
     bCtx.stroke();
 
     bCtx.fillStyle = '#a855f7';
-    bCtx.font = 'bold 30px "Space Grotesk", sans-serif';
-    bCtx.fillText('⚙️ Engineering & Automation', 110, 660);
+    bCtx.font = 'bold 28px "Space Grotesk", sans-serif';
+    bCtx.fillText('💼 Verified Industrial Internships', 105, 635);
 
     bCtx.fillStyle = '#cbd5e1';
-    bCtx.font = '500 24px "Inter", sans-serif';
-    bCtx.fillText('• Python 3 Algorithmic Development & Modular Code', 110, 720);
-    bCtx.fillText('• Relational Database Queries & Schema Design (MySQL)', 110, 775);
-    bCtx.fillText('• Autonomous n8n Workflow Orchestration & Webhooks', 110, 830);
-    bCtx.fillText('• Version Control, Git Branching & GitHub Collaboration', 110, 885);
+    bCtx.font = '500 23px "Inter", sans-serif';
+    bCtx.fillText('• AI Web Developer — Inamigos Foundation (Jul 2026 – Aug 2026)', 105, 685);
+    bCtx.fillText('  Engineered NGO donation portal and responsive full-stack modules.', 105, 725);
+    bCtx.fillText('• Python Programming Intern — InternPe (May 2025 – Jun 2025)', 105, 775);
+    bCtx.fillText('  Built modular Python scripts, algorithms, and data structures.', 105, 815);
 
-    // Verified Credentials Summary
-    bCtx.fillStyle = 'rgba(16, 185, 129, 0.08)';
+    // Section 3: Verified Projects List
+    bCtx.fillStyle = 'rgba(255, 255, 255, 0.03)';
     bCtx.beginPath();
-    bCtx.roundRect(70, 980, 884, 250, 16);
+    bCtx.roundRect(70, 880, 884, 330, 16);
     bCtx.fill();
-    bCtx.strokeStyle = 'rgba(16, 185, 129, 0.3)';
+    bCtx.strokeStyle = 'rgba(16, 185, 129, 0.25)';
     bCtx.stroke();
 
     bCtx.fillStyle = '#34d399';
-    bCtx.font = 'bold 30px "Space Grotesk", sans-serif';
-    bCtx.fillText('📜 Verified Credentials Summary', 110, 1040);
+    bCtx.font = 'bold 28px "Space Grotesk", sans-serif';
+    bCtx.fillText('🚀 6 Documented Portfolio Projects', 105, 935);
 
     bCtx.fillStyle = '#cbd5e1';
-    bCtx.font = '500 24px "Inter", sans-serif';
-    bCtx.fillText('• 7 Authentic Certifications (AnalytixLabs, InternPe, Softpro, etc.)', 110, 1100);
-    bCtx.fillText('• 2 Verified Internships: Inamigos Foundation & InternPe', 110, 1150);
+    bCtx.font = '500 22px "Inter", sans-serif';
+    bCtx.fillText('1. Human Emotion Recognition System (Python, OpenCV, AI/ML)', 105, 980);
+    bCtx.fillText('2. Diabetes Prediction System (Python, Scikit-Learn, Web)', 105, 1025);
+    bCtx.fillText('3. Fake News Prediction Model (Python, NLP, TF-IDF)', 105, 1070);
+    bCtx.fillText('4. Rock and Stone Prediction with Sonar (Python, ML Classifier)', 105, 1115);
+    bCtx.fillText('5. Library Management System (Python, MySQL Relational DB)', 105, 1160);
+
+    // Official Signature Strip & Verification Footer
+    bCtx.fillStyle = '#f8fafc';
+    bCtx.fillRect(100, 1250, 480, 65);
+    bCtx.fillStyle = '#1e293b';
+    bCtx.font = 'italic bold 28px "Space Grotesk", cursive';
+    bCtx.fillText('Harshit Mishra', 140, 1294);
 
     bCtx.fillStyle = '#64748b';
-    bCtx.font = '22px "JetBrains Mono", monospace';
-    bCtx.fillText('SHA256: 8a4f91b7d30c82e6e1f045a2c91834bd', 110, 1310);
-    bCtx.fillText('REPOSITORY: github.com/harshit-001-it', 110, 1350);
+    bCtx.font = '20px "JetBrains Mono", monospace';
+    bCtx.fillText('AUTHORIZED HOLDER SIGNATURE', 100, 1345);
+    bCtx.fillText('OFFICIAL REPOSITORY: github.com/harshit-001-it', 100, 1380);
 
     bCtx.fillStyle = '#94a3b8';
     bCtx.textAlign = 'center';
     bCtx.font = 'bold 24px "Space Grotesk", sans-serif';
     bCtx.fillText('Click badge again to flip to front face', 512, 1480);
-    bCtx.restore();
 
+    bCtx.restore();
     backTexture.needsUpdate = true;
   }
 
+  // Load Authentic Photo
   const avatarImg = new Image();
   avatarImg.crossOrigin = 'anonymous';
   avatarImg.src = 'image.png';
@@ -788,7 +874,7 @@ function initPhysicalTitaniumIDCard() {
   drawFrontFace(null);
   drawBackFace();
 
-  // Elastic Physics & Gesture Tracking
+  // Physics, Drag & Elastic Pull-Down Mechanics
   let isDragging = false;
   let isFlipped = false;
   let dragStartX = 0;
@@ -800,7 +886,7 @@ function initPhysicalTitaniumIDCard() {
   let currentPullY = 0;
   let targetPullY = 0;
   let pullVelocity = 0;
-  let pullDownThreshold = 100;
+  const pullDownThreshold = 90;
 
   function onPointerDown(e) {
     isDragging = true;
@@ -820,7 +906,7 @@ function initPhysicalTitaniumIDCard() {
       targetRotX += deltaY * 0.008;
 
       if (deltaY > 0) {
-        targetPullY = Math.min(deltaY * 0.0028, 0.42);
+        targetPullY = Math.min(deltaY * 0.0028, 0.45);
         if (deltaY > pullDownThreshold && hintBadge && hintText) {
           hintBadge.style.borderColor = 'var(--accent-cyan)';
           hintText.textContent = 'Release to launch About section ↓';
@@ -835,16 +921,16 @@ function initPhysicalTitaniumIDCard() {
       const relY = -(((clientY - rect.top) / rect.height) * 2 - 1);
 
       if (!isFlipped) {
-        targetRotY = relX * 0.45;
-        targetRotX = -relY * 0.35;
+        targetRotY = relX * 0.42;
+        targetRotX = -relY * 0.32;
       }
     }
   }
 
-  function onPointerUp(e) {
+  function onPointerUp() {
     if (isDragging) {
       isDragging = false;
-      if (targetPullY > 0.28) {
+      if (targetPullY > 0.25) {
         const aboutSec = document.getElementById('about');
         if (aboutSec) {
           aboutSec.scrollIntoView({ behavior: 'smooth' });
@@ -858,6 +944,7 @@ function initPhysicalTitaniumIDCard() {
     }
   }
 
+  // Click to Flip (180 deg)
   stage.addEventListener('click', () => {
     if (Math.abs(targetPullY) < 0.05) {
       isFlipped = !isFlipped;
@@ -884,18 +971,21 @@ function initPhysicalTitaniumIDCard() {
     });
   }
 
+  // Animation Loop with Harmonic Spring Physics
   const physClock = new THREE.Clock();
 
   function animatePhysics() {
     requestAnimationFrame(animatePhysics);
     const elapsed = physClock.getElapsedTime();
 
-    const idleSway = isDragging ? 0 : Math.sin(elapsed * 1.6) * 0.05;
+    // Natural Pendulum Sway when idle
+    const idleSway = isDragging ? 0 : Math.sin(elapsed * 1.5) * 0.045;
 
-    currentRotY += (targetRotY + idleSway - currentRotY) * 0.08;
-    currentRotX += (targetRotX - currentRotX) * 0.08;
+    currentRotY += (targetRotY + idleSway - currentRotY) * 0.085;
+    currentRotX += (targetRotX - currentRotX) * 0.085;
 
-    const springForce = (targetPullY - currentPullY) * 0.16;
+    // Harmonic spring tension for lanyard pull
+    const springForce = (targetPullY - currentPullY) * 0.18;
     pullVelocity = (pullVelocity + springForce) * 0.78;
     currentPullY += pullVelocity;
 
@@ -903,19 +993,14 @@ function initPhysicalTitaniumIDCard() {
     cardGroup.rotation.x = currentRotX;
     cardGroup.position.y = -1.48 - currentPullY;
 
+    // Elastic lanyard strap stretch
     const stretchFactor = 1.0 + currentPullY * 1.8;
     strapL.scale.y = stretchFactor;
     strapR.scale.y = stretchFactor;
     swivelBarrel.position.y = 0.02 - (currentPullY * 0.4);
-    carabinerHook.position.y = -0.15 - (currentPullY * 0.7);
-
-    shadowMesh.position.x = currentRotY * 0.35;
-    shadowMesh.position.y = -currentPullY * 0.8;
-    shadowMesh.scale.set(1.0 + currentPullY * 0.3, 1.0 + currentPullY * 0.3, 1);
 
     renderer.render(scene, camera);
   }
-
   animatePhysics();
 
   window.addEventListener('resize', () => {
@@ -928,12 +1013,15 @@ function initPhysicalTitaniumIDCard() {
 }
 
 /* ----------------------------------------------------------------
-   7. DYNAMIC 3D PERSPECTIVE CARD TILT
+   7. TACTILE 3D CARD TILT & SPECULAR GLARE (WHOLE SITE)
    ---------------------------------------------------------------- */
 function initDynamic3DCardTilt() {
   const cards = document.querySelectorAll('.tilt-card');
 
   cards.forEach(card => {
+    if (card.dataset.tiltInitialized) return;
+    card.dataset.tiltInitialized = 'true';
+
     card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -942,16 +1030,16 @@ function initDynamic3DCardTilt() {
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
 
-      const rotateX = ((y - centerY) / centerY) * -8;
-      const rotateY = ((x - centerX) / centerX) * 8;
+      const rotateX = ((y - centerY) / centerY) * -9;
+      const rotateY = ((x - centerX) / centerX) * 9;
 
-      card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(12px)`;
       card.style.setProperty('--mouse-x', `${x}px`);
       card.style.setProperty('--mouse-y', `${y}px`);
     });
 
     card.addEventListener('mouseleave', () => {
-      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
     });
   });
 }
@@ -968,7 +1056,7 @@ function initRevealAnimations() {
         entry.target.classList.add('active');
       }
     });
-  }, { threshold: 0.15 });
+  }, { threshold: 0.12 });
 
   reveals.forEach(el => observer.observe(el));
 }
@@ -984,18 +1072,18 @@ function initCounters() {
       if (entry.isIntersecting) {
         const target = parseInt(entry.target.getAttribute('data-target') || '0', 10);
         let count = 0;
-        const duration = 1200;
-        const step = Math.max(1, Math.floor(target / (duration / 30)));
+        const duration = 1000;
+        const step = Math.max(1, Math.floor(target / (duration / 40)));
 
         const timer = setInterval(() => {
           count += step;
           if (count >= target) {
-            entry.target.textContent = `${target}+`;
+            entry.target.textContent = `${target}`;
             clearInterval(timer);
           } else {
-            entry.target.textContent = `${count}+`;
+            entry.target.textContent = `${count}`;
           }
-        }, 30);
+        }, 40);
 
         observer.unobserve(entry.target);
       }
@@ -1006,52 +1094,127 @@ function initCounters() {
 }
 
 /* ----------------------------------------------------------------
-   10. RENDER SKILLS (FROM AUTHENTIC RESUME)
+   10. RENDER EDUCATION (100% AUTHENTIC RESUME)
+   ---------------------------------------------------------------- */
+function renderEducation() {
+  const container = document.getElementById('educationTimeline');
+  if (!container) return;
+
+  const eduList = [
+    {
+      degree: 'B.Tech — Computer Science & Engineering (IT)',
+      institution: 'IIMT College of Engineering, Greater Noida (AKTU)',
+      period: '2023 – Present',
+      score: 'CGPA: 6.64',
+      details: 'Specializing in Machine Learning, Deep Neural Networks, Python Software Development, and Data Structures.'
+    },
+    {
+      degree: 'Class XII (Senior Secondary) — CBSE',
+      institution: 'Army Public School, Sardar Patel Marg, Lucknow',
+      period: '2022 – 2023',
+      score: '71.6%',
+      details: 'Higher Secondary education with rigorous foundation in Mathematics, Physics, and Computer Science.'
+    },
+    {
+      degree: 'Class X (Secondary) — CBSE',
+      institution: 'Army Public School, Sardar Patel Marg, Lucknow',
+      period: '2020 – 2021',
+      score: '91.4% (Distinction)',
+      details: 'High academic distinction with solid analytical foundations in Mathematics, Science, and Logical Reasoning.'
+    }
+  ];
+
+  container.innerHTML = eduList.map(item => `
+    <div class="timeline-item reveal">
+      <div class="timeline-dot"></div>
+      <div class="timeline-card glass tilt-card">
+        <div class="timeline-badge-row">
+          <span class="company-badge">${item.institution}</span>
+          <span class="date-badge">${item.period}</span>
+        </div>
+        <h3 class="role-title">${item.degree}</h3>
+        <div class="edu-score-pill">${item.score}</div>
+        <p class="role-desc">${item.details}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ----------------------------------------------------------------
+   11. RENDER SKILLS (VERIFIED RESUME CATEGORIES, NO FAKE NUMBERS)
    ---------------------------------------------------------------- */
 function renderSkills() {
   const container = document.getElementById('skillsGrid');
   if (!container) return;
 
+  // Strict categories directly from Harshit's resume
   const categories = [
     {
       title: 'AI & Machine Learning',
       icon: '🧠',
+      tagline: 'Core Modeling & Neural Architectures',
       skills: [
-        { name: 'Machine Learning (Scikit-Learn)', level: '92%' },
-        { name: 'Neural Networks & Deep Learning', level: '88%' },
-        { name: 'TensorFlow & Model Training', level: '86%' },
-        { name: 'Computer Vision (OpenCV)', level: '84%' },
-        { name: 'Large Language Models (LLMs)', level: '85%' }
+        'Machine Learning',
+        'Neural Networks',
+        'TensorFlow',
+        'Large Language Models (LLMs)',
+        'Computer Vision (OpenCV)'
       ]
     },
     {
       title: 'Programming Languages',
       icon: '💻',
+      tagline: 'Algorithmic Software Engineering',
       skills: [
-        { name: 'Python 3', level: '95%' },
-        { name: 'Java', level: '86%' },
-        { name: 'C++', level: '84%' },
-        { name: 'JavaScript (ES6+)', level: '88%' }
+        'Python 3',
+        'Java',
+        'C++',
+        'JavaScript (ES6+)'
       ]
     },
     {
-      title: 'Data & Web Technologies',
+      title: 'Data & Libraries',
+      icon: '📊',
+      tagline: 'Exploratory & Quantitative Analytics',
+      skills: [
+        'Pandas',
+        'NumPy',
+        'Scikit-Learn',
+        'Data Cleaning & EDA'
+      ]
+    },
+    {
+      title: 'Web Technologies',
       icon: '🌐',
+      tagline: 'Interactive Full-Stack Applications',
       skills: [
-        { name: 'Pandas & NumPy', level: '92%' },
-        { name: 'MySQL Relational Databases', level: '88%' },
-        { name: 'HTML5 & Modern CSS3', level: '94%' },
-        { name: 'React.js Frontend Architecture', level: '86%' }
+        'React.js',
+        'HTML5',
+        'CSS3',
+        'RESTful APIs'
       ]
     },
     {
-      title: 'Tools & Soft Skills',
-      icon: '⚙️',
+      title: 'Database & Systems',
+      icon: '🗄️',
+      tagline: 'Data Persistence & Environment',
       skills: [
-        { name: 'Git & GitHub Version Control', level: '92%' },
-        { name: 'Linux / Command Line Tools', level: '85%' },
-        { name: 'Analytical Problem Solving', level: '95%' },
-        { name: 'Agile Team Collaboration', level: '90%' }
+        'MySQL Relational DB',
+        'Linux Environment',
+        'Git & GitHub'
+      ]
+    },
+    {
+      title: 'Soft Skills & Mindset',
+      icon: '⚡',
+      tagline: 'Professional Engineering Standards',
+      skills: [
+        'Analytical Thinking',
+        'Problem Solving',
+        'Communication',
+        'Pressure Handling',
+        'Adaptive Nature',
+        'Collaboration'
       ]
     }
   ];
@@ -1060,19 +1223,17 @@ function renderSkills() {
     <div class="skill-category-card glass tilt-card reveal">
       <div class="category-header">
         <div class="category-icon">${cat.icon}</div>
-        <h3 class="category-title">${cat.title}</h3>
+        <div>
+          <h3 class="category-title">${cat.title}</h3>
+          <span class="category-tagline">${cat.tagline}</span>
+        </div>
       </div>
-      <div class="skill-items-list">
+      <div class="skill-badge-cloud">
         ${cat.skills.map(s => `
-          <div class="skill-item">
-            <div class="skill-item-header">
-              <span>${s.name}</span>
-              <span style="color:var(--accent-cyan);">${s.level}</span>
-            </div>
-            <div class="skill-bar-track">
-              <div class="skill-bar-fill" style="width: ${s.level};"></div>
-            </div>
-          </div>
+          <span class="skill-badge-pill">
+            <span class="badge-dot"></span>
+            <span>${s}</span>
+          </span>
         `).join('')}
       </div>
     </div>
@@ -1082,65 +1243,60 @@ function renderSkills() {
 }
 
 /* ----------------------------------------------------------------
-   11. RENDER FEATURED PROJECTS (FROM AUTHENTIC RESUME)
+   12. RENDER FEATURED PROJECTS (100% REAL FROM RESUME, NO FAKE STARS)
    ---------------------------------------------------------------- */
 function renderProjects() {
   const filtersContainer = document.getElementById('projectFilters');
   const gridContainer = document.getElementById('projectsGrid');
   if (!gridContainer) return;
 
+  // Exactly the 6 authentic projects from Harshit's resume
   const resumeProjects = [
     {
       name: 'Human Emotion Recognition System',
-      description: 'Engineered a real-time facial expression and sentiment detection system utilizing computer vision techniques and trained convolutional neural networks.',
+      description: 'Designed a real-time facial expression and sentiment detection system using computer vision techniques and trained machine learning models.',
       category: 'Machine Learning',
-      tags: ['Python', 'AI/ML', 'Computer Vision', 'Deep Learning'],
-      stars: 14,
+      tags: ['Python', 'AI/ML', 'OpenCV', 'CNN'],
       url: 'https://github.com/harshit-001-it'
     },
     {
-      name: 'Diabetes Risk Prediction System',
-      description: 'End-to-end predictive healthcare pipeline where patients input diagnostic parameters to calculate diabetes vulnerability powered by an optimized classifier.',
+      name: 'Diabetes Prediction',
+      description: 'Built a predictive web application where users input clinical diagnostic metrics to calculate diabetes vulnerability powered by an optimized machine learning classifier.',
       category: 'Machine Learning',
       tags: ['Python', 'Scikit-Learn', 'Classification', 'Healthcare'],
-      stars: 10,
       url: 'https://github.com/harshit-001-it'
     },
     {
-      name: 'Fake News Prediction Model',
-      description: 'Natural language processing classifier that evaluates text bodies and linguistic patterns to detect misleading or fabricated news articles.',
-      category: 'Data Analytics',
-      tags: ['Python', 'NLP', 'TF-IDF', 'Scikit-Learn'],
-      stars: 12,
-      url: 'https://github.com/harshit-001-it'
-    },
-    {
-      name: 'Sonar Subsea Rock vs Mine Classifier',
-      description: 'Deep acoustic signal classifier analyzing sonar frequency bounces to discriminate between undersea mineral rocks and explosive mines.',
+      name: 'Fake News Prediction',
+      description: 'Developed a natural language processing classifier that evaluates article contents and linguistic patterns to classify news reports as authentic or fabricated.',
       category: 'Machine Learning',
-      tags: ['Python', 'NumPy', 'Signal Processing', 'ML'],
-      stars: 9,
+      tags: ['Python', 'NLP', 'TF-IDF', 'Machine Learning'],
+      url: 'https://github.com/harshit-001-it'
+    },
+    {
+      name: 'Rock and Stone Prediction with Sonar',
+      description: 'Built a machine learning system that collects and analyzes sonar frequency signals to accurately classify underwater objects as rock or stone.',
+      category: 'Machine Learning',
+      tags: ['Python', 'NumPy', 'Signal Classification', 'ML'],
       url: 'https://github.com/harshit-001-it'
     },
     {
       name: 'Library Management System',
-      description: 'Database-backed administrative suite for cataloging inventory, issuing student library credentials, and tracking borrow histories with MySQL.',
+      description: 'Engineered an administrative relational database application to manage complete library operations — adding books, issuing to students, and tracking circulation records.',
       category: 'Systems',
-      tags: ['Python', 'MySQL', 'Database Design', 'CRUD'],
-      stars: 8,
+      tags: ['Python', 'MySQL', 'Relational DB', 'CRUD'],
       url: 'https://github.com/har-001/Personal-Portfolio-Website'
     },
     {
-      name: 'Personal Interactive Portfolio Website',
-      description: 'Hardware-accelerated web experience featuring 3D Three.js physics, titanium credential badge, and an autonomous AI Hub suite.',
+      name: 'Personal Portfolio Website',
+      description: 'Built and deployed this personal portfolio to showcase verified skills, machine learning projects, and contact credentials with 3D hardware-accelerated graphics.',
       category: 'Web Dev',
-      tags: ['Three.js', 'JavaScript', 'CSS3', 'WebGL'],
-      stars: 16,
+      tags: ['React.js', 'Python', 'Three.js', 'WebGL'],
       url: 'https://github.com/har-001/Personal-Portfolio-Website'
     }
   ];
 
-  const categories = ['All', 'Machine Learning', 'Data Analytics', 'Systems', 'Web Dev'];
+  const categories = ['All', 'Machine Learning', 'Systems', 'Web Dev'];
   if (filtersContainer) {
     filtersContainer.innerHTML = categories.map((c, i) => `
       <button class="filter-btn ${i === 0 ? 'active' : ''}" data-cat="${c}">${c}</button>
@@ -1158,14 +1314,16 @@ function renderProjects() {
   }
 
   function renderCards(filterCat) {
-    const filtered = filterCat === 'All' ? resumeProjects : resumeProjects.filter(p => p.category === filterCat || p.tags.includes(filterCat));
+    const filtered = filterCat === 'All'
+      ? resumeProjects
+      : resumeProjects.filter(p => p.category === filterCat || p.tags.includes(filterCat));
 
     gridContainer.innerHTML = filtered.map(p => `
       <div class="project-card glass tilt-card reveal">
         <div class="project-card-header">
           <div class="project-icon-box">🚀</div>
           <div class="project-links-row">
-            <a href="${p.url}" target="_blank" rel="noopener" class="icon-link" title="View Source Code" aria-label="GitHub Repository">
+            <a href="${p.url}" target="_blank" rel="noopener" class="icon-link" title="View Source Code on GitHub" aria-label="GitHub Repository">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
             </a>
           </div>
@@ -1185,78 +1343,78 @@ function renderProjects() {
 }
 
 /* ----------------------------------------------------------------
-   12. RENDER 7 AUTHENTIC CERTIFICATES
+   13. RENDER AUTHENTIC CERTIFICATES (MATCHING CERTIFICATES FOLDER)
    ---------------------------------------------------------------- */
 const certificateData = [
   {
     id: 1,
-    title: 'Machine Learning Foundations',
-    issuer: 'AnalytixLabs',
-    date: 'Dec 2024',
-    icon: '🏆',
-    desc: 'Rigorous foundation in Supervised and Unsupervised machine learning models, cost function minimization, and model optimization.',
-    skills: ['Supervised Learning', 'Linear & Logistic Regression', 'Decision Trees', 'Model Validation'],
-    file: 'Certificates/1746987610367.pdf'
+    title: 'AI Web Development Internship Letter 1',
+    issuer: 'Inamigos Foundation',
+    date: 'Jul 2026',
+    icon: '🌐',
+    desc: 'Official Certificate of Internship for successful completion of the AI Web Development Internship at Inamigos Foundation.',
+    skills: ['AI Web Development', 'Frontend Architecture', 'NGO Donation Portal'],
+    file: 'Certificates/Inamigos Completion letter 1.pdf'
   },
   {
     id: 2,
-    title: 'Applied AI Masterclass',
-    issuer: 'Freedom with AI',
-    date: 'Oct 2024',
-    icon: '🤖',
-    desc: 'Practical prompt engineering, generative model integration, and agentic workflows for modern enterprise automation.',
-    skills: ['Generative AI', 'Agent Workflows', 'Prompt Design', 'Productivity Engineering'],
-    file: 'Certificates/1746505154279.jpeg'
+    title: 'AI Web Development Internship Letter 2',
+    issuer: 'Inamigos Foundation',
+    date: 'Aug 2026',
+    icon: '📜',
+    desc: 'Advanced Phase Certificate of Internship acknowledging completion of core web modules and full-stack integration.',
+    skills: ['Full-Stack Integration', 'Responsive UI', 'Production Workflow'],
+    file: 'Certificates/Inamigos Completion letter 2.pdf'
   },
   {
     id: 3,
-    title: 'Python Development Internship',
+    title: 'Python Programming Internship Certificate',
     issuer: 'InternPe',
     date: 'Jun 2025',
     icon: '🐍',
-    desc: 'Industrial Python scripting internship focusing on algorithm design, modular software structure, and unit testing.',
-    skills: ['Python 3', 'Data Structures', 'Industrial Scripting', 'Algorithm Optimization'],
+    desc: 'Official Certificate of Completion awarded for one-month intensive Python Programming Internship.',
+    skills: ['Python 3', 'Data Structures', 'Algorithmic Problem Solving', 'Modular Code'],
     file: 'Certificates/InternPe Completion Letter.png'
   },
   {
     id: 4,
-    title: 'AI Web Development Internship',
-    issuer: 'Inamigos Foundation',
-    date: 'Aug 2026',
-    icon: '🌐',
-    desc: 'Engineering NGO donation platform, frontend modules, and responsive user interfaces.',
-    skills: ['Full-Stack Web Dev', 'HTML5/CSS3', 'JavaScript', 'UI Architecture'],
-    file: 'Certificates/Inamigos Completion letter 1.pdf'
+    title: 'Advance Internet of Things (IoT) Training',
+    issuer: 'Technoledge Eduresearch & IIMT',
+    date: 'Academic Workshop',
+    icon: '📡',
+    desc: 'Certificate of Completion for fulfilling all requirements of the Advance Internet of Things training program.',
+    skills: ['Internet of Things (IoT)', 'Sensors', 'Embedded Systems', 'Telemetry'],
+    file: 'Certificates/PrintMerge1 373.pdf'
   },
   {
     id: 5,
-    title: 'Machine Learning & Data Science Workshop',
-    issuer: 'Softpro India / AKTU',
-    date: 'Nov 2024',
-    icon: '💻',
-    desc: 'Hands-on practical training in exploratory data analysis, data pre-processing, and neural network construction.',
-    skills: ['Data Preprocessing', 'Feature Engineering', 'Scikit-Learn', 'Neural Networks'],
-    file: 'Certificates/1746506117256.jpeg'
+    title: 'Technical Training Program Completion',
+    issuer: 'Technoledge Eduresearch / IIMT',
+    date: 'May Batch',
+    icon: '🏆',
+    desc: 'Technical competency recognition from Technoledge Eduresearch Pvt. Ltd. and IIMT College.',
+    skills: ['Applied Engineering', 'Hardware-Software Interfacing', 'Systems Architecture'],
+    file: 'Certificates/IIMT May batch 99.pdf'
   },
   {
     id: 6,
-    title: 'Smart Embedded Systems',
-    issuer: 'Technoledge',
-    date: 'Sep 2024',
-    icon: '📡',
-    desc: 'Hardware-software co-design, microcontroller interfaces, and sensor telemetry protocols.',
-    skills: ['Microcontrollers', 'Sensors Integration', 'Embedded C', 'Hardware Protocols'],
-    file: 'Certificates/IOT First Year 373.pdf'
+    title: 'Technical Certification Matrix',
+    issuer: 'AKTU / IIMT Verification Record',
+    date: 'May 2025',
+    icon: '💻',
+    desc: 'Verified academic and technical achievement record certified for Harshit Mishra.',
+    skills: ['Machine Learning', 'Python Solutions', 'Applied IT Systems'],
+    file: 'Certificates/1746987610367.pdf'
   },
   {
     id: 7,
-    title: 'Technology Startups & IP Workshop',
-    issuer: 'Appwars Technologies',
-    date: 'Jul 2024',
-    icon: '⚖️',
-    desc: 'Intellectual property law, patent filings for software inventions, and technology commercialization.',
-    skills: ['Intellectual Property', 'Software Patents', 'Startup Strategy', 'Tech Law'],
-    file: 'Certificates/PrintMerge1 373.pdf'
+    title: 'Professional Workshop & Training Credentials',
+    issuer: 'Softpro India / Tech Training',
+    date: 'Technical Program',
+    icon: '⚙️',
+    desc: 'Hands-on practical training credential in modern software technologies and engineering frameworks.',
+    skills: ['Software Engineering', 'System Tools', 'Practical Frameworks'],
+    file: 'Certificates/1746506117256.jpeg'
   }
 ];
 
@@ -1268,17 +1426,17 @@ function renderCertificates() {
     <div class="cert-card glass tilt-card reveal" data-cert-id="${cert.id}">
       <div>
         <div class="cert-header">
-          <div class="cert-icon-box">${cert.icon}</div>
-          <div class="cert-meta">
-            <h3 class="cert-title">${cert.title}</h3>
-            <span class="cert-issuer">${cert.issuer} • ${cert.date}</span>
-          </div>
+          <div class="cert-icon">${cert.icon}</div>
+          <span class="cert-date">${cert.date}</span>
         </div>
+        <h3 class="cert-title">${cert.title}</h3>
+        <p class="cert-issuer">${cert.issuer}</p>
         <p class="cert-desc">${cert.desc}</p>
       </div>
-      <div class="cert-footer">
-        <span class="cert-view-btn">Inspect Credentials 📄 ↗</span>
-        <span class="cert-badge-tag">Verified</span>
+      <div class="cert-actions">
+        <a href="${cert.file}" target="_blank" rel="noopener" class="cert-btn-verify">
+          <span>View Document</span> ↗
+        </a>
       </div>
     </div>
   `).join('');
@@ -1287,59 +1445,29 @@ function renderCertificates() {
 }
 
 /* ----------------------------------------------------------------
-   13. CERTIFICATE MODAL VIEWER
+   14. CERTIFICATE MODAL
    ---------------------------------------------------------------- */
 function initCertificateModal() {
   const overlay = document.getElementById('certModalOverlay');
   const closeBtn = document.getElementById('certModalClose');
-  const titleEl = document.getElementById('certModalTitle');
-  const issuerEl = document.getElementById('certModalIssuer');
-  const skillsEl = document.getElementById('certModalSkills');
-  const linkEl = document.getElementById('certModalVerifyLink');
+  const title = document.getElementById('certModalTitle');
+  const issuer = document.getElementById('certModalIssuer');
+  const skillsList = document.getElementById('certModalSkills');
+  const verifyLink = document.getElementById('certModalVerifyLink');
 
-  if (!overlay) return;
+  if (!overlay || !closeBtn) return;
 
-  document.addEventListener('click', (e) => {
-    const card = e.target.closest('.cert-card');
-    if (!card) return;
-
-    const certId = parseInt(card.getAttribute('data-cert-id') || '0', 10);
-    const cert = certificateData.find(c => c.id === certId);
-    if (!cert) return;
-
-    if (titleEl) titleEl.textContent = cert.title;
-    if (issuerEl) issuerEl.textContent = `${cert.issuer} • ${cert.date}`;
-    if (skillsEl) {
-      skillsEl.innerHTML = cert.skills.map(s => `<li>${s}</li>`).join('');
-    }
-    if (linkEl) {
-      linkEl.setAttribute('href', cert.file);
-    }
-
-    overlay.classList.add('active');
+  closeBtn.addEventListener('click', () => {
+    overlay.classList.remove('active');
   });
-
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      overlay.classList.remove('active');
-    });
-  }
 
   overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) {
-      overlay.classList.remove('active');
-    }
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      overlay.classList.remove('active');
-    }
+    if (e.target === overlay) overlay.classList.remove('active');
   });
 }
 
 /* ----------------------------------------------------------------
-   14. CONTACT FORM
+   15. CONTACT FORM SUBMISSION
    ---------------------------------------------------------------- */
 function initContactForm() {
   const form = document.getElementById('contactForm');
@@ -1348,31 +1476,33 @@ function initContactForm() {
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const btn = form.querySelector('.submit-btn');
-    if (btn) btn.disabled = true;
+    const name = document.getElementById('contactName').value;
+    const email = document.getElementById('contactEmail').value;
+    const subject = document.getElementById('contactSubject').value;
+    const message = document.getElementById('contactMessage').value;
 
-    status.style.color = 'var(--accent-cyan)';
-    status.textContent = 'Transmitting message...';
+    status.innerHTML = `<span style="color:var(--accent-cyan);">Preparing message dispatch...</span>`;
+
+    // Construct mailto fallback
+    const mailtoLink = `mailto:harshitmishra1208@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`From: ${name} (${email})\n\nMessage:\n${message}`)}`;
 
     setTimeout(() => {
-      status.style.color = '#34d399';
-      status.textContent = '✓ Message received! Harshit will get in touch shortly.';
+      window.location.href = mailtoLink;
+      status.innerHTML = `<span style="color:#34d399;">Opening your mail client to send message to harshitmishra1208@gmail.com ✓</span>`;
       form.reset();
-      if (btn) btn.disabled = false;
-    }, 1200);
+    }, 600);
   });
 }
 
 /* ----------------------------------------------------------------
-   15. THEME TOGGLE
+   16. THEME TOGGLE
    ---------------------------------------------------------------- */
 function initThemeToggle() {
-  const btn = document.getElementById('themeToggle');
-  if (!btn) return;
+  const toggle = document.getElementById('themeToggle');
+  if (!toggle) return;
 
-  btn.addEventListener('click', () => {
+  toggle.addEventListener('click', () => {
     document.body.classList.toggle('light-theme');
-    const isLight = document.body.classList.contains('light-theme');
-    btn.textContent = isLight ? '☀️' : '🌙';
+    toggle.textContent = document.body.classList.contains('light-theme') ? '☀️' : '🌙';
   });
 }

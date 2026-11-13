@@ -443,6 +443,88 @@
   height: 720px;
 }
 
+.launch-config-window {
+  max-width: 620px;
+}
+
+.launch-modal-body {
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.launch-info-banner {
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.25);
+  border-radius: var(--radius-md, 12px);
+  padding: 1rem 1.25rem;
+}
+
+.launch-info-banner p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-secondary, #cbd5e1);
+}
+
+.launch-url-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.launch-label {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-cyan, #00d4ff);
+}
+
+.launch-input-wrapper {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.launch-url-field {
+  flex: 1;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.launch-url-field:focus {
+  border-color: var(--accent-cyan, #00d4ff);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+}
+
+.launch-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted, #94a3b8);
+  line-height: 1.4;
+}
+
+.launch-actions-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding-top: 0.5rem;
+}
+
+.launch-proceed-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
 .hub-modal-header {
   display: flex;
   align-items: center;
@@ -1158,3 +1240,4 @@
     height: 94vh;
   }
 }
+
