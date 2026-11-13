@@ -761,17 +761,66 @@ img {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
+.cyber-pod-stage,
 .id-card-stage {
   position: relative;
   width: 100%;
-  height: 550px;
+  height: 540px;
   cursor: grab;
   touch-action: pan-y;
   user-select: none;
 }
 
+.cyber-pod-stage:active,
 .id-card-stage:active {
   cursor: grabbing;
+}
+
+/* 3D Holo-Mode Selector Dock */
+.holo-mode-dock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-top: 10px;
+  background: rgba(11, 15, 29, 0.88);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border-glass);
+  padding: 0.35rem 0.55rem;
+  border-radius: var(--radius-full);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 16px rgba(0, 212, 255, 0.08);
+  z-index: 10;
+}
+
+.holo-mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+  padding: 0.4rem 0.85rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.holo-mode-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.holo-mode-btn.active {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.22), rgba(168, 85, 247, 0.22));
+  color: #00f0ff;
+  border-color: rgba(0, 212, 255, 0.45);
+  box-shadow: 0 0 14px rgba(0, 212, 255, 0.25);
+}
+
+.holo-mode-btn .mode-icon {
+  font-size: 0.92rem;
 }
 
 .card-hint-badge {

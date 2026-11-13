@@ -115,7 +115,7 @@
     let bubbleHideTimeout = null;
     const speechPhrases = [
       'Systems 100% nominal! 🚀',
-      'Check out Harshit\'s 3D ID Card above! 🪪',
+      'Check out Harshit\'s 3D Cyber-Pod above! 🛸',
       'Click any skill below to see its roadmap! 🗺️',
       'Autonomous AI Hub workstations online! ⚡',
       '12 projects verified across @har-001 & @harshit-001-it! 🛡️',

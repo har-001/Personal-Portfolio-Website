@@ -137,10 +137,11 @@
       </div>
 
       <!-- Right Column: Physical Titanium ID Card Stage -->
+      <!-- Right Column: 3D Magnetic Levitation Cyber-Pod & Hologram Chamber -->
       <div class="hero-col-right">
         <div class="hero-stage-wrapper">
-          <div class="id-card-stage" id="idCardStage">
-            <button class="card-reset-btn" id="cardResetBtn" title="Reset card orientation" aria-label="Reset Card Orientation">
+          <div class="cyber-pod-stage" id="idCardStage">
+            <button class="card-reset-btn" id="cardResetBtn" title="Reset Pod Orientation" aria-label="Reset Pod Orientation">
               ↺ Reset
             </button>
             <div class="id-card-fallback" id="idCardFallback" style="display:none;">
@@ -152,9 +153,26 @@
               </div>
             </div>
           </div>
+
+          <!-- Interactive 3D Mode Selector Dock -->
+          <div class="holo-mode-dock" id="holoModeDock">
+            <button class="holo-mode-btn active" data-mode="holo-pass" title="Holographic Identity Pass">
+              <span class="mode-icon">🪪</span>
+              <span class="mode-label">Holo-ID</span>
+            </button>
+            <button class="holo-mode-btn" data-mode="neural-core" title="3D Quantum Neural AI Core">
+              <span class="mode-icon">🧠</span>
+              <span class="mode-label">Neural Core</span>
+            </button>
+            <button class="holo-mode-btn" data-mode="telemetry" title="Orbital Systems Telemetry">
+              <span class="mode-icon">📊</span>
+              <span class="mode-label">Telemetry</span>
+            </button>
+          </div>
+
           <div class="card-hint-badge" id="cardHintBadge">
-            <span class="hint-icon" id="cardHintIcon">🔄</span>
-            <span id="cardHintText">Drag to swing • Click to flip • Pull down to explore ↓</span>
+            <span class="hint-icon" id="cardHintIcon">⚡</span>
+            <span id="cardHintText">Drag 360° to inspect • Click pod to fire pulse • Switch modes above ▴</span>
           </div>
         </div>
       </div>

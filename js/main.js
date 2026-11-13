@@ -274,6 +274,7 @@ function initPhysicalTitaniumIDCard() {
   const resetBtn = document.getElementById('cardResetBtn');
   const hintBadge = document.getElementById('cardHintBadge');
   const hintText = document.getElementById('cardHintText');
+  const modeDock = document.getElementById('holoModeDock');
 
   if (!stage) return;
 
@@ -286,8 +287,8 @@ function initPhysicalTitaniumIDCard() {
   let height = stage.clientHeight || 540;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
-  camera.position.set(0, 0, 5.0);
+  const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+  camera.position.set(0, 0.2, 5.0);
 
   let renderer;
   try {
@@ -306,41 +307,27 @@ function initPhysicalTitaniumIDCard() {
     return;
   }
 
-  // Realistic Studio Lighting Setup
-  const ambient = new THREE.AmbientLight(0xffffff, 1.35);
+  // Realistic Studio Lighting
+  const ambient = new THREE.AmbientLight(0xffffff, 1.4);
   scene.add(ambient);
 
-  // Key directional light creating specular sheen on card clearcoat
-  const keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
-  keyLight.position.set(3, 5, 5);
+  const keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
+  keyLight.position.set(3, 5, 4);
   scene.add(keyLight);
 
-  // Cyan fill from left
-  const cyanFill = new THREE.DirectionalLight(0x00d4ff, 1.2);
-  cyanFill.position.set(-4, -1, 3);
-  scene.add(cyanFill);
+  const cyanBaseLight = new THREE.PointLight(0x00f0ff, 3.5, 8);
+  cyanBaseLight.position.set(0, -1.4, 0.8);
+  scene.add(cyanBaseLight);
 
-  // Violet rim from back/right
-  const violetRim = new THREE.DirectionalLight(0x8b5cf6, 1.2);
-  violetRim.position.set(2, -4, -3);
+  const violetRim = new THREE.DirectionalLight(0xa855f7, 2.0);
+  violetRim.position.set(-3, 3, -3);
   scene.add(violetRim);
 
-  // Dynamic Drop Shadow onto wall plane
-  function createShadowTexture() {
-    const sCanvas = document.createElement('canvas');
-    sCanvas.width = 256;
-    sCanvas.height = 256;
-    const sCtx = sCanvas.getContext('2d');
-    const grad = sCtx.createRadialGradient(128, 128, 10, 128, 128, 120);
-    grad.addColorStop(0, 'rgba(0, 0, 0, 0.7)');
-    grad.addColorStop(0.5, 'rgba(0, 0, 0, 0.35)');
-    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    sCtx.fillStyle = grad;
-    sCtx.fillRect(0, 0, 256, 256);
-    return new THREE.CanvasTexture(sCanvas);
-  }
+  const frontAccent = new THREE.PointLight(0x00d4ff, 1.8, 6);
+  frontAccent.position.set(0, 0, 2.2);
+  scene.add(frontAccent);
 
-  // Dynamic Drop Shadow onto wall plane (Dynamically tracked in physics loop)
+  // Dynamic Floor Shadow Texture
   function createShadowTexture() {
     const sCanvas = document.createElement('canvas');
     sCanvas.width = 256;
@@ -356,143 +343,199 @@ function initPhysicalTitaniumIDCard() {
   }
 
   const shadowMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.6, 3.4),
+    new THREE.PlaneGeometry(3.2, 1.6),
     new THREE.MeshBasicMaterial({
       map: createShadowTexture(),
       transparent: true,
-      opacity: 0.55,
+      opacity: 0.6,
       depthWrite: false
     })
   );
-  shadowMesh.position.set(0, -0.20, -0.45);
+  shadowMesh.rotation.x = -Math.PI / 2;
+  shadowMesh.position.set(0, -1.68, 0);
   scene.add(shadowMesh);
 
-  // Master Physical Lanyard Hierarchy
-  const lanyardMaster = new THREE.Group();
-  lanyardMaster.position.set(0, 0, 0);
-  scene.add(lanyardMaster);
+  // 1. BASE DOCK STATION (Anti-Gravity Magnetic Pedestal)
+  const baseGroup = new THREE.Group();
+  baseGroup.position.set(0, -1.45, 0);
+  scene.add(baseGroup);
 
-  // 1. Architectural Brushed Titanium Ceiling/Wall Mount at Top of Canvas (World y = 1.62)
-  const mountGroup = new THREE.Group();
-  mountGroup.position.set(0, 1.62, 0);
-  lanyardMaster.add(mountGroup);
-
-  const mountBaseGeo = new THREE.BoxGeometry(0.85, 0.10, 0.08);
-  const mountBaseMat = new THREE.MeshStandardMaterial({
-    color: 0x1e293b,
-    metalness: 0.92,
-    roughness: 0.25
+  const titaniumMat = new THREE.MeshPhysicalMaterial({
+    color: 0x0c1220,
+    metalness: 0.94,
+    roughness: 0.22,
+    clearcoat: 0.6
   });
-  const mountBase = new THREE.Mesh(mountBaseGeo, mountBaseMat);
-  mountGroup.add(mountBase);
 
-  // Chrome Hex Screws on Top Mount
-  const boltGeo = new THREE.CylinderGeometry(0.024, 0.024, 0.09, 6);
   const chromeMat = new THREE.MeshStandardMaterial({
     color: 0xf8fafc,
     metalness: 0.98,
     roughness: 0.1
   });
-  [-0.34, -0.12, 0.12, 0.34].forEach(bx => {
-    const bolt = new THREE.Mesh(boltGeo, chromeMat);
-    bolt.rotation.x = Math.PI / 2;
-    bolt.position.set(bx, 0, 0.02);
-    mountGroup.add(bolt);
+
+  // Main Pedestal Cylinder
+  const baseCylGeo = new THREE.CylinderGeometry(1.4, 1.65, 0.25, 36);
+  const baseCyl = new THREE.Mesh(baseCylGeo, titaniumMat);
+  baseGroup.add(baseCyl);
+
+  // Top Induction Plate
+  const plateGeo = new THREE.CylinderGeometry(1.3, 1.3, 0.04, 36);
+  const plateMat = new THREE.MeshStandardMaterial({
+    color: 0x111827,
+    metalness: 0.8,
+    roughness: 0.3
+  });
+  const plate = new THREE.Mesh(plateGeo, plateMat);
+  plate.position.y = 0.13;
+  baseGroup.add(plate);
+
+  // Outer Glowing Induction Ring (Cyan)
+  const outerRingGeo = new THREE.TorusGeometry(1.12, 0.03, 16, 48);
+  const neonCyanMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+  const outerRing = new THREE.Mesh(outerRingGeo, neonCyanMat);
+  outerRing.rotation.x = Math.PI / 2;
+  outerRing.position.y = 0.15;
+  baseGroup.add(outerRing);
+
+  // Inner Glowing Induction Ring (Violet)
+  const innerRingGeo = new THREE.TorusGeometry(0.72, 0.022, 16, 36);
+  const neonVioletMat = new THREE.MeshBasicMaterial({ color: 0xa855f7 });
+  const innerRing = new THREE.Mesh(innerRingGeo, neonVioletMat);
+  innerRing.rotation.x = Math.PI / 2;
+  innerRing.position.y = 0.155;
+  baseGroup.add(innerRing);
+
+  // 3 Magnetic Projector Pylons
+  const pylons = [];
+  const beamGeo = new THREE.CylinderGeometry(0.018, 0.028, 1.25, 12);
+  const beamMat = new THREE.MeshBasicMaterial({
+    color: 0x00d4ff,
+    transparent: true,
+    opacity: 0.35,
+    side: THREE.DoubleSide
   });
 
-  // Dual Chrome Lanyard Suspension Eyelets
-  const eyeletGeo = new THREE.TorusGeometry(0.045, 0.015, 10, 20);
-  [-0.18, 0.18].forEach(ex => {
-    const eyelet = new THREE.Mesh(eyeletGeo, chromeMat);
-    eyelet.position.set(ex, -0.06, 0);
-    mountGroup.add(eyelet);
-  });
+  for (let i = 0; i < 3; i++) {
+    const angle = i * (Math.PI * 2 / 3);
+    const px = Math.cos(angle) * 1.15;
+    const pz = Math.sin(angle) * 1.15;
 
-  // 2. Braided Fabric Strap Texture (Procedural Canvas)
-  function createStrapTexture() {
-    const strapCanvas = document.createElement('canvas');
-    strapCanvas.width = 64;
-    strapCanvas.height = 256;
-    const sCtx = strapCanvas.getContext('2d');
+    const pylon = new THREE.Group();
+    pylon.position.set(px, 0.16, pz);
 
-    sCtx.fillStyle = '#0f172a';
-    sCtx.fillRect(0, 0, 64, 256);
+    const footMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.16, 0.18), titaniumMat);
+    pylon.add(footMesh);
 
-    // Diagonal herringbone weave pattern
-    sCtx.strokeStyle = 'rgba(0, 212, 255, 0.3)';
-    sCtx.lineWidth = 2;
-    for (let y = -64; y < 320; y += 8) {
-      sCtx.beginPath();
-      sCtx.moveTo(0, y);
-      sCtx.lineTo(32, y + 16);
-      sCtx.lineTo(64, y);
-      sCtx.stroke();
-    }
+    const emitterLens = new THREE.Mesh(new THREE.SphereGeometry(0.045, 16, 16), neonCyanMat);
+    emitterLens.position.y = 0.09;
+    pylon.add(emitterLens);
 
-    // Edge seams
-    sCtx.strokeStyle = '#00d4ff';
-    sCtx.lineWidth = 3;
-    sCtx.beginPath();
-    sCtx.moveTo(2, 0); sCtx.lineTo(2, 256);
-    sCtx.moveTo(62, 0); sCtx.lineTo(62, 256);
-    sCtx.stroke();
+    baseGroup.add(pylon);
+    pylons.push(pylon);
 
-    const tex = new THREE.CanvasTexture(strapCanvas);
-    tex.wrapS = THREE.RepeatWrapping;
-    tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(1, 2);
-    return tex;
+    // Containment beam stretching to floating pod
+    const beam = new THREE.Mesh(beamGeo, beamMat);
+    beam.position.set(px * 0.7, 0.75, pz * 0.7);
+    beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(-px * 0.45, 1.2, -pz * 0.45).normalize());
+    baseGroup.add(beam);
   }
 
-  const strapMat = new THREE.MeshStandardMaterial({
-    map: createStrapTexture(),
-    roughness: 0.8,
-    metalness: 0.15
+  // Anti-Gravity Rising Particle Motes
+  const PARTICLE_COUNT = 24;
+  const partGeo = new THREE.SphereGeometry(0.022, 8, 8);
+  const partMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.75 });
+  const fluxParticles = [];
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const p = new THREE.Mesh(partGeo, partMat);
+    p.position.set(
+      (Math.random() - 0.5) * 1.6,
+      Math.random() * 2.2 - 1.2,
+      (Math.random() - 0.5) * 1.6
+    );
+    scene.add(p);
+    fluxParticles.push({
+      mesh: p,
+      speedY: 0.008 + Math.random() * 0.012,
+      baseRadius: 0.3 + Math.random() * 0.5,
+      angle: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.02
+    });
+  }
+
+  // 2. MASTER LEVITATING CYBER-CHAMBER (Floats at y = 0.05)
+  const chamberGroup = new THREE.Group();
+  chamberGroup.position.set(0, 0.05, 0);
+  scene.add(chamberGroup);
+
+  // Outer Hexagonal Crown Top & Bottom Caps
+  const crownGeo = new THREE.CylinderGeometry(1.08, 1.15, 0.14, 6);
+  const topCrown = new THREE.Mesh(crownGeo, titaniumMat);
+  topCrown.position.y = 1.32;
+  chamberGroup.add(topCrown);
+
+  const bottomCrown = new THREE.Mesh(crownGeo, titaniumMat);
+  bottomCrown.position.y = -1.32;
+  bottomCrown.rotation.x = Math.PI;
+  chamberGroup.add(bottomCrown);
+
+  // 6 Vertical Structural Cyber Struts
+  const strutGeo = new THREE.BoxGeometry(0.05, 2.5, 0.08);
+  for (let i = 0; i < 6; i++) {
+    const angle = i * (Math.PI / 3);
+    const strut = new THREE.Mesh(strutGeo, chromeMat);
+    strut.position.set(Math.cos(angle) * 1.06, 0, Math.sin(angle) * 1.06);
+    strut.rotation.y = -angle;
+    chamberGroup.add(strut);
+  }
+
+  // Cylindrical Cyber-Glass Shield
+  const glassGeo = new THREE.CylinderGeometry(1.05, 1.05, 2.50, 32, 1, true);
+  const glassMat = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.22,
+    roughness: 0.05,
+    metalness: 0.1,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.05,
+    transmission: 0.9,
+    depthWrite: false
   });
+  const glassShield = new THREE.Mesh(glassGeo, glassMat);
+  chamberGroup.add(glassShield);
 
-  // Dual converging lanyard straps (from eyelets y=1.56 down to crimp sleeve y=0.98)
-  const strapGeo = new THREE.BoxGeometry(0.12, 0.65, 0.02);
-  const strapL = new THREE.Mesh(strapGeo, strapMat);
-  strapL.position.set(-0.09, 1.28, 0);
-  strapL.rotation.z = -0.14;
-  lanyardMaster.add(strapL);
+  // Shockwave Energy Pulse Ring
+  const pulseRingGeo = new THREE.RingGeometry(0.1, 0.22, 36);
+  const pulseRingMat = new THREE.MeshBasicMaterial({
+    color: 0x00f0ff,
+    transparent: true,
+    opacity: 0,
+    side: THREE.DoubleSide
+  });
+  const pulseRing = new THREE.Mesh(pulseRingGeo, pulseRingMat);
+  pulseRing.position.z = 0.05;
+  chamberGroup.add(pulseRing);
+  let pulseActive = false;
+  let pulseScale = 0.1;
+  let pulseOpacity = 0;
+  let pulseRecoil = 0;
 
-  const strapR = new THREE.Mesh(strapGeo, strapMat);
-  strapR.position.set(0.09, 1.28, 0);
-  strapR.rotation.z = 0.14;
-  lanyardMaster.add(strapR);
+  // Master Hologram Content Group inside the chamber
+  const holoContentGroup = new THREE.Group();
+  chamberGroup.add(holoContentGroup);
 
-  // 3. Metallic Hardware (Chrome Finish)
-  // Crimp clamp sleeve
-  const crimpSleeve = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.10, 0.07), chromeMat);
-  crimpSleeve.position.set(0, 0.98, 0);
-  lanyardMaster.add(crimpSleeve);
+  // ===============================================================
+  // MODE 1: HOLOGRAPHIC IDENTITY PASS (Holo-ID)
+  // ===============================================================
+  const holoPassGroup = new THREE.Group();
+  holoContentGroup.add(holoPassGroup);
 
-  // Swivel barrel joint
-  const swivelBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.048, 0.048, 0.14, 16), chromeMat);
-  swivelBarrel.position.set(0, 0.90, 0);
-  lanyardMaster.add(swivelBarrel);
-
-  // Heavy-Duty Carabiner Swivel Hook (Passing right through the slot hole of the card at y = 0.825)
-  const carabinerHook = new THREE.Mesh(
-    new THREE.TorusGeometry(0.105, 0.030, 12, 24, Math.PI * 1.65),
-    chromeMat
-  );
-  carabinerHook.position.set(0, 0.81, 0);
-  carabinerHook.rotation.set(0, Math.PI / 4, Math.PI / 6);
-  lanyardMaster.add(carabinerHook);
-
-  // 4. Card Pendulum Group (Centered vertically at world y = -0.20)
-  const cardGroup = new THREE.Group();
-  cardGroup.position.set(0, -0.20, 0);
-  lanyardMaster.add(cardGroup);
-
-  const cardW = 1.55;
-  const cardH = 2.35;
+  const cardW = 1.42;
+  const cardH = 2.15;
   const cardR = 0.12;
-  const thickness = 0.042;
+  const cardThick = 0.04;
 
-  // Beveled Titanium / Composite Card Body
   const cardShape = new THREE.Shape();
   cardShape.moveTo(-cardW / 2 + cardR, cardH / 2);
   cardShape.lineTo(cardW / 2 - cardR, cardH / 2);
@@ -504,70 +547,37 @@ function initPhysicalTitaniumIDCard() {
   cardShape.lineTo(-cardW / 2, cardH / 2 - cardR);
   cardShape.quadraticCurveTo(-cardW / 2, cardH / 2, -cardW / 2 + cardR, cardH / 2);
 
-  // Slot Punch Hole at Top (Card Local y = cardH / 2 - 0.15 = 1.025 -> World y = 0.825)
-  const slotW = 0.36;
-  const slotH = 0.075;
-  const slotY = cardH / 2 - 0.15;
-  const slotHole = new THREE.Path();
-  slotHole.moveTo(-slotW / 2, slotY - slotH / 2);
-  slotHole.lineTo(slotW / 2, slotY - slotH / 2);
-  slotHole.lineTo(slotW / 2, slotY + slotH / 2);
-  slotHole.lineTo(-slotW / 2, slotY + slotH / 2);
-  slotHole.closePath();
-  cardShape.holes.push(slotHole);
-
-  const extrudeSettings = {
-    depth: thickness,
+  const passGeo = new THREE.ExtrudeGeometry(cardShape, {
+    depth: cardThick,
     bevelEnabled: true,
-    bevelSegments: 4,
+    bevelSegments: 3,
     steps: 1,
-    bevelSize: 0.018,
-    bevelThickness: 0.018,
+    bevelSize: 0.016,
+    bevelThickness: 0.016,
     curveSegments: 16
-  };
-
-  const bodyGeo = new THREE.ExtrudeGeometry(cardShape, extrudeSettings);
-  bodyGeo.center();
-
-  // Dark Titanium Core Material with Specular Sheen
-  const titaniumMat = new THREE.MeshPhysicalMaterial({
-    color: 0x0f172a,
-    metalness: 0.94,
-    roughness: 0.22,
-    clearcoat: 0.8,
-    clearcoatRoughness: 0.12
   });
-  const bodyMesh = new THREE.Mesh(bodyGeo, titaniumMat);
-  cardGroup.add(bodyMesh);
+  passGeo.center();
 
-  // Corner Chrome Rivets
-  const rivetGeo = new THREE.CylinderGeometry(0.032, 0.032, thickness + 0.04, 12);
-  const cornerOffsets = [
-    [-cardW / 2 + 0.08, cardH / 2 - 0.08],
-    [cardW / 2 - 0.08, cardH / 2 - 0.08],
-    [-cardW / 2 + 0.08, -cardH / 2 + 0.08],
-    [cardW / 2 - 0.08, -cardH / 2 + 0.08]
-  ];
-  cornerOffsets.forEach(([rx, ry]) => {
-    const rivet = new THREE.Mesh(rivetGeo, chromeMat);
-    rivet.rotation.x = Math.PI / 2;
-    rivet.position.set(rx, ry, 0);
-    cardGroup.add(rivet);
-  });
+  const passCoreMesh = new THREE.Mesh(passGeo, titaniumMat);
+  holoPassGroup.add(passCoreMesh);
 
-  // FRONT & BACK HIGH-DPI CANVAS TEXTURES (1024 x 1600)
+  // Canvas Textures for Front & Back
   const frontCanvas = document.createElement('canvas');
   frontCanvas.width = 1024;
-  frontCanvas.height = 1600;
+  frontCanvas.height = 1500;
   const fCtx = frontCanvas.getContext('2d');
   const frontTexture = new THREE.CanvasTexture(frontCanvas);
   frontTexture.anisotropy = 8;
 
-  const faceW = cardW - 0.04;
-  const faceH = cardH - 0.04;
-  const facePlaneGeo = new THREE.PlaneGeometry(faceW, faceH);
+  const backCanvas = document.createElement('canvas');
+  backCanvas.width = 1024;
+  backCanvas.height = 1500;
+  const bCtx = backCanvas.getContext('2d');
+  const backTexture = new THREE.CanvasTexture(backCanvas);
+  backTexture.anisotropy = 8;
 
-  // MeshPhysicalMaterial with clearcoat for glossy laminated card look!
+  const facePlaneGeo = new THREE.PlaneGeometry(cardW - 0.03, cardH - 0.03);
+
   const frontMat = new THREE.MeshPhysicalMaterial({
     map: frontTexture,
     transparent: true,
@@ -578,16 +588,8 @@ function initPhysicalTitaniumIDCard() {
     reflectivity: 0.85
   });
   const frontMesh = new THREE.Mesh(facePlaneGeo, frontMat);
-  frontMesh.position.z = thickness / 2 + 0.020;
-  cardGroup.add(frontMesh);
-
-  // Back Face
-  const backCanvas = document.createElement('canvas');
-  backCanvas.width = 1024;
-  backCanvas.height = 1600;
-  const bCtx = backCanvas.getContext('2d');
-  const backTexture = new THREE.CanvasTexture(backCanvas);
-  backTexture.anisotropy = 8;
+  frontMesh.position.z = cardThick / 2 + 0.018;
+  holoPassGroup.add(frontMesh);
 
   const backMat = new THREE.MeshPhysicalMaterial({
     map: backTexture,
@@ -599,79 +601,83 @@ function initPhysicalTitaniumIDCard() {
     reflectivity: 0.85
   });
   const backMesh = new THREE.Mesh(facePlaneGeo, backMat);
-  backMesh.position.z = -(thickness / 2 + 0.020);
+  backMesh.position.z = -(cardThick / 2 + 0.018);
   backMesh.rotation.y = Math.PI;
-  cardGroup.add(backMesh);
+  holoPassGroup.add(backMesh);
 
-  // RENDER FRONT FACE (100% VERIFIED AUTHENTIC RESUME CREDENTIALS)
+  // Holographic Orbiting Data Rings around the pass
+  const ringHolo1 = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.012, 12, 48), neonCyanMat);
+  holoPassGroup.add(ringHolo1);
+
+  const ringHolo2 = new THREE.Mesh(new THREE.TorusGeometry(0.92, 0.009, 12, 48), neonVioletMat);
+  ringHolo2.rotation.x = Math.PI / 4;
+  holoPassGroup.add(ringHolo2);
+
+  // Draw Front Face of Holo-Pass
   function drawFrontFace(avatarImg) {
     const w = 1024;
-    const h = 1600;
-
+    const h = 1500;
     fCtx.save();
-    fCtx.textAlign = 'left';
-    fCtx.textBaseline = 'alphabetic';
 
-    // Premium Cyber Dark Card Stock
     const bgGrad = fCtx.createLinearGradient(0, 0, w, h);
     bgGrad.addColorStop(0, '#0c101d');
-    bgGrad.addColorStop(0.4, '#070a14');
+    bgGrad.addColorStop(0.5, '#070a14');
     bgGrad.addColorStop(1, '#0e1526');
     fCtx.fillStyle = bgGrad;
     fCtx.fillRect(0, 0, w, h);
 
-    // Subtle Metallic Grid Circuit Lines
-    fCtx.strokeStyle = 'rgba(0, 212, 255, 0.14)';
+    // Circuit grid lines
+    fCtx.strokeStyle = 'rgba(0, 212, 255, 0.15)';
     fCtx.lineWidth = 2.5;
     fCtx.beginPath();
-    fCtx.moveTo(60, 210); fCtx.lineTo(964, 210);
-    fCtx.moveTo(60, 780); fCtx.lineTo(964, 780);
-    fCtx.moveTo(60, 1340); fCtx.lineTo(964, 1340);
+    fCtx.moveTo(60, 200); fCtx.lineTo(964, 200);
+    fCtx.moveTo(60, 740); fCtx.lineTo(964, 740);
+    fCtx.moveTo(60, 1260); fCtx.lineTo(964, 1260);
     fCtx.stroke();
 
-    // Top Header: Official College & Affiliation
+    // Top Header: College & AKTU
+    fCtx.textAlign = 'left';
     fCtx.fillStyle = '#00d4ff';
-    fCtx.font = 'bold 34px "Space Grotesk", sans-serif';
-    fCtx.fillText('IIMT COLLEGE OF ENGINEERING', 80, 120);
+    fCtx.font = 'bold 32px "Space Grotesk", sans-serif';
+    fCtx.fillText('IIMT COLLEGE OF ENGINEERING', 80, 115);
 
     fCtx.fillStyle = '#94a3b8';
-    fCtx.font = '600 22px "JetBrains Mono", monospace';
-    fCtx.fillText('AKTU // DEPT. OF INFORMATION TECHNOLOGY', 80, 155);
+    fCtx.font = '600 21px "JetBrains Mono", monospace';
+    fCtx.fillText('AKTU // DEPT. OF INFORMATION TECHNOLOGY', 80, 150);
 
-    // Active Clearance Status Pill
+    // Online Status Pill
     fCtx.fillStyle = 'rgba(16, 185, 129, 0.15)';
     fCtx.beginPath();
-    fCtx.roundRect(690, 92, 250, 48, 24);
+    fCtx.roundRect(690, 88, 250, 46, 23);
     fCtx.fill();
-    fCtx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
+    fCtx.strokeStyle = 'rgba(16, 185, 129, 0.45)';
     fCtx.lineWidth = 2;
     fCtx.stroke();
 
     fCtx.fillStyle = '#10b981';
     fCtx.beginPath();
-    fCtx.arc(718, 116, 7, 0, Math.PI * 2);
+    fCtx.arc(716, 111, 7, 0, Math.PI * 2);
     fCtx.fill();
 
     fCtx.fillStyle = '#34d399';
-    fCtx.font = 'bold 20px "JetBrains Mono", monospace';
-    fCtx.fillText('ONLINE // ACTIVE', 738, 123);
+    fCtx.font = 'bold 19px "JetBrains Mono", monospace';
+    fCtx.fillText('ONLINE // ACTIVE', 736, 118);
 
-    // Circular Portrait Cyber Frame (Centered at 512, 485)
+    // Official Portrait Frame
     const cx = 512;
-    const cy = 485;
-    const r = 210;
+    const cy = 460;
+    const r = 200;
 
     fCtx.save();
     fCtx.beginPath();
-    fCtx.arc(cx, cy, r + 10, 0, Math.PI * 2);
+    fCtx.arc(cx, cy, r + 8, 0, Math.PI * 2);
     fCtx.strokeStyle = '#00d4ff';
-    fCtx.lineWidth = 6;
+    fCtx.lineWidth = 5;
     fCtx.shadowColor = '#00d4ff';
-    fCtx.shadowBlur = 24;
+    fCtx.shadowBlur = 20;
     fCtx.stroke();
     fCtx.restore();
 
-    // Draw Harshit's Authentic Photo
     if (avatarImg && avatarImg.complete && avatarImg.naturalWidth > 0) {
       fCtx.save();
       fCtx.beginPath();
@@ -685,52 +691,50 @@ function initPhysicalTitaniumIDCard() {
       fCtx.arc(cx, cy, r, 0, Math.PI * 2);
       fCtx.fill();
       fCtx.fillStyle = '#ffffff';
-      fCtx.font = 'bold 120px sans-serif';
+      fCtx.font = 'bold 110px sans-serif';
       fCtx.textAlign = 'center';
-      fCtx.fillText('HM', cx, cy + 40);
+      fCtx.fillText('HM', cx, cy + 35);
       fCtx.textAlign = 'left';
     }
 
-    // Name & Official Designation
+    // Name & Title
     fCtx.textAlign = 'center';
     fCtx.fillStyle = '#ffffff';
-    fCtx.font = '900 60px "Space Grotesk", sans-serif';
-    fCtx.fillText('HARSHIT MISHRA', cx, 865);
+    fCtx.font = '900 58px "Space Grotesk", sans-serif';
+    fCtx.fillText('HARSHIT MISHRA', cx, 815);
 
     fCtx.fillStyle = '#00d4ff';
-    fCtx.font = 'bold 30px "JetBrains Mono", monospace';
-    fCtx.fillText('AI / ML ENGINEER & FULL-STACK DEV', cx, 920);
+    fCtx.font = 'bold 28px "JetBrains Mono", monospace';
+    fCtx.fillText('AI / ML ENGINEER & FULL-STACK DEV', cx, 865);
 
     fCtx.fillStyle = '#94a3b8';
-    fCtx.font = '600 24px "Inter", sans-serif';
-    fCtx.fillText('B.Tech CSE (IT) • IIMT College • CGPA: 6.64', cx, 968);
+    fCtx.font = '600 23px "Inter", sans-serif';
+    fCtx.fillText('B.Tech CSE (IT) • IIMT College • CGPA: 6.64', cx, 912);
 
-    // Verified Skills Badges Row (Strictly from resume)
+    // Verified Skills Badges Row
     const badges = ['PYTHON 3', 'MACHINE LEARNING', 'TENSORFLOW', 'REACT.JS'];
     let bx = 90;
     badges.forEach((b) => {
       fCtx.fillStyle = 'rgba(0, 212, 255, 0.08)';
       fCtx.beginPath();
-      fCtx.roundRect(bx, 1030, 195, 48, 10);
+      fCtx.roundRect(bx, 970, 195, 46, 10);
       fCtx.fill();
       fCtx.strokeStyle = 'rgba(0, 212, 255, 0.28)';
       fCtx.lineWidth = 1.5;
       fCtx.stroke();
 
       fCtx.fillStyle = '#e2e8f0';
-      fCtx.font = 'bold 20px "JetBrains Mono", monospace';
-      fCtx.fillText(b, bx + 97, 1061);
+      fCtx.font = 'bold 19px "JetBrains Mono", monospace';
+      fCtx.fillText(b, bx + 97, 1000);
       bx += 215;
     });
 
-    // Authentic Gold Metallic EMV Smart Chip
+    // Authentic Gold EMV Smart Chip
     fCtx.textAlign = 'left';
     const chipX = 80;
-    const chipY = 1130;
-    const chipW = 140;
-    const chipH = 95;
-    const chipR = 12;
-
+    const chipY = 1065;
+    const chipW = 135;
+    const chipH = 90;
     const chipGrad = fCtx.createLinearGradient(chipX, chipY, chipX + chipW, chipY + chipH);
     chipGrad.addColorStop(0, '#f59e0b');
     chipGrad.addColorStop(0.35, '#fef08a');
@@ -740,71 +744,53 @@ function initPhysicalTitaniumIDCard() {
 
     fCtx.fillStyle = chipGrad;
     fCtx.beginPath();
-    fCtx.roundRect(chipX, chipY, chipW, chipH, chipR);
+    fCtx.roundRect(chipX, chipY, chipW, chipH, 10);
     fCtx.fill();
     fCtx.strokeStyle = '#78350f';
     fCtx.lineWidth = 2;
     fCtx.stroke();
 
-    // Etched Contact Pad Divisions
     fCtx.strokeStyle = 'rgba(120, 53, 15, 0.75)';
     fCtx.lineWidth = 2;
-
     fCtx.beginPath();
     fCtx.moveTo(chipX + 8, chipY + chipH / 2);
     fCtx.lineTo(chipX + chipW - 8, chipY + chipH / 2);
     fCtx.stroke();
 
-    fCtx.beginPath();
-    fCtx.roundRect(chipX + 42, chipY + 18, 56, 59, 6);
-    fCtx.stroke();
-
-    fCtx.beginPath();
-    fCtx.moveTo(chipX + 42, chipY + 6);
-    fCtx.lineTo(chipX + 42, chipY + 18);
-    fCtx.moveTo(chipX + 98, chipY + 6);
-    fCtx.lineTo(chipX + 98, chipY + 18);
-    fCtx.moveTo(chipX + 42, chipY + 77);
-    fCtx.lineTo(chipX + 42, chipY + chipH - 6);
-    fCtx.moveTo(chipX + 98, chipY + 77);
-    fCtx.lineTo(chipX + 98, chipY + chipH - 6);
-    fCtx.stroke();
-
-    // Clearance and Credentials Matrix Details
+    // Security Clearance Text
     fCtx.fillStyle = '#64748b';
-    fCtx.font = '600 22px "JetBrains Mono", monospace';
-    fCtx.fillText('STUDENT ID: #HM-2026-IIMT-IT', 250, 1165);
-    fCtx.fillText('AFFILIATION: DR. A.P.J. ABDUL KALAM TECH UNIV', 250, 1200);
-    fCtx.fillStyle = '#00d4ff';
-    fCtx.fillText('STATUS: AUTHENTIC VERIFIED PASS', 250, 1235);
+    fCtx.font = 'bold 20px "JetBrains Mono", monospace';
+    fCtx.fillText('CLEARANCE: LEVEL-5 ACTIVE', 240, 1105);
+    fCtx.fillStyle = '#38bdf8';
+    fCtx.font = '600 19px "JetBrains Mono", monospace';
+    fCtx.fillText('ID: HM-2026-IT // BATCH: 2022-2026', 240, 1138);
 
-    // High-Density Code-128 Barcode Pattern
-    const barStartX = 80;
-    const barY = 1310;
-    const barH = 75;
-    fCtx.fillStyle = '#f8fafc';
-    for (let x = barStartX; x < 944; x += 9) {
-      const wBar = (x % 27 === 0 || x % 63 === 0) ? 6 : 2.5;
-      fCtx.fillRect(x, barY, wBar, barH);
+    // Code 128 Barcode at bottom
+    fCtx.fillStyle = '#ffffff';
+    fCtx.fillRect(80, 1290, 864, 75);
+    fCtx.fillStyle = '#0f172a';
+    const barPattern = [3, 2, 4, 1, 2, 4, 3, 1, 2, 3, 4, 2, 1, 3, 2, 4, 1, 3, 2, 4, 3, 1, 2, 4, 1, 3, 2, 4, 3, 2, 1, 4, 2, 3, 1, 4, 3, 2, 4, 1, 2, 3, 4, 1, 3, 2, 4, 2, 1, 3, 4, 2, 3, 1, 2, 4, 3, 1, 2, 4];
+    let barX = 110;
+    for (let i = 0; i < barPattern.length; i++) {
+      const bW = barPattern[i] * 3.2;
+      if (i % 2 === 0) fCtx.fillRect(barX, 1300, bW, 55);
+      barX += bW + 2;
     }
 
     fCtx.fillStyle = '#64748b';
-    fCtx.font = '20px "JetBrains Mono", monospace';
+    fCtx.font = '18px "JetBrains Mono", monospace';
     fCtx.textAlign = 'center';
-    fCtx.fillText('OFFICIAL IDENTITY CREDENTIAL • IIMT COLLEGE OF ENGINEERING', cx, 1440);
+    fCtx.fillText('VERIFIED AUTHENTIC CREDENTIAL // CODE-128 AUTH: HM-AKTU-2026', 512, 1400);
 
     fCtx.restore();
     frontTexture.needsUpdate = true;
   }
 
-  // RENDER BACK FACE (VERIFIED EDUCATION, INTERNSHIPS, PROJECTS)
+  // Draw Back Face of Holo-Pass
   function drawBackFace() {
     const w = 1024;
-    const h = 1600;
-
+    const h = 1500;
     bCtx.save();
-    bCtx.textAlign = 'left';
-    bCtx.textBaseline = 'alphabetic';
 
     const bgGrad = bCtx.createLinearGradient(0, 0, w, h);
     bgGrad.addColorStop(0, '#0c101d');
@@ -813,102 +799,99 @@ function initPhysicalTitaniumIDCard() {
     bCtx.fillStyle = bgGrad;
     bCtx.fillRect(0, 0, w, h);
 
-    // Top Magnetic Stripe
+    // Magnetic Stripe
     bCtx.fillStyle = '#020617';
     bCtx.fillRect(0, 40, w, 110);
     bCtx.fillStyle = '#334155';
     bCtx.fillRect(0, 75, w, 40);
 
-    // Header
     bCtx.fillStyle = '#00d4ff';
-    bCtx.font = 'bold 34px "Space Grotesk", sans-serif';
-    bCtx.fillText('ACADEMIC & PROFESSIONAL CREDENTIALS', 80, 200);
+    bCtx.font = 'bold 32px "Space Grotesk", sans-serif';
+    bCtx.fillText('ACADEMIC & PROFESSIONAL CREDENTIALS', 80, 195);
 
     bCtx.fillStyle = '#94a3b8';
-    bCtx.font = '600 22px "JetBrains Mono", monospace';
-    bCtx.fillText('VERIFIED RESUME RECORD // HARSHIT MISHRA', 80, 235);
+    bCtx.font = '600 21px "JetBrains Mono", monospace';
+    bCtx.fillText('VERIFIED RECORD // HARSHIT MISHRA', 80, 230);
 
-    // Section 1: Academic Milestones
+    // Academic Section
     bCtx.fillStyle = 'rgba(255, 255, 255, 0.03)';
     bCtx.beginPath();
-    bCtx.roundRect(70, 280, 884, 270, 16);
+    bCtx.roundRect(70, 265, 884, 250, 14);
     bCtx.fill();
     bCtx.strokeStyle = 'rgba(0, 212, 255, 0.2)';
     bCtx.lineWidth = 1.5;
     bCtx.stroke();
 
     bCtx.fillStyle = '#00d4ff';
-    bCtx.font = 'bold 28px "Space Grotesk", sans-serif';
-    bCtx.fillText('🎓 Verified Academic Milestones', 105, 335);
+    bCtx.font = 'bold 26px "Space Grotesk", sans-serif';
+    bCtx.fillText('🎓 Verified Academic Milestones', 105, 315);
 
     bCtx.fillStyle = '#cbd5e1';
-    bCtx.font = '500 23px "Inter", sans-serif';
-    bCtx.fillText('• B.Tech in CSE (IT) — IIMT College of Engineering (CGPA: 6.64)', 105, 385);
-    bCtx.fillText('• Class XII CBSE — Army Public School, Lucknow (71.6% • 2023)', 105, 435);
-    bCtx.fillText('• Class X CBSE — Army Public School, Lucknow (91.4% • 2021)', 105, 485);
+    bCtx.font = '500 22px "Inter", sans-serif';
+    bCtx.fillText('• B.Tech in CSE (IT) — IIMT College of Engineering (CGPA: 6.64)', 105, 365);
+    bCtx.fillText('• Class XII CBSE — Army Public School, Lucknow (71.6% • 2023)', 105, 415);
+    bCtx.fillText('• Class X CBSE — Army Public School, Lucknow (91.4% • 2021)', 105, 465);
 
-    // Section 2: Industrial Internships
+    // Internships Section
     bCtx.fillStyle = 'rgba(255, 255, 255, 0.03)';
     bCtx.beginPath();
-    bCtx.roundRect(70, 580, 884, 270, 16);
+    bCtx.roundRect(70, 540, 884, 250, 14);
     bCtx.fill();
-    bCtx.strokeStyle = 'rgba(139, 92, 246, 0.2)';
+    bCtx.strokeStyle = 'rgba(168, 85, 247, 0.2)';
     bCtx.stroke();
 
     bCtx.fillStyle = '#a855f7';
-    bCtx.font = 'bold 28px "Space Grotesk", sans-serif';
-    bCtx.fillText('💼 Verified Industrial Internships', 105, 635);
+    bCtx.font = 'bold 26px "Space Grotesk", sans-serif';
+    bCtx.fillText('💼 Verified Industrial Internships', 105, 590);
 
     bCtx.fillStyle = '#cbd5e1';
-    bCtx.font = '500 23px "Inter", sans-serif';
-    bCtx.fillText('• AI Web Developer — Inamigos Foundation (Jul 2026 – Aug 2026)', 105, 685);
-    bCtx.fillText('  Engineered NGO donation portal and responsive full-stack modules.', 105, 725);
-    bCtx.fillText('• Python Programming Intern — InternPe (May 2025 – Jun 2025)', 105, 775);
-    bCtx.fillText('  Built modular Python scripts, algorithms, and data structures.', 105, 815);
+    bCtx.font = '500 22px "Inter", sans-serif';
+    bCtx.fillText('• AI Web Developer — Inamigos Foundation (Jul 2026 – Aug 2026)', 105, 640);
+    bCtx.fillText('  Engineered NGO donation portal and responsive web modules.', 105, 678);
+    bCtx.fillText('• Python Programming Intern — InternPe (May 2025 – Jun 2025)', 105, 725);
+    bCtx.fillText('  Built modular Python scripts, algorithms, and data structures.', 105, 763);
 
-    // Section 3: Verified Projects List
+    // GitHub Repositories Section
     bCtx.fillStyle = 'rgba(255, 255, 255, 0.03)';
     bCtx.beginPath();
-    bCtx.roundRect(70, 880, 884, 330, 16);
+    bCtx.roundRect(70, 815, 884, 300, 14);
     bCtx.fill();
     bCtx.strokeStyle = 'rgba(16, 185, 129, 0.25)';
     bCtx.stroke();
 
     bCtx.fillStyle = '#34d399';
-    bCtx.font = 'bold 27px "Space Grotesk", sans-serif';
-    bCtx.fillText('🚀 Verified GitHub Repositories (@har-001 & @harshit-001-it)', 105, 930);
+    bCtx.font = 'bold 26px "Space Grotesk", sans-serif';
+    bCtx.fillText('🚀 Verified GitHub Repositories (@har-001 & @harshit-001-it)', 105, 865);
 
     bCtx.fillStyle = '#cbd5e1';
-    bCtx.font = '500 21px "Inter", sans-serif';
-    bCtx.fillText('• Personal Portfolio Website (3D WebGL, Physics) [LIVE]', 105, 975);
-    bCtx.fillText('• NIVA AI Task & Conversational Assistant (Python, LLM)', 105, 1015);
-    bCtx.fillText('• Human Emotion Recognition System (CNN, OpenCV, DL)', 105, 1055);
-    bCtx.fillText('• Diabetes & Heart Disease Prediction (Scikit-Learn ML)', 105, 1095);
-    bCtx.fillText('• VedoraAI Trading Market Prediction Bot (Python)', 105, 1135);
-    bCtx.fillText('• Rock & Stone Sonar Classifier & Library System (MySQL)', 105, 1175);
+    bCtx.font = '500 20px "Inter", sans-serif';
+    bCtx.fillText('• Personal Portfolio Website (3D WebGL, Physics) [LIVE DEMO]', 105, 910);
+    bCtx.fillText('• NIVA AI Task & Conversational Assistant (Python, LLM)', 105, 948);
+    bCtx.fillText('• Human Emotion Recognition System (CNN, OpenCV, Deep Learning)', 105, 986);
+    bCtx.fillText('• Diabetes & Heart Disease Prediction Models (Scikit-Learn ML)', 105, 1024);
+    bCtx.fillText('• VedoraAI Trading Market Prediction Bot & Platform (Python)', 105, 1062);
 
-    // Official Signature Strip & Verification Footer
+    // Signature Strip
     bCtx.fillStyle = '#f8fafc';
-    bCtx.fillRect(100, 1250, 480, 65);
+    bCtx.fillRect(100, 1145, 460, 60);
     bCtx.fillStyle = '#1e293b';
     bCtx.font = 'italic bold 28px "Space Grotesk", cursive';
-    bCtx.fillText('Harshit Mishra', 140, 1294);
+    bCtx.fillText('Harshit Mishra', 140, 1188);
 
     bCtx.fillStyle = '#64748b';
-    bCtx.font = '20px "JetBrains Mono", monospace';
-    bCtx.fillText('AUTHORIZED HOLDER SIGNATURE', 100, 1345);
-    bCtx.fillText('OFFICIAL REPOSITORY: github.com/harshit-001-it', 100, 1380);
+    bCtx.font = '19px "JetBrains Mono", monospace';
+    bCtx.fillText('OFFICIAL GITHUB: github.com/har-001', 100, 1235);
+    bCtx.fillText('SECONDARY REPO: github.com/harshit-001-it', 100, 1265);
 
     bCtx.fillStyle = '#94a3b8';
     bCtx.textAlign = 'center';
-    bCtx.font = 'bold 24px "Space Grotesk", sans-serif';
-    bCtx.fillText('Click badge again to flip to front face', 512, 1480);
+    bCtx.font = 'bold 23px "Space Grotesk", sans-serif';
+    bCtx.fillText('Click to flip back to front face ↺', 512, 1370);
 
     bCtx.restore();
     backTexture.needsUpdate = true;
   }
 
-  // Load Authentic Photo
   const avatarImg = new Image();
   avatarImg.crossOrigin = 'anonymous';
   avatarImg.src = 'image.png';
@@ -917,7 +900,166 @@ function initPhysicalTitaniumIDCard() {
   drawFrontFace(null);
   drawBackFace();
 
-  // Physics, Drag & Elastic Pull-Down Mechanics
+  // ===============================================================
+  // MODE 2: 3D QUANTUM NEURAL AI CORE
+  // ===============================================================
+  const neuralCoreGroup = new THREE.Group();
+  neuralCoreGroup.visible = false;
+  holoContentGroup.add(neuralCoreGroup);
+
+  // Central Pulsating Energy Singularity
+  const coreSingularityGeo = new THREE.SphereGeometry(0.38, 28, 28);
+  const coreSingularityMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+  const coreSingularity = new THREE.Mesh(coreSingularityGeo, coreSingularityMat);
+  neuralCoreGroup.add(coreSingularity);
+
+  const coreAuraGeo = new THREE.SphereGeometry(0.48, 20, 20);
+  const coreAuraMat = new THREE.MeshBasicMaterial({ color: 0xa855f7, transparent: true, opacity: 0.35 });
+  const coreAura = new THREE.Mesh(coreAuraGeo, coreAuraMat);
+  neuralCoreGroup.add(coreAura);
+
+  // 3D Neural Network Nodes & Synaptic Connections
+  const NODE_COUNT = 28;
+  const neuralNodes = [];
+  const nodeGeo = new THREE.SphereGeometry(0.045, 12, 12);
+  const nodeMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+
+  for (let i = 0; i < NODE_COUNT; i++) {
+    const phi = Math.acos(-1 + (2 * i) / NODE_COUNT);
+    const theta = Math.sqrt(NODE_COUNT * Math.PI) * phi;
+    const r = 0.95;
+    const nx = Math.cos(theta) * Math.sin(phi) * r;
+    const ny = Math.sin(theta) * Math.sin(phi) * r;
+    const nz = Math.cos(phi) * r;
+
+    const nMesh = new THREE.Mesh(nodeGeo, nodeMat);
+    nMesh.position.set(nx, ny, nz);
+    neuralCoreGroup.add(nMesh);
+    neuralNodes.push({ pos: new THREE.Vector3(nx, ny, nz), mesh: nMesh });
+  }
+
+  // Synaptic Line Segments
+  const linePositions = [];
+  for (let i = 0; i < NODE_COUNT; i++) {
+    for (let j = i + 1; j < NODE_COUNT; j++) {
+      if (neuralNodes[i].pos.distanceTo(neuralNodes[j].pos) < 0.65) {
+        linePositions.push(
+          neuralNodes[i].pos.x, neuralNodes[i].pos.y, neuralNodes[i].pos.z,
+          neuralNodes[j].pos.x, neuralNodes[j].pos.y, neuralNodes[j].pos.z
+        );
+      }
+    }
+  }
+  const linesGeo = new THREE.BufferGeometry();
+  linesGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+  const linesMat = new THREE.LineBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.4 });
+  const synapticLines = new THREE.LineSegments(linesGeo, linesMat);
+  neuralCoreGroup.add(synapticLines);
+
+  // Orbiting Tech Badges in 3D
+  const techLabels = ['Python 3', 'TensorFlow', 'OpenCV', 'Scikit-Learn', 'LLM', 'Deep Learning'];
+  const techSatellites = [];
+  techLabels.forEach((label, idx) => {
+    const sGroup = new THREE.Group();
+    const orb = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.06, 0.04), chromeMat);
+    sGroup.add(orb);
+    neuralCoreGroup.add(sGroup);
+    techSatellites.push({
+      group: sGroup,
+      angle: idx * (Math.PI * 2 / techLabels.length),
+      radius: 1.15,
+      speed: 0.015 * (idx % 2 === 0 ? 1 : -1)
+    });
+  });
+
+  // ===============================================================
+  // MODE 3: ORBITAL SYSTEMS TELEMETRY & RADAR
+  // ===============================================================
+  const telemetryGroup = new THREE.Group();
+  telemetryGroup.visible = false;
+  holoContentGroup.add(telemetryGroup);
+
+  // Concentric Radar Rings
+  [0.4, 0.75, 1.1].forEach((rad, idx) => {
+    const rRing = new THREE.Mesh(
+      new THREE.RingGeometry(rad - 0.01, rad, 48),
+      new THREE.MeshBasicMaterial({ color: idx === 2 ? 0x00f0ff : 0x38bdf8, transparent: true, opacity: 0.45, side: THREE.DoubleSide })
+    );
+    telemetryGroup.add(rRing);
+  });
+
+  // Radar Sweep Beam
+  const sweepGeo = new THREE.BufferGeometry();
+  sweepGeo.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 1.1, 0, 0], 3));
+  const sweepMat = new THREE.LineBasicMaterial({ color: 0x00f0ff, linewidth: 2 });
+  const sweepLine = new THREE.Line(sweepGeo, sweepMat);
+  telemetryGroup.add(sweepLine);
+
+  // 12 Orbital Project Satellites representing the 12 verified repositories
+  const satGeo = new THREE.SphereGeometry(0.045, 12, 12);
+  const satMat = new THREE.MeshBasicMaterial({ color: 0x34d399 });
+  const projectSatellites = [];
+
+  for (let i = 0; i < 12; i++) {
+    const sat = new THREE.Mesh(satGeo, satMat);
+    telemetryGroup.add(sat);
+    projectSatellites.push({
+      mesh: sat,
+      radius: 0.45 + (i % 3) * 0.32,
+      angle: i * (Math.PI * 2 / 12),
+      speed: 0.01 + (i % 3) * 0.006,
+      tiltY: (i % 2 === 0 ? 1 : -1) * 0.2
+    });
+  }
+
+  // ===============================================================
+  // INTERACTION & MODE DOCK CONTROLLER
+  // ===============================================================
+  let currentMode = 'holo-pass';
+
+  function switchMode(newMode) {
+    currentMode = newMode;
+    holoPassGroup.visible = (newMode === 'holo-pass');
+    neuralCoreGroup.visible = (newMode === 'neural-core');
+    telemetryGroup.visible = (newMode === 'telemetry');
+
+    // Trigger visual shockwave on switch
+    pulseActive = true;
+    pulseScale = 0.1;
+    pulseOpacity = 0.95;
+    pulseRecoil = 0.07;
+
+    // Update Dock UI
+    if (modeDock) {
+      const btns = modeDock.querySelectorAll('.holo-mode-btn');
+      btns.forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-mode') === newMode);
+      });
+    }
+
+    if (hintText) {
+      if (newMode === 'holo-pass') {
+        hintText.textContent = 'Identity Holo-Pass Active • Drag to inspect • Click to flip front/back ↻';
+      } else if (newMode === 'neural-core') {
+        hintText.textContent = 'Quantum Neural AI Core Active • Synaptic pathways firing ⚡';
+      } else if (newMode === 'telemetry') {
+        hintText.textContent = 'Radar Telemetry Active • 12 Verified GitHub repositories mapped 🛰️';
+      }
+    }
+  }
+
+  if (modeDock) {
+    const btns = modeDock.querySelectorAll('.holo-mode-btn');
+    btns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const mode = btn.getAttribute('data-mode');
+        if (mode) switchMode(mode);
+      });
+    });
+  }
+
+  // Pointer & Drag Interaction (Full 360° Inspection)
   let isDragging = false;
   let isFlipped = false;
   let dragStartX = 0;
@@ -926,14 +1068,10 @@ function initPhysicalTitaniumIDCard() {
   let targetRotY = 0;
   let currentRotX = 0;
   let targetRotX = 0;
-  let currentPullY = 0;
-  let targetPullY = 0;
-  let pullVelocity = 0;
-  const pullDownThreshold = 90;
-
   let totalDragDist = 0;
 
   function onPointerDown(e) {
+    if (e.target && e.target.closest('#cardResetBtn')) return;
     isDragging = true;
     totalDragDist = 0;
     dragStartX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
@@ -952,19 +1090,10 @@ function initPhysicalTitaniumIDCard() {
       targetRotY += deltaX * 0.012;
       targetRotX += deltaY * 0.008;
 
-      if (deltaY > 0) {
-        targetPullY = Math.min(deltaY * 0.0028, 0.45);
-        if (deltaY > pullDownThreshold && hintBadge && hintText) {
-          hintBadge.style.borderColor = 'var(--accent-cyan)';
-          hintText.textContent = 'Release to launch About section ↓';
-        }
-      }
-
       dragStartX = clientX;
       dragStartY = clientY;
     } else {
       const rect = stage.getBoundingClientRect();
-      // Proximity check: ONLY tilt if mouse is hovering over/near the card stage!
       const inProximity = (
         clientX >= rect.left - 50 &&
         clientX <= rect.right + 50 &&
@@ -975,61 +1104,44 @@ function initPhysicalTitaniumIDCard() {
       if (inProximity) {
         const relX = Math.max(-1, Math.min(1, ((clientX - rect.left) / rect.width) * 2 - 1));
         const relY = Math.max(-1, Math.min(1, -(((clientY - rect.top) / rect.height) * 2 - 1)));
-
+        targetRotX = -relY * 0.22;
         if (!isFlipped) {
           targetRotY = relX * 0.35;
-          targetRotX = -relY * 0.25;
         } else {
           targetRotY = Math.PI + relX * 0.35;
-          targetRotX = -relY * 0.25;
         }
       } else {
-        // Smoothly return to perfect front/back orientation
-        if (!isFlipped) {
-          targetRotY = 0;
-          targetRotX = 0;
-        } else {
-          targetRotY = Math.PI;
-          targetRotX = 0;
-        }
+        targetRotX = 0;
+        targetRotY = isFlipped ? Math.PI : 0;
       }
     }
   }
 
   function onPointerUp() {
-    if (isDragging) {
-      isDragging = false;
+    isDragging = false;
+  }
 
-      if (targetPullY > 0.22) {
-        const aboutSec = document.getElementById('about');
-        if (aboutSec) {
-          aboutSec.scrollIntoView({ behavior: 'smooth' });
-        }
-      }
-      targetPullY = 0;
+  // Guaranteed Click Handler
+  stage.addEventListener('click', (e) => {
+    if (e.target && e.target.closest('#cardResetBtn')) return;
+    if (totalDragDist > 18) return;
 
+    // Trigger Energy Pulse
+    pulseActive = true;
+    pulseScale = 0.1;
+    pulseOpacity = 0.95;
+    pulseRecoil = 0.08;
+
+    // In Holo-ID mode, also flip front/back
+    if (currentMode === 'holo-pass') {
+      isFlipped = !isFlipped;
+      targetRotY = isFlipped ? Math.PI : 0;
+      targetRotX = 0;
       if (hintText) {
         hintText.textContent = isFlipped
           ? 'Back Face: Verified Credentials • Click to flip front ↺'
-          : 'Drag to swing • Click to flip • Pull down to explore ↓';
+          : 'Front Face: Verified Pass • Click to flip back ↻';
       }
-    }
-  }
-
-  // Guaranteed Click-to-Flip Handler
-  stage.addEventListener('click', (e) => {
-    if (e.target && e.target.closest('#cardResetBtn')) return;
-    if (totalDragDist > 18) return; // Only flip if it was a click/tap, not a long drag
-
-    isFlipped = !isFlipped;
-    targetRotY = isFlipped ? Math.PI : 0;
-    targetRotX = 0;
-    targetPullY = 0;
-
-    if (hintText) {
-      hintText.textContent = isFlipped
-        ? 'Back Face: Verified Credentials • Click to flip front ↺'
-        : 'Front Face: Verified Pass • Click to flip back ↻';
     }
   });
 
@@ -1047,54 +1159,88 @@ function initPhysicalTitaniumIDCard() {
       isFlipped = false;
       targetRotY = 0;
       targetRotX = 0;
-      targetPullY = 0;
-      if (hintText) {
-        hintText.textContent = 'Drag to swing • Click to flip • Pull down to explore ↓';
-      }
+      switchMode('holo-pass');
     });
   }
 
-  // Animation Loop with Harmonic Spring Physics
+  // ===============================================================
+  // PHYSICS & ANIMATION LOOP
+  // ===============================================================
   const physClock = new THREE.Clock();
 
   function animatePhysics() {
     requestAnimationFrame(animatePhysics);
     const elapsed = physClock.getElapsedTime();
 
-    // Natural Pendulum Sway when idle
-    const idleSway = isDragging ? 0 : Math.sin(elapsed * 1.6) * 0.04;
-    const idlePitch = isDragging ? 0 : Math.cos(elapsed * 1.2) * 0.02;
+    // 1. Magnetic Buoyancy Bobbing & Gyroscopic Precession
+    const bobY = Math.sin(elapsed * 1.8) * 0.055;
+    const idlePrecession = Math.sin(elapsed * 1.2) * 0.018;
 
-    currentRotY += (targetRotY + idleSway - currentRotY) * 0.085;
-    currentRotX += (targetRotX + idlePitch - currentRotX) * 0.085;
+    pulseRecoil *= 0.88;
+    chamberGroup.position.y = 0.05 + bobY + pulseRecoil;
 
-    // Harmonic spring tension for lanyard pull
-    const springForce = (targetPullY - currentPullY) * 0.20;
-    pullVelocity = (pullVelocity + springForce) * 0.76;
-    currentPullY += pullVelocity;
+    // 2. Smooth 360° Rotation Easing
+    currentRotY += (targetRotY - currentRotY) * 0.085;
+    currentRotX += (targetRotX + idlePrecession - currentRotX) * 0.085;
+    chamberGroup.rotation.y = currentRotY;
+    chamberGroup.rotation.x = currentRotX;
 
-    cardGroup.rotation.y = currentRotY;
-    cardGroup.rotation.x = currentRotX;
-    cardGroup.position.y = -0.20 - currentPullY;
+    // 3. Shockwave Pulse Expansion
+    if (pulseActive) {
+      pulseScale += 0.08;
+      pulseOpacity -= 0.035;
+      pulseRing.scale.set(pulseScale, pulseScale, 1);
+      pulseRingMat.opacity = Math.max(0, pulseOpacity);
+      if (pulseOpacity <= 0) {
+        pulseActive = false;
+        pulseRingMat.opacity = 0;
+      }
+    }
 
-    // Elastic lanyard strap stretch
-    const stretchFactor = 1.0 + currentPullY * 1.4;
-    strapL.scale.y = stretchFactor;
-    strapR.scale.y = stretchFactor;
-    strapL.position.y = 1.28 - (currentPullY * 0.35);
-    strapR.position.y = 1.28 - (currentPullY * 0.35);
-    crimpSleeve.position.y = 0.98 - (currentPullY * 0.70);
-    swivelBarrel.position.y = 0.90 - (currentPullY * 0.78);
-    carabinerHook.position.y = 0.81 - (currentPullY * 0.86);
+    // 4. Update Rising Flux Particles
+    fluxParticles.forEach(fp => {
+      fp.mesh.position.y += fp.speedY;
+      fp.angle += fp.rotSpeed;
+      fp.mesh.position.x = Math.cos(fp.angle) * fp.baseRadius;
+      fp.mesh.position.z = Math.sin(fp.angle) * fp.baseRadius;
+      if (fp.mesh.position.y > 0.4) {
+        fp.mesh.position.y = -1.35;
+      }
+    });
 
-    // Dynamic drop shadow responds to card orientation and swing
+    // 5. Update Active Mode Subsystems
+    if (currentMode === 'holo-pass') {
+      ringHolo1.rotation.z = elapsed * 0.8;
+      ringHolo2.rotation.y = -elapsed * 0.6;
+    } else if (currentMode === 'neural-core') {
+      const pulseVal = 1.0 + Math.sin(elapsed * 3.5) * 0.08;
+      coreSingularity.scale.set(pulseVal, pulseVal, pulseVal);
+      coreAura.scale.set(pulseVal * 1.1, pulseVal * 1.1, pulseVal * 1.1);
+      techSatellites.forEach(ts => {
+        ts.angle += ts.speed;
+        ts.group.position.set(
+          Math.cos(ts.angle) * ts.radius,
+          Math.sin(ts.angle * 2) * 0.25,
+          Math.sin(ts.angle) * ts.radius
+        );
+        ts.group.rotation.y = ts.angle;
+      });
+    } else if (currentMode === 'telemetry') {
+      sweepLine.rotation.z = -elapsed * 1.8;
+      projectSatellites.forEach(ps => {
+        ps.angle += ps.speed;
+        ps.mesh.position.set(
+          Math.cos(ps.angle) * ps.radius,
+          Math.sin(ps.angle) * ps.tiltY,
+          Math.sin(ps.angle) * ps.radius
+        );
+      });
+    }
+
+    // Dynamic Floor Shadow
     const cosY = Math.cos(currentRotY);
-    const sinY = Math.sin(currentRotY);
-    shadowMesh.scale.x = Math.max(0.12, Math.abs(cosY));
-    shadowMesh.position.x = sinY * 0.32;
-    shadowMesh.position.y = -0.20 - (currentPullY * 0.75);
-    shadowMesh.rotation.z = currentRotY * 0.08;
-    shadowMesh.material.opacity = Math.max(0.18, 0.55 * Math.abs(cosY));
+    shadowMesh.scale.x = 1.0 - Math.abs(Math.sin(currentRotY)) * 0.35;
+    shadowMesh.material.opacity = 0.55 - Math.abs(bobY) * 1.5;
 
     renderer.render(scene, camera);
   }
