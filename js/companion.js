@@ -118,7 +118,7 @@
       'Check out Harshit\'s 3D ID Card above! 🪪',
       'Click any skill below to see its roadmap! 🗺️',
       'Autonomous AI Hub workstations online! ⚡',
-      'All 11 projects verified from resume! 🛡️',
+      '12 projects verified across @har-001 & @harshit-001-it! 🛡️',
       'Harshit Mishra • AI / ML Engineer 🧠',
       'Double-click me for an acrobatic flip! ✨',
       'Patrolling Harshit\'s digital portfolio! 🛰️'
@@ -161,8 +161,8 @@
       activeCharKey = key;
       localStorage.setItem('harshit_companion_char', key);
 
-      // Substantial, clearly visible scale (~65px across)
-      characterHolder.scale.set(2.4, 2.4, 2.4);
+      // Optimized 1.8x scale (~48-52px across) as specifically requested
+      characterHolder.scale.set(1.8, 1.8, 1.8);
 
       updateDockUI(key);
 

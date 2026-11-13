@@ -340,35 +340,86 @@ function initPhysicalTitaniumIDCard() {
     return new THREE.CanvasTexture(sCanvas);
   }
 
+  // Dynamic Drop Shadow onto wall plane (Dynamically tracked in physics loop)
+  function createShadowTexture() {
+    const sCanvas = document.createElement('canvas');
+    sCanvas.width = 256;
+    sCanvas.height = 256;
+    const sCtx = sCanvas.getContext('2d');
+    const grad = sCtx.createRadialGradient(128, 128, 10, 128, 128, 120);
+    grad.addColorStop(0, 'rgba(0, 0, 0, 0.7)');
+    grad.addColorStop(0.5, 'rgba(0, 0, 0, 0.35)');
+    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    sCtx.fillStyle = grad;
+    sCtx.fillRect(0, 0, 256, 256);
+    return new THREE.CanvasTexture(sCanvas);
+  }
+
   const shadowMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(3.2, 4.2),
+    new THREE.PlaneGeometry(2.6, 3.4),
     new THREE.MeshBasicMaterial({
       map: createShadowTexture(),
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.55,
       depthWrite: false
     })
   );
-  shadowMesh.position.set(0, 0, -0.4);
+  shadowMesh.position.set(0, -0.20, -0.45);
   scene.add(shadowMesh);
 
-  // Lanyard Anchor at Top
+  // Master Physical Lanyard Hierarchy
   const lanyardMaster = new THREE.Group();
-  lanyardMaster.position.set(0, 1.48, 0);
+  lanyardMaster.position.set(0, 0, 0);
   scene.add(lanyardMaster);
 
-  // Braided Fabric Strap Texture (Procedural Canvas)
+  // 1. Architectural Brushed Titanium Ceiling/Wall Mount at Top of Canvas (World y = 1.62)
+  const mountGroup = new THREE.Group();
+  mountGroup.position.set(0, 1.62, 0);
+  lanyardMaster.add(mountGroup);
+
+  const mountBaseGeo = new THREE.BoxGeometry(0.85, 0.10, 0.08);
+  const mountBaseMat = new THREE.MeshStandardMaterial({
+    color: 0x1e293b,
+    metalness: 0.92,
+    roughness: 0.25
+  });
+  const mountBase = new THREE.Mesh(mountBaseGeo, mountBaseMat);
+  mountGroup.add(mountBase);
+
+  // Chrome Hex Screws on Top Mount
+  const boltGeo = new THREE.CylinderGeometry(0.024, 0.024, 0.09, 6);
+  const chromeMat = new THREE.MeshStandardMaterial({
+    color: 0xf8fafc,
+    metalness: 0.98,
+    roughness: 0.1
+  });
+  [-0.34, -0.12, 0.12, 0.34].forEach(bx => {
+    const bolt = new THREE.Mesh(boltGeo, chromeMat);
+    bolt.rotation.x = Math.PI / 2;
+    bolt.position.set(bx, 0, 0.02);
+    mountGroup.add(bolt);
+  });
+
+  // Dual Chrome Lanyard Suspension Eyelets
+  const eyeletGeo = new THREE.TorusGeometry(0.045, 0.015, 10, 20);
+  [-0.18, 0.18].forEach(ex => {
+    const eyelet = new THREE.Mesh(eyeletGeo, chromeMat);
+    eyelet.position.set(ex, -0.06, 0);
+    mountGroup.add(eyelet);
+  });
+
+  // 2. Braided Fabric Strap Texture (Procedural Canvas)
   function createStrapTexture() {
     const strapCanvas = document.createElement('canvas');
     strapCanvas.width = 64;
     strapCanvas.height = 256;
     const sCtx = strapCanvas.getContext('2d');
 
-    sCtx.fillStyle = '#101626';
+    sCtx.fillStyle = '#0f172a';
     sCtx.fillRect(0, 0, 64, 256);
 
     // Diagonal herringbone weave pattern
-    sCtx.strokeStyle = 'rgba(0, 212, 255, 0.25)';
+    sCtx.strokeStyle = 'rgba(0, 212, 255, 0.3)';
     sCtx.lineWidth = 2;
     for (let y = -64; y < 320; y += 8) {
       sCtx.beginPath();
@@ -399,52 +450,47 @@ function initPhysicalTitaniumIDCard() {
     metalness: 0.15
   });
 
-  const strapGeo = new THREE.BoxGeometry(0.14, 1.6, 0.02);
+  // Dual converging lanyard straps (from eyelets y=1.56 down to crimp sleeve y=0.98)
+  const strapGeo = new THREE.BoxGeometry(0.12, 0.65, 0.02);
   const strapL = new THREE.Mesh(strapGeo, strapMat);
-  strapL.position.set(-0.25, 0.45, 0);
-  strapL.rotation.z = -0.16;
+  strapL.position.set(-0.09, 1.28, 0);
+  strapL.rotation.z = -0.14;
   lanyardMaster.add(strapL);
 
   const strapR = new THREE.Mesh(strapGeo, strapMat);
-  strapR.position.set(0.25, 0.45, 0);
-  strapR.rotation.z = 0.16;
+  strapR.position.set(0.09, 1.28, 0);
+  strapR.rotation.z = 0.14;
   lanyardMaster.add(strapR);
 
-  // Metallic Hardware (Chrome Finish)
-  const chromeMat = new THREE.MeshStandardMaterial({
-    color: 0xf8fafc,
-    metalness: 0.98,
-    roughness: 0.1
-  });
-
+  // 3. Metallic Hardware (Chrome Finish)
   // Crimp clamp sleeve
-  const crimpSleeve = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.14, 0.08), chromeMat);
-  crimpSleeve.position.set(0, 0.15, 0);
+  const crimpSleeve = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.10, 0.07), chromeMat);
+  crimpSleeve.position.set(0, 0.98, 0);
   lanyardMaster.add(crimpSleeve);
 
-  // Swivel barrel
-  const swivelBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.22, 16), chromeMat);
-  swivelBarrel.position.set(0, 0.02, 0);
+  // Swivel barrel joint
+  const swivelBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.048, 0.048, 0.14, 16), chromeMat);
+  swivelBarrel.position.set(0, 0.90, 0);
   lanyardMaster.add(swivelBarrel);
 
-  // Carabiner Swivel Hook
+  // Heavy-Duty Carabiner Swivel Hook (Passing right through the slot hole of the card at y = 0.825)
   const carabinerHook = new THREE.Mesh(
-    new THREE.TorusGeometry(0.13, 0.038, 12, 24, Math.PI * 1.55),
+    new THREE.TorusGeometry(0.105, 0.030, 12, 24, Math.PI * 1.65),
     chromeMat
   );
-  carabinerHook.position.set(0, -0.16, 0);
-  carabinerHook.rotation.z = Math.PI / 4;
+  carabinerHook.position.set(0, 0.81, 0);
+  carabinerHook.rotation.set(0, Math.PI / 4, Math.PI / 6);
   lanyardMaster.add(carabinerHook);
 
-  // Card Pendulum Group (Centered vertically at world y = 0.0)
+  // 4. Card Pendulum Group (Centered vertically at world y = -0.20)
   const cardGroup = new THREE.Group();
-  cardGroup.position.set(0, -1.48, 0);
+  cardGroup.position.set(0, -0.20, 0);
   lanyardMaster.add(cardGroup);
 
-  const cardW = 1.95;
-  const cardH = 2.95;
-  const cardR = 0.14;
-  const thickness = 0.045;
+  const cardW = 1.55;
+  const cardH = 2.35;
+  const cardR = 0.12;
+  const thickness = 0.042;
 
   // Beveled Titanium / Composite Card Body
   const cardShape = new THREE.Shape();
@@ -458,10 +504,10 @@ function initPhysicalTitaniumIDCard() {
   cardShape.lineTo(-cardW / 2, cardH / 2 - cardR);
   cardShape.quadraticCurveTo(-cardW / 2, cardH / 2, -cardW / 2 + cardR, cardH / 2);
 
-  // Slot Punch Hole
-  const slotW = 0.42;
-  const slotH = 0.085;
-  const slotY = cardH / 2 - 0.16;
+  // Slot Punch Hole at Top (Card Local y = cardH / 2 - 0.15 = 1.025 -> World y = 0.825)
+  const slotW = 0.36;
+  const slotH = 0.075;
+  const slotY = cardH / 2 - 0.15;
   const slotHole = new THREE.Path();
   slotHole.moveTo(-slotW / 2, slotY - slotH / 2);
   slotHole.lineTo(slotW / 2, slotY - slotH / 2);
@@ -475,8 +521,8 @@ function initPhysicalTitaniumIDCard() {
     bevelEnabled: true,
     bevelSegments: 4,
     steps: 1,
-    bevelSize: 0.02,
-    bevelThickness: 0.02,
+    bevelSize: 0.018,
+    bevelThickness: 0.018,
     curveSegments: 16
   };
 
@@ -485,62 +531,22 @@ function initPhysicalTitaniumIDCard() {
 
   // Dark Titanium Core Material with Specular Sheen
   const titaniumMat = new THREE.MeshPhysicalMaterial({
-    color: 0x111625,
-    metalness: 0.92,
+    color: 0x0f172a,
+    metalness: 0.94,
     roughness: 0.22,
-    clearcoat: 0.6,
-    clearcoatRoughness: 0.15
+    clearcoat: 0.8,
+    clearcoatRoughness: 0.12
   });
   const bodyMesh = new THREE.Mesh(bodyGeo, titaniumMat);
   cardGroup.add(bodyMesh);
 
-  // Clear Acrylic Protective Sleeve (Adds true physical glass/plastic casing)
-  const casingShape = new THREE.Shape();
-  const cW = cardW + 0.06;
-  const cH = cardH + 0.08;
-  const cR = 0.16;
-  casingShape.moveTo(-cW / 2 + cR, cH / 2);
-  casingShape.lineTo(cW / 2 - cR, cH / 2);
-  casingShape.quadraticCurveTo(cW / 2, cH / 2, cW / 2, cH / 2 - cR);
-  casingShape.lineTo(cW / 2, -cH / 2 + cR);
-  casingShape.quadraticCurveTo(cW / 2, -cH / 2, cW / 2 - cR, -cH / 2);
-  casingShape.lineTo(-cW / 2 + cR, -cH / 2);
-  casingShape.quadraticCurveTo(-cW / 2, -cH / 2, -cW / 2, -cH / 2 + cR);
-  casingShape.lineTo(-cW / 2, cH / 2 - cR);
-  casingShape.quadraticCurveTo(-cW / 2, cH / 2, -cW / 2 + cR, cH / 2);
-  casingShape.holes.push(slotHole);
-
-  const casingGeo = new THREE.ExtrudeGeometry(casingShape, {
-    depth: thickness + 0.025,
-    bevelEnabled: true,
-    bevelSegments: 3,
-    bevelSize: 0.012,
-    bevelThickness: 0.012,
-    curveSegments: 16
-  });
-  casingGeo.center();
-
-  const acrylicMat = new THREE.MeshPhysicalMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: 0.28,
-    roughness: 0.08,
-    metalness: 0.1,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.05,
-    transmission: 0.85,
-    depthWrite: false
-  });
-  const casingMesh = new THREE.Mesh(casingGeo, acrylicMat);
-  cardGroup.add(casingMesh);
-
   // Corner Chrome Rivets
-  const rivetGeo = new THREE.CylinderGeometry(0.04, 0.04, thickness + 0.045, 12);
+  const rivetGeo = new THREE.CylinderGeometry(0.032, 0.032, thickness + 0.04, 12);
   const cornerOffsets = [
-    [-cardW / 2 + 0.1, cardH / 2 - 0.1],
-    [cardW / 2 - 0.1, cardH / 2 - 0.1],
-    [-cardW / 2 + 0.1, -cardH / 2 + 0.1],
-    [cardW / 2 - 0.1, -cardH / 2 + 0.1]
+    [-cardW / 2 + 0.08, cardH / 2 - 0.08],
+    [cardW / 2 - 0.08, cardH / 2 - 0.08],
+    [-cardW / 2 + 0.08, -cardH / 2 + 0.08],
+    [cardW / 2 - 0.08, -cardH / 2 + 0.08]
   ];
   cornerOffsets.forEach(([rx, ry]) => {
     const rivet = new THREE.Mesh(rivetGeo, chromeMat);
@@ -557,21 +563,22 @@ function initPhysicalTitaniumIDCard() {
   const frontTexture = new THREE.CanvasTexture(frontCanvas);
   frontTexture.anisotropy = 8;
 
-  const faceW = cardW - 0.06;
-  const faceH = cardH - 0.06;
+  const faceW = cardW - 0.04;
+  const faceH = cardH - 0.04;
   const facePlaneGeo = new THREE.PlaneGeometry(faceW, faceH);
 
   // MeshPhysicalMaterial with clearcoat for glossy laminated card look!
   const frontMat = new THREE.MeshPhysicalMaterial({
     map: frontTexture,
     transparent: true,
-    roughness: 0.2,
+    roughness: 0.18,
     metalness: 0.15,
-    clearcoat: 0.95,
-    clearcoatRoughness: 0.08
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.06,
+    reflectivity: 0.85
   });
   const frontMesh = new THREE.Mesh(facePlaneGeo, frontMat);
-  frontMesh.position.z = thickness / 2 + 0.028;
+  frontMesh.position.z = thickness / 2 + 0.020;
   cardGroup.add(frontMesh);
 
   // Back Face
@@ -585,13 +592,14 @@ function initPhysicalTitaniumIDCard() {
   const backMat = new THREE.MeshPhysicalMaterial({
     map: backTexture,
     transparent: true,
-    roughness: 0.2,
+    roughness: 0.18,
     metalness: 0.15,
-    clearcoat: 0.95,
-    clearcoatRoughness: 0.08
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.06,
+    reflectivity: 0.85
   });
   const backMesh = new THREE.Mesh(facePlaneGeo, backMat);
-  backMesh.position.z = -(thickness / 2 + 0.028);
+  backMesh.position.z = -(thickness / 2 + 0.020);
   backMesh.rotation.y = Math.PI;
   cardGroup.add(backMesh);
 
@@ -715,19 +723,52 @@ function initPhysicalTitaniumIDCard() {
       bx += 215;
     });
 
-    // Security Holographic Chip
+    // Authentic Gold Metallic EMV Smart Chip
     fCtx.textAlign = 'left';
-    fCtx.fillStyle = '#d97706';
+    const chipX = 80;
+    const chipY = 1130;
+    const chipW = 140;
+    const chipH = 95;
+    const chipR = 12;
+
+    const chipGrad = fCtx.createLinearGradient(chipX, chipY, chipX + chipW, chipY + chipH);
+    chipGrad.addColorStop(0, '#f59e0b');
+    chipGrad.addColorStop(0.35, '#fef08a');
+    chipGrad.addColorStop(0.55, '#d97706');
+    chipGrad.addColorStop(0.8, '#fef08a');
+    chipGrad.addColorStop(1, '#b45309');
+
+    fCtx.fillStyle = chipGrad;
     fCtx.beginPath();
-    fCtx.roundRect(80, 1135, 140, 95, 14);
+    fCtx.roundRect(chipX, chipY, chipW, chipH, chipR);
     fCtx.fill();
-    fCtx.strokeStyle = '#fef3c7';
+    fCtx.strokeStyle = '#78350f';
     fCtx.lineWidth = 2;
     fCtx.stroke();
 
-    fCtx.fillStyle = '#1e293b';
-    fCtx.font = 'bold 18px "JetBrains Mono", monospace';
-    fCtx.fillText('SECURITY CHIP', 150, 1190);
+    // Etched Contact Pad Divisions
+    fCtx.strokeStyle = 'rgba(120, 53, 15, 0.75)';
+    fCtx.lineWidth = 2;
+
+    fCtx.beginPath();
+    fCtx.moveTo(chipX + 8, chipY + chipH / 2);
+    fCtx.lineTo(chipX + chipW - 8, chipY + chipH / 2);
+    fCtx.stroke();
+
+    fCtx.beginPath();
+    fCtx.roundRect(chipX + 42, chipY + 18, 56, 59, 6);
+    fCtx.stroke();
+
+    fCtx.beginPath();
+    fCtx.moveTo(chipX + 42, chipY + 6);
+    fCtx.lineTo(chipX + 42, chipY + 18);
+    fCtx.moveTo(chipX + 98, chipY + 6);
+    fCtx.lineTo(chipX + 98, chipY + 18);
+    fCtx.moveTo(chipX + 42, chipY + 77);
+    fCtx.lineTo(chipX + 42, chipY + chipH - 6);
+    fCtx.moveTo(chipX + 98, chipY + 77);
+    fCtx.lineTo(chipX + 98, chipY + chipH - 6);
+    fCtx.stroke();
 
     // Clearance and Credentials Matrix Details
     fCtx.fillStyle = '#64748b';
@@ -834,16 +875,17 @@ function initPhysicalTitaniumIDCard() {
     bCtx.stroke();
 
     bCtx.fillStyle = '#34d399';
-    bCtx.font = 'bold 28px "Space Grotesk", sans-serif';
-    bCtx.fillText('🚀 6 Documented Portfolio Projects', 105, 935);
+    bCtx.font = 'bold 27px "Space Grotesk", sans-serif';
+    bCtx.fillText('🚀 Verified GitHub Repositories (@har-001 & @harshit-001-it)', 105, 930);
 
     bCtx.fillStyle = '#cbd5e1';
-    bCtx.font = '500 22px "Inter", sans-serif';
-    bCtx.fillText('1. Human Emotion Recognition System (Python, OpenCV, AI/ML)', 105, 980);
-    bCtx.fillText('2. Diabetes Prediction System (Python, Scikit-Learn, Web)', 105, 1025);
-    bCtx.fillText('3. Fake News Prediction Model (Python, NLP, TF-IDF)', 105, 1070);
-    bCtx.fillText('4. Rock and Stone Prediction with Sonar (Python, ML Classifier)', 105, 1115);
-    bCtx.fillText('5. Library Management System (Python, MySQL Relational DB)', 105, 1160);
+    bCtx.font = '500 21px "Inter", sans-serif';
+    bCtx.fillText('• Personal Portfolio Website (3D WebGL, Physics) [LIVE]', 105, 975);
+    bCtx.fillText('• NIVA AI Task & Conversational Assistant (Python, LLM)', 105, 1015);
+    bCtx.fillText('• Human Emotion Recognition System (CNN, OpenCV, DL)', 105, 1055);
+    bCtx.fillText('• Diabetes & Heart Disease Prediction (Scikit-Learn ML)', 105, 1095);
+    bCtx.fillText('• VedoraAI Trading Market Prediction Bot (Python)', 105, 1135);
+    bCtx.fillText('• Rock & Stone Sonar Classifier & Library System (MySQL)', 105, 1175);
 
     // Official Signature Strip & Verification Footer
     bCtx.fillStyle = '#f8fafc';
@@ -889,8 +931,11 @@ function initPhysicalTitaniumIDCard() {
   let pullVelocity = 0;
   const pullDownThreshold = 90;
 
+  let totalDragDist = 0;
+
   function onPointerDown(e) {
     isDragging = true;
+    totalDragDist = 0;
     dragStartX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
     dragStartY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
   }
@@ -902,6 +947,7 @@ function initPhysicalTitaniumIDCard() {
     if (isDragging) {
       const deltaX = clientX - dragStartX;
       const deltaY = clientY - dragStartY;
+      totalDragDist += Math.hypot(deltaX, deltaY);
 
       targetRotY += deltaX * 0.012;
       targetRotX += deltaY * 0.008;
@@ -918,12 +964,34 @@ function initPhysicalTitaniumIDCard() {
       dragStartY = clientY;
     } else {
       const rect = stage.getBoundingClientRect();
-      const relX = ((clientX - rect.left) / rect.width) * 2 - 1;
-      const relY = -(((clientY - rect.top) / rect.height) * 2 - 1);
+      // Proximity check: ONLY tilt if mouse is hovering over/near the card stage!
+      const inProximity = (
+        clientX >= rect.left - 50 &&
+        clientX <= rect.right + 50 &&
+        clientY >= rect.top - 50 &&
+        clientY <= rect.bottom + 50
+      );
 
-      if (!isFlipped) {
-        targetRotY = relX * 0.42;
-        targetRotX = -relY * 0.32;
+      if (inProximity) {
+        const relX = Math.max(-1, Math.min(1, ((clientX - rect.left) / rect.width) * 2 - 1));
+        const relY = Math.max(-1, Math.min(1, -(((clientY - rect.top) / rect.height) * 2 - 1)));
+
+        if (!isFlipped) {
+          targetRotY = relX * 0.35;
+          targetRotX = -relY * 0.25;
+        } else {
+          targetRotY = Math.PI + relX * 0.35;
+          targetRotX = -relY * 0.25;
+        }
+      } else {
+        // Smoothly return to perfect front/back orientation
+        if (!isFlipped) {
+          targetRotY = 0;
+          targetRotX = 0;
+        } else {
+          targetRotY = Math.PI;
+          targetRotX = 0;
+        }
       }
     }
   }
@@ -931,7 +999,8 @@ function initPhysicalTitaniumIDCard() {
   function onPointerUp() {
     if (isDragging) {
       isDragging = false;
-      if (targetPullY > 0.25) {
+
+      if (targetPullY > 0.22) {
         const aboutSec = document.getElementById('about');
         if (aboutSec) {
           aboutSec.scrollIntoView({ behavior: 'smooth' });
@@ -940,17 +1009,27 @@ function initPhysicalTitaniumIDCard() {
       targetPullY = 0;
 
       if (hintText) {
-        hintText.textContent = 'Drag to swing • Click to flip • Pull down to explore ↓';
+        hintText.textContent = isFlipped
+          ? 'Back Face: Verified Credentials • Click to flip front ↺'
+          : 'Drag to swing • Click to flip • Pull down to explore ↓';
       }
     }
   }
 
-  // Click to Flip (180 deg)
-  stage.addEventListener('click', () => {
-    if (Math.abs(targetPullY) < 0.05) {
-      isFlipped = !isFlipped;
-      targetRotY = isFlipped ? Math.PI : 0;
-      targetRotX = 0;
+  // Guaranteed Click-to-Flip Handler
+  stage.addEventListener('click', (e) => {
+    if (e.target && e.target.closest('#cardResetBtn')) return;
+    if (totalDragDist > 18) return; // Only flip if it was a click/tap, not a long drag
+
+    isFlipped = !isFlipped;
+    targetRotY = isFlipped ? Math.PI : 0;
+    targetRotX = 0;
+    targetPullY = 0;
+
+    if (hintText) {
+      hintText.textContent = isFlipped
+        ? 'Back Face: Verified Credentials • Click to flip front ↺'
+        : 'Front Face: Verified Pass • Click to flip back ↻';
     }
   });
 
@@ -969,6 +1048,9 @@ function initPhysicalTitaniumIDCard() {
       targetRotY = 0;
       targetRotX = 0;
       targetPullY = 0;
+      if (hintText) {
+        hintText.textContent = 'Drag to swing • Click to flip • Pull down to explore ↓';
+      }
     });
   }
 
@@ -980,25 +1062,39 @@ function initPhysicalTitaniumIDCard() {
     const elapsed = physClock.getElapsedTime();
 
     // Natural Pendulum Sway when idle
-    const idleSway = isDragging ? 0 : Math.sin(elapsed * 1.5) * 0.045;
+    const idleSway = isDragging ? 0 : Math.sin(elapsed * 1.6) * 0.04;
+    const idlePitch = isDragging ? 0 : Math.cos(elapsed * 1.2) * 0.02;
 
     currentRotY += (targetRotY + idleSway - currentRotY) * 0.085;
-    currentRotX += (targetRotX - currentRotX) * 0.085;
+    currentRotX += (targetRotX + idlePitch - currentRotX) * 0.085;
 
     // Harmonic spring tension for lanyard pull
-    const springForce = (targetPullY - currentPullY) * 0.18;
-    pullVelocity = (pullVelocity + springForce) * 0.78;
+    const springForce = (targetPullY - currentPullY) * 0.20;
+    pullVelocity = (pullVelocity + springForce) * 0.76;
     currentPullY += pullVelocity;
 
     cardGroup.rotation.y = currentRotY;
     cardGroup.rotation.x = currentRotX;
-    cardGroup.position.y = -1.48 - currentPullY;
+    cardGroup.position.y = -0.20 - currentPullY;
 
     // Elastic lanyard strap stretch
-    const stretchFactor = 1.0 + currentPullY * 1.8;
+    const stretchFactor = 1.0 + currentPullY * 1.4;
     strapL.scale.y = stretchFactor;
     strapR.scale.y = stretchFactor;
-    swivelBarrel.position.y = 0.02 - (currentPullY * 0.4);
+    strapL.position.y = 1.28 - (currentPullY * 0.35);
+    strapR.position.y = 1.28 - (currentPullY * 0.35);
+    crimpSleeve.position.y = 0.98 - (currentPullY * 0.70);
+    swivelBarrel.position.y = 0.90 - (currentPullY * 0.78);
+    carabinerHook.position.y = 0.81 - (currentPullY * 0.86);
+
+    // Dynamic drop shadow responds to card orientation and swing
+    const cosY = Math.cos(currentRotY);
+    const sinY = Math.sin(currentRotY);
+    shadowMesh.scale.x = Math.max(0.12, Math.abs(cosY));
+    shadowMesh.position.x = sinY * 0.32;
+    shadowMesh.position.y = -0.20 - (currentPullY * 0.75);
+    shadowMesh.rotation.z = currentRotY * 0.08;
+    shadowMesh.material.opacity = Math.max(0.18, 0.55 * Math.abs(cosY));
 
     renderer.render(scene, camera);
   }
@@ -1889,7 +1985,8 @@ function renderProjects() {
   const gridContainer = document.getElementById('projectsGrid');
   if (!gridContainer) return;
 
-  // Complete roster of 11 authentic projects with Personal Portfolio #1 at top
+  // Complete roster of 12 authentic projects from BOTH GitHub accounts (@har-001 & @harshit-001-it)
+  // ONLY Personal Portfolio Website has a live link, as requested
   const resumeProjects = [
     {
       name: 'Personal Portfolio Website',
@@ -1902,31 +1999,51 @@ function renderProjects() {
       icon: '🌐'
     },
     {
+      name: 'NIVA AI Assistant',
+      description: 'Intelligent conversational and task automation assistant engineered to streamline user workflows, execute commands, and deliver structured AI intelligence.',
+      category: 'AI & ML',
+      tags: ['Python', 'AI Assistant', 'Automation', 'LLM'],
+      url: 'https://github.com/har-001/NIVA',
+      liveUrl: null,
+      featured: false,
+      icon: '🤖'
+    },
+    {
       name: 'Human Emotion Recognition System',
-      description: 'Real-time facial expression and emotional sentiment detection engine utilizing Deep Learning Convolutional Neural Networks (CNN) and OpenCV for live webcam stream inference.',
-      category: 'Machine Learning',
-      tags: ['Python', 'AI/ML', 'OpenCV', 'CNN', 'Deep Learning'],
-      url: 'https://github.com/harshit-001-it',
+      description: 'Real-time facial expression and emotional sentiment detection engine utilizing Deep Learning Convolutional Neural Networks (CNN) and OpenCV for live webcam and video inference.',
+      category: 'AI & ML',
+      tags: ['Python', 'CNN', 'OpenCV', 'Deep Learning'],
+      url: 'https://github.com/harshit-001-it/Human-Emotion-Recognition-System',
       liveUrl: null,
       featured: false,
       icon: '🧠'
     },
     {
       name: 'Diabetes Prediction System',
-      description: 'Predictive clinical diagnostic engine where users input clinical diagnostic metrics to calculate diabetes risk vulnerability powered by an optimized Scikit-Learn classifier.',
-      category: 'Machine Learning',
+      description: 'Predictive clinical diagnostic engine where users input health data metrics to calculate diabetes risk vulnerability powered by an optimized Scikit-Learn classifier.',
+      category: 'AI & ML',
       tags: ['Python', 'Scikit-Learn', 'Classification', 'Healthcare'],
-      url: 'https://github.com/harshit-001-it',
+      url: 'https://github.com/harshit-001-it/Diabetes-Prediction',
       liveUrl: null,
       featured: false,
       icon: '🩺'
     },
     {
-      name: 'Fake News Prediction Pipeline',
-      description: 'Natural language processing classifier that evaluates article contents and linguistic patterns using TF-IDF vectorization and Logistic Regression to classify news as authentic or fabricated.',
-      category: 'Machine Learning',
+      name: 'Heart Disease Prediction',
+      description: 'Supervised machine learning risk assessment classifier evaluating clinical diagnostic indicators to predict cardiovascular condition vulnerability.',
+      category: 'AI & ML',
+      tags: ['Python', 'Machine Learning', 'Healthcare', 'EDA'],
+      url: 'https://github.com/harshit-001-it/Heart-Disease-Prediction',
+      liveUrl: null,
+      featured: false,
+      icon: '❤️'
+    },
+    {
+      name: 'Fake News Prediction',
+      description: 'Natural language processing classifier that evaluates article contents and linguistic patterns using TF-IDF vectorization and Logistic Regression to identify authentic versus fabricated news.',
+      category: 'AI & ML',
       tags: ['Python', 'NLP', 'TF-IDF', 'Machine Learning'],
-      url: 'https://github.com/harshit-001-it',
+      url: 'https://github.com/harshit-001-it/Fake-News-Prediction',
       liveUrl: null,
       featured: false,
       icon: '📰'
@@ -1934,76 +2051,66 @@ function renderProjects() {
     {
       name: 'Rock and Stone Prediction with Sonar',
       description: 'Acoustic signal classification system analyzing 60-band underwater sonar frequency reflections to accurately discriminate between submerged metal cylinders and seabed rock formations.',
-      category: 'Machine Learning',
+      category: 'AI & ML',
       tags: ['Python', 'NumPy', 'Signal Processing', 'ML Classifier'],
-      url: 'https://github.com/harshit-001-it',
+      url: 'https://github.com/harshit-001-it/Rock-and-Stone-Prediction-With-Sonar',
       liveUrl: null,
       featured: false,
       icon: '🌊'
     },
     {
-      name: 'Crop Disease Predictor & Plant Pathology',
-      description: 'Computer vision deep learning pipeline using Convolutional Neural Networks (CNN) to detect agricultural diseases and foliage infections from leaf photographs to support crop health.',
-      category: 'Machine Learning',
-      tags: ['Python', 'CNN', 'OpenCV', 'TensorFlow', 'AgriTech'],
-      url: 'https://github.com/harshit-001-it',
+      name: 'VedoraAI Trading Prediction Bot',
+      description: 'Quantitative algorithmic trading bot designed to analyze live financial chart data and forecast market direction using predictive AI modeling.',
+      category: 'AI & ML',
+      tags: ['Python', 'Financial Analytics', 'Trading Bot', 'AI Modeling'],
+      url: 'https://github.com/har-001/VedoraAI-Bot',
       liveUrl: null,
       featured: false,
-      icon: '🌿'
+      icon: '📈'
     },
     {
-      name: 'Autonomous n8n Multi-Portal Job Agent',
-      description: 'Multi-channel autonomous job search automation built with n8n workflow nodes, polling career portals, matching resume criteria, and delivering real-time candidate notifications via webhooks.',
-      category: 'Autonomous Workflows',
-      tags: ['n8n', 'Webhooks', 'API Automation', 'Python'],
-      url: 'https://github.com/har-001/Personal-Portfolio-Website',
-      liveUrl: 'ai-hub.html',
-      featured: false,
-      icon: '⚡'
-    },
-    {
-      name: 'Autonomous n8n Freelance Gig Radar',
-      description: 'Autonomous freelance opportunities aggregator polling remote freelance platforms, evaluating project budget matches, and automatically drafting tailored client proposals.',
-      category: 'Autonomous Workflows',
-      tags: ['n8n', 'Freelance APIs', 'Proposal Bot', 'Automation'],
-      url: 'https://github.com/har-001/Personal-Portfolio-Website',
-      liveUrl: 'ai-hub.html',
+      name: 'VedoraAI Platform',
+      description: 'Modern financial analytics platform empowering traders with algorithmic market insights and AI-driven trade execution pipelines.',
+      category: 'Web & 3D',
+      tags: ['Full-Stack', 'AI Trading', 'Python', 'Web Architecture'],
+      url: 'https://github.com/har-001/VedoraAI',
+      liveUrl: null,
       featured: false,
       icon: '💼'
     },
     {
-      name: 'Inamigos Foundation NGO Donation Portal & Web Modules',
-      description: 'Engineered responsive donation collection interfaces, campaign landing pages, and interactive UI modules for Inamigos Foundation during AI Web Development internship.',
-      category: 'Web & 3D',
-      tags: ['HTML5', 'CSS3', 'JavaScript', 'Responsive UI', 'NGO Portal'],
-      url: 'https://github.com/har-001/Personal-Portfolio-Website',
-      liveUrl: null,
-      featured: false,
-      icon: '🤝'
-    },
-    {
-      name: 'InternPe Modular Python Algorithmic Solutions',
-      description: 'Engineered optimized algorithmic modules, automated file processors, and core data structure workflows during Python Programming internship at InternPe.',
-      category: 'Systems & DB',
-      tags: ['Python 3', 'Data Structures', 'File I/O', 'Automation'],
-      url: 'https://github.com/har-001/Personal-Portfolio-Website',
-      liveUrl: null,
-      featured: false,
-      icon: '⚙️'
-    },
-    {
       name: 'Library Management System',
-      description: 'Administrative relational database application to manage complete library operations — adding books, issuing to students, and tracking borrowing and return records.',
+      description: 'Administrative relational database application engineered with Python and MySQL to handle book cataloging, student issues, and circulation records.',
       category: 'Systems & DB',
       tags: ['Python', 'MySQL', 'Relational DB', 'CRUD'],
-      url: 'https://github.com/har-001/Personal-Portfolio-Website',
+      url: 'https://github.com/harshit-001-it/Library-Management-System',
       liveUrl: null,
       featured: false,
       icon: '📚'
+    },
+    {
+      name: 'QR Code Generator Automation',
+      description: 'Automated utility script generating customized high-density QR codes for web links, documents, and network configurations.',
+      category: 'Systems & DB',
+      tags: ['Python', 'Automation', 'Utility', 'QR Encoding'],
+      url: 'https://github.com/har-001/Qr-Generator',
+      liveUrl: null,
+      featured: false,
+      icon: '📱'
+    },
+    {
+      name: 'NextGen AI Solutions',
+      description: 'Exploratory artificial intelligence repository containing neural model experiments, algorithm architectures, and next-generation AI tools.',
+      category: 'AI & ML',
+      tags: ['AI Modeling', 'Neural Networks', 'Python', 'Innovation'],
+      url: 'https://github.com/har-001/NextGen-AI-Solutions',
+      liveUrl: null,
+      featured: false,
+      icon: '⚡'
     }
   ];
 
-  const categories = ['All', 'Machine Learning', 'Autonomous Workflows', 'Web & 3D', 'Systems & DB'];
+  const categories = ['All', 'AI & ML', 'Systems & DB', 'Web & 3D'];
   if (filtersContainer) {
     filtersContainer.innerHTML = categories.map((c, i) => `
       <button class="filter-btn ${i === 0 ? 'active' : ''}" data-cat="${c}">${c}</button>
